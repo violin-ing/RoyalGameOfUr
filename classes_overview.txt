@@ -1,0 +1,4 @@
+- Board: Grid, 
+- Grid: Tile, 
+- Tile: Chip, chip amount
+- Chip: ownership, 

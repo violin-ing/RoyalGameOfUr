@@ -1,0 +1,10 @@
+- Board GUI class [Cole]
+    - Use 3 arrays/linked lists to represent the board
+    - Arrays with a custom type (Tile?), which tracks another custom type (Chip/ChipStack) as one of its properties
+    - Check if the chip is in the last square, and just win as long as the roll > 0
+- Controls class (which player, roll, choose highlighted square, update board, check score) [Cole]
+- Networking (passing 3 arrays?) [Eugene]
+- AI Player [Tristin]
+- Base game rules [Amanda]
+- Chip/ChipStack class (player, amount, safe?) [Cole]
+- JUnit? [Amanda]
