@@ -41,7 +41,7 @@ public class GraphicsTile extends JPanel {
     }
     // PATH WILL HAVE TO BE CHANGED SOON
     private void loadImage(String imageName) {
-        ImageIcon icon = new ImageIcon("./assets/" + imageName);
+        ImageIcon icon = new ImageIcon("./RoyalGameOfUr/src/impl/graphics/assets/" + imageName);
         Image result = icon.getImage();
         this.image = result;
     }

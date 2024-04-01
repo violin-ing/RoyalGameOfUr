@@ -6,6 +6,8 @@ public class CS1003UrGame {
     static Dice dice = new Dice();
     public static void main(String[] args) {
         Game game = new Game(currentBoard, futureBoard, counter, dice);
+        // gameGUI on a new thread?
+        GameGUI gameGUI = new GameGUI(game);
         game.start();
     }
 }

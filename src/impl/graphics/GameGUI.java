@@ -9,10 +9,13 @@ public class GameGUI extends JFrame {
     private static final int WINDOWWIDTH = 1200;
     private static final int WINDOWHEIGHT = 1000;
     private static final int BLOCKDIMENSION = 100;
+    private Dice dice = new Dice();
+    private Game game;
 
     // sets up the game screen on first run.
-    public GameGUI() {
+    public GameGUI(Game game) {
         addComponents();
+        this.game = game;
         this.setLayout(null);
         this.setSize(new Dimension(WINDOWWIDTH,WINDOWHEIGHT));
         this.setResizable(false);
@@ -50,22 +53,38 @@ public class GameGUI extends JFrame {
         // SET BOUNDS ON TEXT?!?!
         JButton rollButtonP1 = new JButton("ROLL");
         rollButtonP1.setBounds((WINDOWWIDTH/4)-200, (WINDOWHEIGHT/2)-200, 200, 75);
-        this.add(rollButtonP1);
         JLabel rollAmountP1 = new JLabel("0");
         rollAmountP1.setBounds((WINDOWWIDTH/4)-100, (WINDOWHEIGHT/2)-100, 200, 75);
+        rollButtonActionListener(rollButtonP1,rollAmountP1);
+        this.add(rollButtonP1);
         this.add(rollAmountP1);
+
         JButton rollButtonP2 = new JButton("ROLL");
         rollButtonP2.setBounds((WINDOWWIDTH/4)*3, (WINDOWHEIGHT/2)-200, 200, 75);
-        this.add(rollButtonP2);
         JLabel rollAmountP2 = new JLabel("0");
         rollAmountP2.setBounds((WINDOWWIDTH/4)*3+100, (WINDOWHEIGHT/2)-100, 200, 75);
+        rollButtonActionListener(rollButtonP2,rollAmountP2);
+        this.add(rollButtonP2);
         this.add(rollAmountP2);
+
         JLabel scoreP1 = new JLabel("Score: 7-0");
         scoreP1.setBounds((WINDOWWIDTH/4)-200, (WINDOWHEIGHT/2), 200, 75);
         this.add(scoreP1);
         JLabel scoreP2 = new JLabel("Score: 7-0");
         scoreP2.setBounds((WINDOWWIDTH/4)*3, (WINDOWHEIGHT/2), 200, 75);
         this.add(scoreP2);
+    }
+
+    public void rollButtonActionListener(JButton rollbutton, JLabel rollAmountText) {
+        rollbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // depending on the status of that button (waiting to select a move) / already selected move.
+                // some method will then need to be called which will change which other buttons are visible.
+                int rollAmount = dice.roll();
+                rollAmountText.setText("" + rollAmount);
+            }
+        });
     }
 
     public void addButtonActionListener(GraphicsButton button) {

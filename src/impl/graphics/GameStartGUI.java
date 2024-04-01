@@ -23,7 +23,7 @@ public class GameStartGUI extends JFrame {
 
     public void startGame() {
         closeFrame();
-        new GameGUI();
+        //new GameGUI();
     }
 
     public void addComponents() {
