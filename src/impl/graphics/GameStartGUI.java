@@ -35,7 +35,7 @@ public class GameStartGUI extends JFrame {
         } else if (network) {
             option.setText("Multiplayer (Network) Selected");
         } else {
-            option.setText("Singleplayer Selected");
+            option.setText("Singleplayer Selected");;
         }
         option.setBounds((WINDOWWIDTH/2)-100, WINDOWHEIGHT/2-100, 200, 100);
         startButton.setBounds((WINDOWWIDTH/2)-100,WINDOWHEIGHT/2,200,100);

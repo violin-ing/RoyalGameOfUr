@@ -14,6 +14,9 @@ public class Client {
      public static final int DEFAULT_PORT = 6969; // Server game port
      private final static int HEARTBEAT_PORT = 42069; // Heartbeat port
 
+     public int dieRollGetter;
+     public boolean rollPressed;
+
      /**
      * Initiates a 1v1 match by first discovering the game server via a broadcast message
      * and then establishing a TCP connection to participate in a match.
@@ -101,7 +104,6 @@ public class Client {
                               // 1. Read for dice roll and send user input to server
                               // 2. Read for move (ONLY if dice roll > 0)
                               // 3. Read for move again if the player ends up on a rosetta tile
-                              // Can use a do-while loop for the logic above (but must link up with server)
 
                               // PSEUDO-CODE:
                               // rollButtonP1.setVisible(true);
