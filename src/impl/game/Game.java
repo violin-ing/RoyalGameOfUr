@@ -55,7 +55,7 @@ public class Game {
             System.out.println(currentPlayer + " Please hit enter to roll");
 
             while(!rollPressed) {
-                System.out.println("nuh uh");
+                // System.out.println("nuh uh");
             }
 
             rollPressed = false;
