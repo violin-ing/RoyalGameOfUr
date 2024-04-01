@@ -1,12 +1,24 @@
 import java.util.Scanner;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+// General notes:
+// anywhere with a "system.out.println" message should be replaced with a call to the GUI to display the message, use general intuition to determine 
+
 public class Game {
-    Board board = new Board();
-    Counter counter = new Counter();
-    Dice dice = new Dice();
+    private Board currentBoard;
+    private Board futureBoard;
+    private Counter counter;
+    private Dice dice;
+
+    public Game(Board currentBoard, Board futureBoard, Counter counter, Dice dice) {
+        this.currentBoard = currentBoard;
+        this.futureBoard = futureBoard;
+        this.counter = counter;
+        this.dice = dice;
+    }
 
     Scanner scanner = new Scanner(System.in);
     Random random = new Random();
@@ -23,6 +35,9 @@ public class Game {
          *      The ability to check the result of a players movement (takedown, score, movement)
          *      The ability to check if a player has won
     */
+
+    public Board getCurrentBoard() {return this.currentBoard;}
+    public Board getFutureBoard() {return this.futureBoard;}
         
     public void start() {
         String currentPlayer = "";
@@ -44,35 +59,33 @@ public class Game {
 
             // TODO: Form part of gameloop that checks for valid moves, and returns a map of valid moves for the player to choose, then from those valid moves, ask which piece the player wants to move
 
-            Optional<HashMap<Integer, Integer>> validMoves = checkValidMoves(currentPlayer, roll);
-            if (!validMoves.isPresent()) {System.out.println("No moves available, passing turn."); continue;}
-            else {
-                 System.out.println("You can move to: ");
-            //    for (Optional<HashMap.Entry<Integer, Integer>> entry : validMoves.entrySet()) System.out.println("piece" + validMoves.getKey() + "can move " + validMoves.getValue() + ", ");
-            //          System.out.println("Please which piece you want to move player " + currentPlayer);
-            //          choiceInput = scanner.nextLine();
-            //          makeMove(choiceInput, roll);
-            }
+            availableMoves(currentPlayer, roll);
+            System.out.println(currentPlayer + " Please choose a move");
+            String targetPiece = scanner.nextLine();
+
         }
     }
 
 
-
     /**
-     * TODO: Method to check what moves they can make, and return as an optional map
-     * 
-     * Method to check the valid moves for a player
-     * It goes through each strip in the board array
-     * It stores what positions hold a chip of the current player and returns them ()
-     * @param currentPlayer
-     * @param roll
-     * @return <Optional<HashMap<Integer,Integer>> validMoves, we return optinonal in the case no valid moves are found, otherwise this will return the valid moves available for each chip
-     * @info I found that returning Optional<HashMap> was considered a "raw type" since it didn't have a type argument, just as a note
+     * We will check the current positions of each of the player's pieces through invoking ".identifyPieces()" on the current board instance returning a map of <strip, position> pairs
+     * We will then input those pairs into a future board instance for each piece
+     * We can then apply identifyPieces() to the future board instance in order to return a map of the moves available. A piece with an invalid move will remain in place (this is either useful or a hinderance)
+     *
+     * @see Board#identifyPieces(String) runs through each tile of each strip of the board and "puts" the strip and position in it into a map as <strip, position>, then returns it
      */
+    public void availableMoves(String player, int roll) {
+        this.futureBoard = this.currentBoard;   
+        Map<Integer,Integer> currentPositions = this.currentBoard.identifyPieces(player);
+    
+        futureBoard.pieceMover(player, roll, currentPositions);
+        Map<Integer,Integer> futurePositions = this.futureBoard.identifyPieces(player);
 
-     //THIS METHOD IS CURRENTLY USELESS, IT NEEDS TO BE IMPLEMENTED
-    public Optional<HashMap<Integer,Integer>> checkValidMoves(String currentPlayer, int roll) {
-        Optional<HashMap<Integer,Integer>> validMoves = Optional.of(new HashMap<Integer, Integer>());
-        return validMoves;
+        // for each piece in the currentPositions map, we will print the strip its in and the position it is in
+        System.out.println("You have pieces in the following positions:");
+
+        for (Map.Entry<Integer, Integer> entry : currentPositions.entrySet()) {
+            System.out.println("Strip: " + entry.getKey() + " Tile: " + entry.getValue());
+        }
     }
 }
