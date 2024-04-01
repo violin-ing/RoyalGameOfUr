@@ -12,7 +12,7 @@ public class Ai {
 
     static Map<String, String> behaviour = new HashMap<>();
 
-    public Game game = new Game(); // remove these when ai is added to base game
+    //public Game game = new Game(); // remove these when ai is added to base game
     public Dice dice = new Dice();
 
     public static String aiMode = "SPEEDY";
@@ -171,11 +171,6 @@ public class Ai {
         return values;
     }
 
-    public void calculateScore(String aiMode) {
-        game.checkValidMoves("ai", dice.roll());
-    
-    } 
-
     public static Node filterChildren(double expectimax) {
         List<Node> children = root.getChildren();
         for (Node c : children) {
@@ -191,7 +186,9 @@ public class Ai {
 
         while (filteredChildren.size() > 1) {
             for (String m : moves) {
-                if (children.stream().anyMatch(child -> child.getMove() == m)) {
+                if (filteredChildren.stream().anyMatch(child -> child.getMove().equals(m))) {
+                    System.out.println(m);
+                    System.out.println(filteredChildren.stream().anyMatch(child -> child.getMove().equals(m)));
                     filteredChildren = filteredChildren.stream()
                     .filter(child -> child.getMove() == m)
                     .toList();
