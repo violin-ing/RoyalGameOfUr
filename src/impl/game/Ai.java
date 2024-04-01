@@ -1,16 +1,39 @@
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Ai {
     private static Node root;
-    public static double[] ROLL_PERCENTAGES = {6.25, 25, 37.5, 25, 6.25};
+    public static double[] ROLL_PERCENTAGES = {0.0625, 0.25, 0.375, 0.25, 0.0625};
     public static int LEVELS = 4;
-    
-    public Ai() {
-        root = new Node(0, "max");
+
+    //String[] moves = {"MOVE", "ROSETTE", "ADD CHIP", "STACK", "TAKE CHIP", "WIN", "BLOCK"};
+    static String[] moves = {"MOVE", "TAKE CHIP", "STACK", "ADD CHIP"};
+    static String[] tactics = {"SPEEDY", "HOSTILE", "ATTRITION", "SNEAKY"};
+
+    static Map<String, String> behaviour = new HashMap<>();
+
+    public Game game = new Game(); // remove these when ai is added to base game
+    public Dice dice = new Dice();
+
+    public static String aiMode = "SPEEDY";
+
+    /* 
+    public Ai(String aiMode) {
+        this.aiMode = aiMode;
+    } */
+
+    public static Map<String, String> mapScores() {
+        //behaviour = new HashMap<>();
+
+        for (int i = 0; i < tactics.length; i++) {
+            behaviour.put(tactics[i], moves[i]);
+        }
+        System.out.println(behaviour);
+        return behaviour;
     }
 
     public static Node createTree() {
-        root =  new Node(0, "max");
+        root =  new Node(0, "max", null);
 
         Queue<Node> queue = new LinkedList<>();
         queue.add(root); // Add the root node to the queue
@@ -21,15 +44,16 @@ public class Ai {
 
             for (int i = 0; i < levelSize; i++) {
                 Node currentNode = queue.poll(); // Get the current node from the queue
-                int numChildren = getValidMoves();
 
-                for (int j = 0; j < numChildren; j++) {
+                for (int j = 0; j < getValidMoves().length; j++) {
                     Node childNode;
 
+                    String[] moves = getValidMoves();
+
                     if (LEVELS == 2) {
-                        childNode = new Node(getScore(), getNextType(currentNode));
+                        childNode = new Node(getScore(moves[j]), currentNode.getNextType(), moves[j]);
                     } else {
-                        childNode = new Node(0, getNextType(currentNode));
+                        childNode = new Node(0, currentNode.getNextType(), moves[j]);
                     }
 
                     currentNode.addChild(childNode); // Add the child node to the current node
@@ -42,28 +66,60 @@ public class Ai {
         return root;
     }
 
-    public static int getValidMoves() { //set to 3 for now --> need to get valid moves method
-        return 2;
-    }
-
-    public static int getScore() { //random for now --> need to calculate score
+    public static String[] getValidMoves() { //set to 3 for now --> need to get valid moves method
+        // get valid moves and store in string array as commands ("WIN", "TAKE CHIP", "STACK" ect)
+        // temporary values to test functionality
         Random random = new Random();
-        return random.nextInt(10) + 1;
+        int num = random.nextInt(3);
+        
+        switch (num) {
+            case 0:
+                String[] moves1 = {"TAKE CHIP", "STACK", "STACK"};
+                return moves1;
+            case 1:
+                String[] moves2 = {"MOVE", "TAKE CHIP", "ROSETTE"};
+                return moves2;
+            case 2:
+                String[] moves3 = {"STACK", "ADD CHIP", "MOVE"};
+                return moves3;
+            default:
+                String[] moves4 = {"MOVE"};
+                return moves4;
+        }
+        
     }
 
-    public static String getNextType(Node node) { // move to nodes?
-        switch (node.getType()) {
-            case "max":
-                return "roll";
+    /* 
+    public static int getScore(String move) { //random for now --> need to calculate score
+        //Random random = new Random();
+        //return random.nextInt(10) + 1;
 
-            case "roll":
-                return "min";
-            
-            case "min":
-                return "max";
+        int Score = 0;
+        System.out.println(behaviour.get(aiMode));
 
+        if (move.equals(behaviour.get(aiMode))) {
+            Score += 3;
+        } else {
+            Score += 1;
+        }
+
+        System.out.println(Score + ":" + move);
+
+
+        return Score;
+    } */
+
+    public static int getScore(String move) {
+        int score = 0;
+        
+        switch(move) {
+            case "TAKE CHIP":
+            case "STACK":
+            case "ROSETTE":
+                score--;
+                return score;
             default:
-                return "";
+                return score;
         }
     }
 
@@ -72,54 +128,93 @@ public class Ai {
         for (int i = 0; i < level; i++) {
             System.out.print("\t");
         }
-        System.out.println(node.getType() + ": " + node.getValue());
+        System.out.println(node.getType() + ": " + node.getValue() + ": " + node.getMove());
         for (Node child : node.getChildren()) {
             printTree(child, level + 1);
         }
     }
 
-    public static float expectimax(Node node, String type) {
+    public static double expectiminimax(Node node, String type) {
         if (node.getChildren().isEmpty()) {
             return node.getValue();
         }
 
-        List<Float> values = new ArrayList<>();
+        List<Double> values;
 
         switch (type) {
             case "max":
-                for (Node n : node.getChildren()) {
-                    float v = expectimax(n, "roll");
-                    values.add(v);
-                    n.setValue(v);
-                }
-                return (float) Collections.max(values);
+                values = iterateChildren(node, node.getNextType());
+                return (double) Collections.max(values);
 
             case "min":
-                for (Node n : node.getChildren()) {
-                    float v = expectimax(n, "roll");
-                    values.add(v);
-                    n.setValue(v);
-                }
-                return (float) Collections.min(values);
+                values = iterateChildren(node, node.getNextType());
+                return (double) Collections.min(values);
 
             case "roll":
-                for (Node n : node.getChildren()) {
-                    float v = expectimax(n, "min");
-                    values.add(v);
-                    n.setValue(v);
-                } 
-                return (float) values.stream().mapToDouble(Float::doubleValue).average().orElse(0.0);
+                values = iterateChildren(node, node.getNextType());
+                return IntStream.range(0, values.size()).mapToDouble(i -> values.get(i) * ROLL_PERCENTAGES[i]).sum();
             
             default:
                 return 0;
         }
     }
 
+    public static List<Double> iterateChildren(Node node, String type) {
+        List<Double> values = new ArrayList<>();
+        
+        for (Node child : node.getChildren()) {
+            double value = expectiminimax(child, type);
+            values.add(value);
+            child.setValue(value);
+        }
+
+        return values;
+    }
+
+    public void calculateScore(String aiMode) {
+        game.checkValidMoves("ai", dice.roll());
+    
+    } 
+
+    public static Node filterChildren(double expectimax) {
+        List<Node> children = root.getChildren();
+        for (Node c : children) {
+            System.out.println(c.getValue());
+        }
+
+        List<Node> filteredChildren = children.stream()
+        .filter(child -> child.getValue() == expectimax)
+        .toList(); // Collect the filtered objects into a new ArrayList
+        for (Node c : filteredChildren) {
+            System.out.println(c.getValue());
+        }
+
+        while (filteredChildren.size() > 1) {
+            for (String m : moves) {
+                if (children.stream().anyMatch(child -> child.getMove() == m)) {
+                    filteredChildren = filteredChildren.stream()
+                    .filter(child -> child.getMove() == m)
+                    .toList();
+                }
+            }
+        }
+
+        if (!filteredChildren.isEmpty()) {
+            return filteredChildren.get(0); // Return the first element if not empty
+        } else {
+            return null; // Return null if filteredChildren is empty
+        }
+    }
+
     public static void main(String[] args) {
+        //Ai ai = new Ai("SPEEDY");
+        behaviour = mapScores();
         Node root = createTree();
-        printTree(root, 0);
-        float expectimax = expectimax(root, "max");
+        double expectimax = expectiminimax(root, "max");
         System.out.println(expectimax);
         printTree(root, 0);
+
+        Node bestChild = filterChildren(expectimax);
+        System.out.println(bestChild.getValue() + bestChild.getMove());
     }
 }
