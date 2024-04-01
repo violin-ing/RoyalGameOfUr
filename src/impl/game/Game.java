@@ -1,8 +1,4 @@
-import java.util.Scanner;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 // General notes:
 // anywhere with a "system.out.println" message should be replaced with a call to the GUI to display the message, use general intuition to determine 
@@ -46,9 +42,7 @@ public class Game {
     public void start() {
         String currentPlayer = "";
 
-        while (true) {
-            boolean hasRolled = false;
-            
+        while (true) {         
             currentPlayer = counter.getPlayerTurn();
             gui.changePlayerTurn(currentPlayer);
             // method to change the P1/P2 value for GUI
