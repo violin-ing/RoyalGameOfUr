@@ -34,8 +34,6 @@ public class Server {
                     Socket player1 = serverSocket.accept();
                     System.out.println("Server: " + player1.getInetAddress().getHostAddress() + " has connected.");
 
-                    // player1.setSoTimeout(60000); // Set timeout to 60 seconds
-
                     try (PrintWriter player1Out = new PrintWriter(player1.getOutputStream(), true);
                          BufferedReader player1In = new BufferedReader(new InputStreamReader(player1.getInputStream()));) {
                          
@@ -43,8 +41,6 @@ public class Server {
 
                          Socket player2 = serverSocket.accept();
                          System.out.println("Server: " + player2.getInetAddress().getHostAddress() + " has connected.");
-
-                         // player2.setSoTimeout(60000);
 
                          try (PrintWriter player2Out = new PrintWriter(player2.getOutputStream(), true);
                               BufferedReader player2In = new BufferedReader(new InputStreamReader(player2.getInputStream()));) {
