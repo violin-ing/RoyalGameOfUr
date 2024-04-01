@@ -1,5 +1,0 @@
-- Create a server
-- In a 1v1 game, both players connect to the server 
-- The game will only start when there are two players connected to the game
-- If one player leaves and the connection breaks, the other player automatically wins (game over criteria)
-- Each player will send their moves to the server, which will update the board and send the updated state to both players
