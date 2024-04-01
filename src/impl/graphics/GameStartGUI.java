@@ -8,10 +8,11 @@ import javax.swing.*;
 public class GameStartGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
     private static final int WINDOWHEIGHT = 500;
-    private boolean muliplayer;
+    private boolean muliplayer, network;
 
-    public GameStartGUI(boolean muliplayer) {
+    public GameStartGUI(boolean muliplayer, boolean network) {
         this.muliplayer = muliplayer;
+        this.network = network;
         addComponents();
         this.setLayout(null);
         this.setSize(new Dimension(WINDOWWIDTH,WINDOWHEIGHT));
@@ -30,7 +31,9 @@ public class GameStartGUI extends JFrame {
         JButton startButton = new JButton("Start Game");
         JLabel option = new JLabel();
         if (muliplayer) {
-            option.setText("Multiplayer Selected");
+            option.setText("Multiplayer (Local) Selected");
+        } else if (network) {
+            option.setText("Multiplayer (Network) Selected");
         } else {
             option.setText("Singleplayer Selected");
         }
