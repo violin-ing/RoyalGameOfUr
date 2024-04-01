@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class Board {
     private Counter counter = new Counter();
     
@@ -55,15 +58,16 @@ public class Board {
     // Iterates through each possible position a player chip could be, and passes the ownership, roll, and wanted piece to the moveLogic method
     // so that it can handle with identifying the strip the chip is in, and moving it to the specified location
     
-    public void pieceMover(String player, int roll, int wantedPiece) {
+    public void pieceMover(String player, int roll, Map<Integer, Integer> wantedPiece) {
         if (player.equals("P1")) {
-            for (Tile tile : p1Strip) moveLogic(tile, player, roll, wantedPiece, "p1Strip");
-            for (Tile tile : midStrip) moveLogic(tile, player, roll, wantedPiece, "midStrip");
+            for (Tile tile : p1Strip) moveLogic(tile, player, roll, wantedPiece, "p1Strip");        //We can call {p1, p2, mid}strip as it is a property of this class
         }
+    
         else if (player.equals("P2")) {
             for (Tile tile : p2Strip) moveLogic(tile, player, roll, wantedPiece, "p2Strip");
-            for (Tile tile : midStrip) moveLogic(tile, player, roll, wantedPiece, "midStrip");
         }
+
+        for (Tile tile : midStrip) moveLogic(tile, player, roll, wantedPiece, "midStrip");
     }
 
     /**
@@ -74,7 +78,8 @@ public class Board {
      * There is a difference between your current position being in the first / second section of the strip vs your current position + roll. 
      * If the former, you move within that strip, if the latter, you move to the next strip
      * 
-     * We check what strip (p1, p2, or midstrip) we are meant to reference tiles from, then we check if the chip belongs to the player and is the one they want to move
+     * We check what strip (p1, p2, or midstrip) we are meant to reference tiles from, then we check if the chip belongs to the player and is the one they want to move 
+     * (by matching the current strip to the wanted strip through piece.getKey() and the current tile to the wanted tile through piece.getValue())
      * If they are currently within section one of the player strip, we check if their roll will move them out of it, and move them onto midstrip, otherwise just move them within section one 
      * If they are currently within section two, we check if their roll will lead them to cheque the chip and leave section two, or just move within section 2
      * If they are currently within the midstrip, we check if their roll will lead them to move into section two of the player strip, or just move within the midstrip
@@ -82,7 +87,7 @@ public class Board {
      * @param tile we pass in each tile in the strip specified
      * @param player the player that is moving the chip, important for checking ownership
      * @param roll the number of positions the chip will move
-     * @param wantedPiece the position containing a piece that player has chosen to move with however many movement points they have (based on roll)
+     * @param wantedPiece a map containing the strip and tile of the chip they want to move, we turn this into a map.entry set to get the key and value
      * @param strip the strip the chip is in
      * 
      * @see movePlayerStrip this handles checking if a chip originated from a player strip and will move within that strip, or transfer to the midstrip. It also checks if a piece is returning from the midstrip to the player strip
@@ -90,29 +95,34 @@ public class Board {
      * @see clearPreviousPosition this resets the ownership of the previous position of the chip to none
      */
 
-    private void moveLogic(Tile tile, String player, int roll, int wantedPiece, String strip) {
-        int currentPosition = tile.getPos();                        //So far we know what array the chip is in, and what position it is in that array
+     //TODO: Map.Entry<Integer, Integer> line does not find the first key value pair in the mapping, it instead finds nothing. The map is somehow empty
 
+    private void moveLogic(Tile tile, String player, int roll, Map<Integer,Integer> piecePos, String strip) {
+        int currentPosition = tile.getPos();                                                                //So far we know what array the chip is in, and what position it is in that array
+        
+        Map.Entry<Integer, Integer> wantedPiece = piecePos.entrySet().stream().findFirst().get(); //Finds the first (albeit only) key value pair in mapping through streams. Allows us to call .getValue() and .getKey()
+
+        //Check if the player owns this chip, that it is the tile they want to move, and that it is in the correct strip
         if (strip.equals("p1Strip") || strip.equals("p2Strip")) {
-            if (tile.getChip().getOwnership().equals(player) && currentPosition == wantedPiece) { 
-                if (currentPosition <= lengthOfPlayerStripSectionOne) {                                     // within section one of the player strip                
+            if (tile.getChip().getOwnership().equals(player) && (currentPosition == wantedPiece.getValue() && (wantedPiece.getKey() == 0 || wantedPiece.getKey() == 2))) {  
+                if (currentPosition <= lengthOfPlayerStripSectionOne) {                                                                                                  // is checking within section one of the player strip                
                     if (currentPosition + roll >= lengthOfPlayerStripSectionOne) {moveMidStrip(tile, currentPosition, roll, player, "from pStrip");}            // Move from section one of player strip to midstrip       
                     else if (currentPosition + roll < lengthOfPlayerStripSectionOne) {movePlayerStrip(tile, currentPosition, roll, player, "in pStrip");}       // Move within section one of player strip
                 }
 
-                else if (currentPosition > lengthOfPlayerStripSectionOne) {                                 // within section two of the player strip
-                    if (currentPosition + roll >= lengthOfPlayerStrip) {                                   //  cheque the chip
-                        counter.pointScorer("P1"); 
+                else if (currentPosition > lengthOfPlayerStripSectionOne) {                                                                                              // is checking within section two of the player strip
+                    if (currentPosition + roll >= lengthOfPlayerStrip) {                                                                                                 //  cheque the chip
+                        counter.pointScorer(player); 
                         clearPreviousPosition(tile); 
                     }
-                    else if (currentPosition + roll < lengthOfPlayerStrip) {movePlayerStrip(tile, currentPosition, roll, player, "in pStrip");} // Move within section two of player strip
+                    else if (currentPosition + roll < lengthOfPlayerStrip) {movePlayerStrip(tile, currentPosition, roll, player, "in pStrip");}                 // Move within section two of player strip
                 }
             }
         }
-        if (strip.equals("midStrip")) {                                                             // within the midstrip
-            if (tile.getChip().getOwnership().equals(player) && currentPosition == wantedPiece) { 
-                if (currentPosition + roll >= lengthOfMidStrip) {movePlayerStrip(tile, currentPosition, roll, player, "from midStrip");}                // Move from midstrip to section two of player strip
-                else if (currentPosition + roll < lengthOfPlayerStripSectionOne) {moveMidStrip(tile, currentPosition, roll, player, "from midStrip");}  // Move within midstrip
+        if (strip.equals("midStrip")) {                                                                                                                         // is checking within the midstrip
+            if (tile.getChip().getOwnership().equals(player) && currentPosition == wantedPiece.getValue()) { 
+                if (currentPosition + roll >= lengthOfMidStrip) {movePlayerStrip(tile, currentPosition, roll, player, "from midStrip");}                        // Move from midstrip to section two of player strip
+                else if (currentPosition + roll < lengthOfPlayerStripSectionOne) {moveMidStrip(tile, currentPosition, roll, player, "from midStrip");}          // Move within midstrip
             }
         }   
 }
@@ -169,5 +179,19 @@ public class Board {
     private void clearPreviousPosition(Tile tile) {
         tile.getChip().setOwnership("none");
         tile.getChip().setAmn(0);
+    }
+
+
+    public Map<Integer, Integer> identifyPieces(String player) {
+        Map<Integer, Integer> pieces = new HashMap<>();
+
+        for (int i = 0; i < 3; i++) {
+            for (Tile tile : this.board[i]) {
+                if (tile.getChip().getOwnership().equals(player)) {
+                    pieces.put(i, tile.getPos());
+                }    
+            }
+        }
+        return pieces;
     }
 }
