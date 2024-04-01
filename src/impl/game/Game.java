@@ -12,6 +12,10 @@ public class Game {
     private Board futureBoard;
     private Counter counter;
     private Dice dice;
+    private GameGUI gui;
+    //TEMP
+    public int rollAmount;
+    public boolean rollPressed = false;
 
     public Game(Board currentBoard, Board futureBoard, Counter counter, Dice dice) {
         this.currentBoard = currentBoard;
@@ -41,27 +45,26 @@ public class Game {
         
     public void start() {
         String currentPlayer = "";
-        int roll = 0;
 
         while (true) {
             boolean hasRolled = false;
             
             currentPlayer = counter.getPlayerTurn();
+            gui.changePlayerTurn(currentPlayer);
+            // method to change the P1/P2 value for GUI
             System.out.println(currentPlayer + " Please hit enter to roll");
 
-            while (!hasRolled) {
-                if (scanner.nextLine().equals(rollInput)) {
-                    roll = dice.roll();
-                    System.out.println("You rolled a " + roll + "!");
-                    hasRolled = true;
-                }
+            while(!rollPressed) {
+                System.out.println("nuh uh");
             }
 
+            rollPressed = false;
             // TODO: Form part of gameloop that checks for valid moves, and returns a map of valid moves for the player to choose, then from those valid moves, ask which piece the player wants to move
-
-            availableMoves(currentPlayer, roll);
-            System.out.println(currentPlayer + " Please choose a move");
-            String targetPiece = scanner.nextLine();
+            System.out.println("ROLL: " + rollAmount);
+            availableMoves(currentPlayer, rollAmount);
+            // System.out.println(currentPlayer + " Please choose a move");
+            // String targetPiece = scanner.nextLine();
+            break;
 
         }
     }
@@ -87,5 +90,9 @@ public class Game {
         for (Map.Entry<Integer, Integer> entry : currentPositions.entrySet()) {
             System.out.println("Strip: " + entry.getKey() + " Tile: " + entry.getValue());
         }
+    }
+
+    public void setGameGUI(GameGUI gui) {
+        this.gui = gui;
     }
 }

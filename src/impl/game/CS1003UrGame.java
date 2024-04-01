@@ -8,6 +8,7 @@ public class CS1003UrGame {
         Game game = new Game(currentBoard, futureBoard, counter, dice);
         // gameGUI on a new thread?
         GameGUI gameGUI = new GameGUI(game);
+        game.setGameGUI(gameGUI);
         game.start();
     }
 }
