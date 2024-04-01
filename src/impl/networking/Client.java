@@ -104,45 +104,48 @@ public class Client {
                               // Can use a do-while loop for the logic above (but must link up with server)
 
                               // PSEUDO-CODE:
-                              // set GUI to clickable
-                              // boolean rosettaTile = false;
-                              //
-                              // String diceRoll = GUI dice roll shit;
-                              // out.println(diceRoll);
-                              // Thread.sleep(500);
-                              //
-                              // int diceNum = Integer.parseInt(diceRoll);
-                              // 
-                              // if (diceNum > 0) {
-                              //      do {
-                              //           String move = GUI chip move shit
-                              //           p1Out.println(move);
-                              //           rosettaTile = (currentTile.rosetta) ? true : false;
-                              //           Thread.sleep(500);
-                              //      } while (rosetta);
-                              // } 
-                              // 
-                              // myTurn.set(false); // Reset turn after sending message
+                              // rollButtonP1.setVisible(true);
+                              boolean rosetta = false;
+                              
+                              // String diceRoll = 
+                              String diceRoll = "-1";
+                              out.println(diceRoll);
+                              Thread.sleep(500);
+                              
+                              int diceNum = Integer.parseInt(diceRoll);
+                              
+                              if (diceNum > 0) {
+                                   do {
+                                        // String move = GUI chip move shit
+                                        // Tile currentTile = last destination tile;
+                                        // String move = "move";
+                                        // out.println(move);
+                                        // rosetta = (currentTile.isRosetta()) ? true : false;
+                                        Thread.sleep(500);
+                                   } while (rosetta);
+                              } 
+                              
+                              myTurn.set(false); // Reset turn after sending message
                               // check for win message
-                              // set GUI to unclickable
+                              // rollButtonP1.setVisible(false);
                               
                          } else {
                               // 1. Read opponent's dice roll and update GUI
                               // 2. Read opponent's move and update GUI
                               
                               // PSEUDO-CODE:
-                              // boolean opponentTurn = true
-                              // String dieRollStr = in.readLine();
+                              boolean opponentTurn = true;
+                              String dieRollStr = in.readLine();
                               // update local GUI with opponent's roll 
-                              // int dieRoll = Integer.parseInt(dieRollStr);
-                              // if (dieroll > 0) {
-                              //      do {
-                              //           String move = in.readLine();
-                              //           update local GUI with opponent's move
-                              //           opponentTurn = (currentTile.rosetta) ? true : false;
-                              //           Thread.sleep(500);
-                              //      } while (opponentTurn)
-                              // }
+                              int dieRoll = Integer.parseInt(dieRollStr);
+                              if (dieRoll > 0) {
+                                   do {
+                                        String move = in.readLine();
+                                        // update local GUI with opponent's move 0 -> use a mini panel
+                                        // opponentTurn = (currentTile.rosettaTile) ? true : false;
+                                        Thread.sleep(500);
+                                   } while (opponentTurn);
+                              }
                               // check if opponent has won (should get losing message if so)
                          }
                     }
