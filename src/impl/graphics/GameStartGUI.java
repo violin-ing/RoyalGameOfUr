@@ -3,7 +3,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
-//TODO: make interface for frame
+// TODO: make interface for frame
 // render this on a new thread 
 public class GameStartGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
@@ -34,6 +34,11 @@ public class GameStartGUI extends JFrame {
             option.setText("Multiplayer (Local) Selected");
         } else if (network) {
             option.setText("Multiplayer (Network) Selected");
+            // Start connecting to server immediately (no need for a start button)
+            Client.initiateMatch();
+            if (Client.matchFound) {
+                startGame(); // No need to wait for the user to press start game
+            }
         } else {
             option.setText("Singleplayer Selected");;
         }

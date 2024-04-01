@@ -18,7 +18,7 @@ public class Client {
 
      public int dieRollGetter;
      public static boolean rollPressed;
-     public static boolean matchFound;
+     public static boolean matchFound = false;
 
      /**
      * Initiates a 1v1 match by first discovering the game server via a broadcast message
@@ -97,7 +97,7 @@ public class Client {
                               while ((fromServer = in.readLine()) != null) {
                                    // System.out.println("Server: " + fromServer);
                                    if ("Match found!".equals(fromServer)) {
-                                        
+                                        matchFound = true;
                                    }
 
                                    if ("Your turn:".equals(fromServer.trim())) {
