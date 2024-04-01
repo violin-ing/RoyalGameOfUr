@@ -100,6 +100,7 @@ public class GameGUI extends JFrame {
                 rollAmountText.setText("" + rollAmount);
                 game.rollAmount = rollAmount;
                 game.rollPressed = true;
+                
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
             }
         });
