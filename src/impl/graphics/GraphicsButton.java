@@ -14,6 +14,8 @@ public class GraphicsButton extends JButton {
     // ALL OF THESE ARE GREEN BY DEFAULT?!?!?!
     private final int xPosition;
     private final int yPosition;
+    private boolean selectable;
+    private static boolean tileSelected;
 
     public GraphicsButton(int x, int y) {
         this.xPosition = x;
@@ -27,14 +29,19 @@ public class GraphicsButton extends JButton {
         this.setVisible(false);
     }
 
-    // public void addActionListenerToButton() {
-    //     this.addActionListener(new ActionListener() {
-    //         @Override
-    //         public void actionPerformed(ActionEvent e) {
-    //             System.out.println("CLICKED");
-    //         }
-    //     });
-    // }
+    public void setButtonSelectable() {
+        this.setBorder(BorderFactory.createLineBorder(Color.GREEN,5));
+        this.setEnabled(true);
+        this.setVisible(true);
+    }
 
-    // method with action listener to register a click on roll and update the roll value.
+    public void setButtonFutureSelectable() {
+        this.setBorder(BorderFactory.createLineBorder(Color.ORANGE,5));
+        this.setEnabled(false);
+        this.setVisible(true);
+    }
+
+    public void setButtonInvisible(){
+        this.setVisible(false);
+    }
 }

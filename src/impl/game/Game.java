@@ -46,16 +46,39 @@ public class Game {
             currentPlayer = counter.getPlayerTurn();
             gui.changePlayerTurn(currentPlayer);
             // method to change the P1/P2 value for GUI
-            System.out.println(currentPlayer + " Please hit enter to roll");
 
             while(!rollPressed) {
-                // System.out.println("nuh uh");
+                System.out.println("Waiting for roll input");
             }
 
-            rollPressed = false;
-            // TODO: Form part of gameloop that checks for valid moves, and returns a map of valid moves for the player to choose, then from those valid moves, ask which piece the player wants to move
+            //pass current roll amount and player to available moves
+            // available moves should also calculate if the player can add a token to the board:
+            //  - this can be done if the roll amount does not == 0 
+            //  - and the player has at least 1 token in reserve
             System.out.println("ROLL: " + rollAmount);
-            availableMoves(currentPlayer, rollAmount);
+            rollPressed = false;
+
+            // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
+            if (rollAmount == 0) {
+                continue;
+            } else {
+                availableMoves(currentPlayer, rollAmount);
+            }
+            
+
+            //this will return the map of current and furture positions (being the current positions of tiles on the board, and the positions they can be moved)
+
+
+
+            // send these values to the GUI, update screen to have green boarders around tile which can be moved, and orange (non-clickable boarders), around where they are going
+            // make it so if you select a tile (that is green) you can then click the move location, but you can also still click other tiles which can be moved. (MAYBE MAKE ANOTHER CLASS?! or just an attribute of GraphicsTile)
+
+            // return selected move by GUI 
+            // send this move to movelogic to actually make it move.
+            // send the new updated board to GUI so that it can be updated (along with score etc.)
+
+
+            // TODO: Form part of gameloop that checks for valid moves, and returns a map of valid moves for the player to choose, then from those valid moves, ask which piece the player wants to move
             // System.out.println(currentPlayer + " Please choose a move");
             // String targetPiece = scanner.nextLine();
             break;
@@ -72,19 +95,69 @@ public class Game {
      * @see Board#identifyPieces(String) runs through each tile of each strip of the board and "puts" the strip and position in it into a map as <strip, position>, then returns it
      */
     public void availableMoves(String player, int roll) {
+        int currentPlayerCounter;
+        if (player.equals("P1")) {
+            currentPlayerCounter = counter.getP1Counter();
+        } else {
+            currentPlayerCounter = counter.getP2Counter();
+        }
+
         this.futureBoard = this.currentBoard;   
-        Map<Integer,Integer> currentPositions = this.currentBoard.identifyPieces(player);
+        List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, this.currentBoard.identifyPieces(player), currentPlayerCounter);
     
-        futureBoard.pieceMover(player, roll, currentPositions);
-        Map<Integer,Integer> futurePositions = this.futureBoard.identifyPieces(player);
+        //futureBoard.pieceMover(player, roll, currentPositions);
+        List<int[]> futurePositions = this.futureBoard.identifyPieces(player);
+
+        gui.updateSelectableTiles(currentMovablePositions, futurePositions);
 
         // for each piece in the currentPositions map, we will print the strip its in and the position it is in
-        System.out.println("You have pieces in the following positions:");
+        System.out.println("You have the following MOVEABLE Pieces");
 
-        for (Map.Entry<Integer, Integer> entry : currentPositions.entrySet()) {
-            System.out.println("Strip: " + entry.getKey() + " Tile: " + entry.getValue());
-        }
+        // for (Map.Entry<Integer, Integer> entry : currentMovablePositions.entrySet()) {
+        //     System.out.println("Strip: " + entry.getKey() + " Tile: " + entry.getValue());
+        // }
     }
+
+        // this will check if a particular chip on the board is movable.
+    // TODO: make a method which will calculate where this particular piece will be moved (edit the above method).
+
+    public List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {
+        List<int[]> currentMovablePositions = new ArrayList<>();
+        int[] stringPos = new int[2];
+
+        for (int[] stripAndPos : currentPositions) {
+            if (isMoveable(player, roll, stripAndPos[1], stripAndPos[0])) {
+                currentMovablePositions.add(stripAndPos);
+            }
+        }
+        // this will add a possible move for a player to move a token onto the board.
+        if (player.equals("P1")) {
+            if (tileCounter != 0) {
+                stringPos[0] = 0;
+                stringPos[1] = -1;
+                currentMovablePositions.add(stringPos);
+            }
+        } else {
+            if (tileCounter !=0 ) {
+                stringPos[0] = 2;
+                stringPos[1] = -1;
+                currentMovablePositions.add(stringPos);
+            }
+        }
+
+        return currentMovablePositions;
+    }
+
+    public void getFuturePositions() {
+        
+    }
+
+    // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
+    private boolean isMoveable(String player, int roll, int movePosition, int strip) {
+        // validiation of moves happens, here, so the above method can be simplified more easily.
+        return false;
+    }
+
 
     public void setGameGUI(GameGUI gui) {
         this.gui = gui;

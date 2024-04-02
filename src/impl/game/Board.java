@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Board {
@@ -52,6 +54,7 @@ public class Board {
 
 
     // TODO: pieceMover method requires valid move checker so that user knows what piece can be implemented, provide wanted chip prevalidated before it enters pieceMover
+    // TODO: make it so that adding token to the board is always an available move under certain circumstances.
     // Ensure an array of valid moves is returned by the checker, and then lists them to the user, and loops until they choose one of the options
 
     // Will handle movement through the arrays
@@ -59,6 +62,9 @@ public class Board {
     // so that it can handle with identifying the strip the chip is in, and moving it to the specified location
     
     public void pieceMover(String player, int roll, Map<Integer, Integer> wantedPiece) {
+        // loop through all the pieces in the current board, if p1, only check p1 string and middle, if p2 only check p2 and middle
+        // we then want to update this current board to only have all available moves.
+        // we also need to do an additional check to see if we can add a token to the board in the availalbe moves.
         if (player.equals("P1")) {
             for (Tile tile : p1Strip) moveLogic(tile, player, roll, wantedPiece, "p1Strip");        //We can call {p1, p2, mid}strip as it is a property of this class
         }
@@ -181,14 +187,16 @@ public class Board {
         tile.getChip().setAmn(0);
     }
 
-
-    public Map<Integer, Integer> identifyPieces(String player) {
-        Map<Integer, Integer> pieces = new HashMap<>();
+    public List<int[]> identifyPieces(String player) {
+        List<int[]> pieces = new ArrayList<>();
+        int[] stripPos = new int[2];
 
         for (int i = 0; i < 3; i++) {
             for (Tile tile : this.board[i]) {
                 if (tile.getChip().getOwnership().equals(player)) {
-                    pieces.put(i, tile.getPos());
+                    stripPos[0] = i;
+                    stripPos[1] = tile.getPos();
+                    pieces.add(stripPos);
                 }    
             }
         }

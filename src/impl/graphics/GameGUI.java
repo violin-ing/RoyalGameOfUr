@@ -1,6 +1,8 @@
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.*;
 // TODO: make interface for frame
@@ -14,6 +16,8 @@ public class GameGUI extends JFrame {
     private Game game;
     private JButton rollButtonP1;
     private JButton rollButtonP2;
+    private GraphicsButton[][] buttonArray;
+    private GraphicsTile[][] componentsArray;
 
     // sets up the game screen on first run.
     public GameGUI(Game game) {
@@ -28,8 +32,8 @@ public class GameGUI extends JFrame {
     }
     // adds all required components to the screen.
     public void addComponents() {
-        GraphicsTile[][] componentsArray = new GraphicsTile[3][8];
-        GraphicsButton[][] buttonArray = new GraphicsButton[3][8];
+        componentsArray = new GraphicsTile[3][8];
+        buttonArray = new GraphicsButton[3][8];
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 8; y++) {
                 // check if tile is a rosette tile.
@@ -50,10 +54,7 @@ public class GameGUI extends JFrame {
             }
         }
 
-        componentsArray[1][2].updateImage(3, "P2");
-        buttonArray[1][2].setVisible(true);
-        //TODO: maybe add methods to 
-        // SET BOUNDS ON TEXT?!?!
+        // create roll buttons and add them to the screen.
         rollButtonP1 = new JButton("ROLL");
         rollButtonP1.setBounds((WINDOWWIDTH/4)-200, (WINDOWHEIGHT/2)-200, 200, 75);
         JLabel rollAmountP1 = new JLabel("0");
@@ -110,7 +111,6 @@ public class GameGUI extends JFrame {
                 rollAmountText.setText("" + rollAmount);
                 game.rollAmount = rollAmount;
                 game.rollPressed = true;
-                
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
             }
         });
@@ -129,5 +129,35 @@ public class GameGUI extends JFrame {
 
     public void closeFrame() {
         this.dispose();
+    }
+
+    public void updateSelectableTiles(List<int[]> currentMovable, List<int[]> futureMovable) {
+        int buttonPosition;
+        int strip;
+        int[] playerStringPos = {3,2,1,0};
+        int[] playerStringBottonPos = {7,6};
+        for (int[] stripPlace: currentMovable) {
+            strip = stripPlace[0];
+            if (strip == 0 || strip == 2) {
+                //side strips, this ensures the correct tile is chosen for position in our strip array.
+                if (stripPlace[1] == -1) {
+                    buttonPosition = 4;
+                    // CHANGE FOR CURRENT PLAYER!!!
+                    componentsArray[strip][buttonPosition].updateImage(1, player);
+                } else if(stripPlace[1] >= 0 || stripPlace[1] <= 3) {
+                    buttonPosition = playerStringPos[stripPlace[1]];
+                } else {
+                    buttonPosition = playerStringBottonPos[stripPlace[1]-4];
+                }
+            } else {
+                buttonPosition = stripPlace[1];
+            }
+            buttonArray[strip][buttonPosition].setButtonSelectable();
+        }
+        // do the same as above but for the futureMovable tiles.
+    }
+
+    public void updateBoard() {
+        // this will update the sprites on the board after a move has been made.
     }
 }
