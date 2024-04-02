@@ -128,7 +128,7 @@ public class Client {
                     serverListener.start();
 
                     if (matchFound) {
-                         // Start game + launch GUI
+                         // Launch singleplayer game (should be the same as AI)
                     }
 
                     // Main thread deals with sending messages to server
