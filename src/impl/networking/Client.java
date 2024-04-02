@@ -24,7 +24,7 @@ public class Client {
 
      public Client(GameGUI gui) {
           this.gui = gui;
-          initiateMatch(gui);
+          initiateMatch(this.gui);
      }
 
      /**
