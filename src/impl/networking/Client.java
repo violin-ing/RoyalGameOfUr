@@ -2,6 +2,8 @@ import java.io.*;
 import java.net.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.swing.SwingUtilities;
+
 /**
  * The {@code Client} class handles the client-side logic for connecting to a game server
  * for a 1v1 match, including discovering the server via a broadcast message, establishing
@@ -14,8 +16,13 @@ public class Client {
      public static final int DEFAULT_PORT = 6969; // Server game port
      private final static int HEARTBEAT_PORT = 42069; // Heartbeat port
 
-     public int dieRollGetter;
-     public boolean rollPressed;
+     public static int diceRollGetter;
+     public static boolean rollPressed;
+     public static boolean matchFound = false;
+
+     public Client() {
+          
+     }
 
      /**
      * Initiates a 1v1 match by first discovering the game server via a broadcast message
@@ -26,18 +33,33 @@ public class Client {
      */
      public static void initiateMatch() {
           try {
+               // Connecting to server display
+               ServerConnectionGUI frame = ServerConnectionGUI.display();
+
+               matchFound = false;
+
                // Listen for server broadcast to discover the server
                DatagramSocket broadcastSocket = new DatagramSocket(DEFAULT_PORT);
                broadcastSocket.setBroadcast(true);
                byte[] buffer = new byte[1024];
                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-               System.out.println("Connecting to server...");
+
                broadcastSocket.receive(packet);
                broadcastSocket.close();
 
                // Extract the server IP address from the broadcast message
                String serverIP = new String(packet.getData(), 0, packet.getLength()).trim();
-               System.out.println("Connected to server at " + serverIP);
+               // System.out.println("Connected to server at " + serverIP);
+
+               // Close server connection display window after connecting to the server
+               SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                         if (frame != null) {
+                              frame.closeWindow();
+                         }
+                    }
+               });
 
                // Connect to the server using the discovered IP address
                int serverPort = DEFAULT_PORT;
@@ -77,7 +99,11 @@ public class Client {
                          String fromServer;
                          try {
                               while ((fromServer = in.readLine()) != null) {
-                                   System.out.println("Server: " + fromServer);
+                                   // System.out.println("Server: " + fromServer);
+                                   if ("Match found!".equals(fromServer)) {
+                                        matchFound = true;
+                                   }
+
                                    if ("Your turn:".equals(fromServer.trim())) {
                                         myTurn.set(true);
                                    } else if ("You have disconnected.".equals(fromServer.trim())) {
@@ -106,13 +132,15 @@ public class Client {
                               // 3. Read for move again if the player ends up on a rosetta tile
 
                               // PSEUDO-CODE:
-                              // rollButtonP1.setVisible(true);
+                              // rollButtonP1.setVisible(true); // Enable P1 to click stuff on the GUI
                               boolean rosetta = false;
                               
-                              // String diceRoll = 
-                              String diceRoll = "-1";
+                              while (!rollPressed) {}
+                              rollPressed = false;
+
+                              // Send dice number to the server to send to opponent
+                              String diceRoll = Integer.toString(diceRollGetter);
                               out.println(diceRoll);
-                              Thread.sleep(500);
                               
                               int diceNum = Integer.parseInt(diceRoll);
                               
@@ -121,9 +149,11 @@ public class Client {
                                         // String move = GUI chip move shit
                                         // Tile currentTile = last destination tile;
                                         // String move = "move";
+                                        // INFORMATION TO SEND:
+                                        // 1. Tile coordinates (before AND after)
+                                        // 2. Rosetta boolean // For server to check if it should listen for more inputs
                                         // out.println(move);
                                         // rosetta = (currentTile.isRosetta()) ? true : false;
-                                        Thread.sleep(500);
                                    } while (rosetta);
                               } 
                               
@@ -143,7 +173,9 @@ public class Client {
                               if (dieRoll > 0) {
                                    do {
                                         String move = in.readLine();
-                                        // update local GUI with opponent's move 0 -> use a mini panel
+                                        // INFORMATION TO RECEIVE:
+                                        // 1. Tile coordinates (before AND after)
+                                        // 2. Rosetta tile -> check if opponent's turn should end
                                         // opponentTurn = (currentTile.rosettaTile) ? true : false;
                                         Thread.sleep(500);
                                    } while (opponentTurn);

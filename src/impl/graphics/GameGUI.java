@@ -89,6 +89,16 @@ public class GameGUI extends JFrame {
         }
     }
 
+    // For singleplayer and multiplayer (network) game modes
+    public void disableP2() {
+        rollButtonP2.setEnabled(false);
+    }
+
+    // For singleplayer and multiplayer (network) game modes
+    public void switchP1RollButton(boolean switcher) {
+        rollButtonP1.setEnabled(switcher);
+    }
+
 
     public void rollButtonActionListener(JButton rollbutton, JLabel rollAmountText) {
         rollbutton.addActionListener(new ActionListener() {
@@ -100,6 +110,7 @@ public class GameGUI extends JFrame {
                 rollAmountText.setText("" + rollAmount);
                 game.rollAmount = rollAmount;
                 game.rollPressed = true;
+                
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
             }
         });

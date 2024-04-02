@@ -173,19 +173,20 @@ public class GameSession {
                     // At the end of the player's turn check if the game is over (ie. player has won)
 
                     // PSEUDO-CODE:
-                    // boolean rosettaTile = false;
-                    // String diceRoll = p1In.readLine();
-                    // p2Out.println(diceRoll);
-                    // int diceNum = Integer.parseInt(diceRoll);
-                    // Thread.sleep(500);
-                    // if (diceNum > 0) {
-                    //      do {
-                    //           String move = p1In.readLine();
-                    //           p2Out.println(move); -> send P1's moves to P2 after each move
-                    //           Thread.sleep(500);
-                    //           rosettaTile = (currentTile.rosetta) ? true : false;
-                    //      } while (rosetta);
-                    // } 
+                    boolean rosetta = false;
+                    String diceRoll = p1In.readLine();
+                    p2Out.println(diceRoll); // Send opponent dice roll
+                    int diceNum = Integer.parseInt(diceRoll);
+                    if (diceNum > 0) {
+                         do {
+                              // String move = p1In.readLine();
+                              // INFORMATION TO SEND:
+                              // 1. Origin tile and new tile coords
+                              // 2. Rosetta boolean 
+                              // p2Out.println(move); // Send P1's moves to P2 after each move
+                              // rosettaTile = (currentTile.rosetta) ? true : false;
+                         } while (rosetta);
+                    } 
 
                } else {
                     // TO EDIT: THIS WILL BE THE MAIN GAME THING
