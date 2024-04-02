@@ -179,15 +179,15 @@ public class Game {
 
         int checkTileAfter;
         if (strip != 1) {
-            checkTileAfter = movePosition + roll;
+            checkTileAfter = movePosition + roll - 1;
             if (checkTileAfter > 7) {
-                    checkTileAfter = (checkTileAfter - 8 + 3); // Position on new strip
+                    checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
                     strip = 1;
             }
         } else {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 3) {
-                    checkTileAfter = (checkTileAfter - 4 - 1); // Position on new strip
+                    checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
                     strip = ("P1".equals(player)) ? 0 : 2;
             }
         }
