@@ -20,8 +20,11 @@ public class Client {
      public static boolean rollPressed;
      public static boolean matchFound = false;
 
-     public Client() {
-          
+     private GameGUI gui;
+
+     public Client(GameGUI gui) {
+          this.gui = gui;
+          initiateMatch(gui);
      }
 
      /**
@@ -31,7 +34,7 @@ public class Client {
      * messages to the server to indicate that the client is still connected.
      * The method also listens for user input to send game actions to the server.
      */
-     public static void initiateMatch() {
+     public static void initiateMatch(GameGUI gui) {
           try {
                // Connecting to server display
                ServerConnectionGUI frame = ServerConnectionGUI.display();
