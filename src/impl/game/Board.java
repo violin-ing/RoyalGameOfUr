@@ -58,7 +58,7 @@ public class Board {
     // Iterates through each possible position a player chip could be, and passes the ownership, roll, and wanted piece to the moveLogic method
     // so that it can handle with identifying the strip the chip is in, and moving it to the specified location
     
-    public void pieceMover(String player, int roll, Map<Integer, Integer> wantedPiece) {
+    public void pieceMover(String player, int roll, int[] wantedPiece) {
         // loop through all the pieces in the current board, if p1, only check p1 string and middle, if p2 only check p2 and middle
         // we then want to update this current board to only have all available moves.
         // we also need to do an additional check to see if we can add a token to the board in the availalbe moves.
@@ -100,14 +100,12 @@ public class Board {
 
      //TODO: Map.Entry<Integer, Integer> line does not find the first key value pair in the mapping, it instead finds nothing. The map is somehow empty
 
-    private void moveLogic(Tile tile, String player, int roll, Map<Integer,Integer> piecePos, String strip) {
+    private void moveLogic(Tile tile, String player, int roll, int[] piecePos, String strip) {
         int currentPosition = tile.getPos();                                                                //So far we know what array the chip is in, and what position it is in that array
-        
-        Map.Entry<Integer, Integer> wantedPiece = piecePos.entrySet().stream().findFirst().get(); //Finds the first (albeit only) key value pair in mapping through streams. Allows us to call .getValue() and .getKey()
 
         //Check if the player owns this chip, that it is the tile they want to move, and that it is in the correct strip
         if (strip.equals("p1Strip") || strip.equals("p2Strip")) {
-            if (tile.getChip().getOwnership().equals(player) && (currentPosition == wantedPiece.getValue() && (wantedPiece.getKey() == 0 || wantedPiece.getKey() == 2))) {  
+            if (tile.getChip().getOwnership().equals(player) && (currentPosition == piecePos[1] && (piecePos[1] == 0 || piecePos[1] == 2))) {  
                 if (currentPosition <= lengthOfPlayerStripSectionOne) {                                                                                                  // is checking within section one of the player strip                
                     if (currentPosition + roll >= lengthOfPlayerStripSectionOne) {moveMidStrip(tile, currentPosition, roll, player, "from pStrip");}            // Move from section one of player strip to midstrip       
                     else if (currentPosition + roll < lengthOfPlayerStripSectionOne) {movePlayerStrip(tile, currentPosition, roll, player, "in pStrip");}       // Move within section one of player strip
@@ -123,12 +121,12 @@ public class Board {
             }
         }
         if (strip.equals("midStrip")) {                                                                                                                         // is checking within the midstrip
-            if (tile.getChip().getOwnership().equals(player) && currentPosition == wantedPiece.getValue()) { 
+            if (tile.getChip().getOwnership().equals(player) && currentPosition == piecePos[0]) { 
                 if (currentPosition + roll >= lengthOfMidStrip) {movePlayerStrip(tile, currentPosition, roll, player, "from midStrip");}                        // Move from midstrip to section two of player strip
                 else if (currentPosition + roll < lengthOfPlayerStripSectionOne) {moveMidStrip(tile, currentPosition, roll, player, "from midStrip");}          // Move within midstrip
             }
         }   
-}
+    }
 
     private void moveMidStrip(Tile tile, int currentPosition, int roll, String player, String transfer) {
         if (player.equals("P1")) {

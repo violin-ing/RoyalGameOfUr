@@ -105,8 +105,7 @@ public class Game {
         this.futureBoard = this.currentBoard;   
         List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, this.currentBoard.identifyPieces(player), currentPlayerCounter);
     
-        //futureBoard.pieceMover(player, roll, currentPositions);
-        List<int[]> futurePositions = this.futureBoard.identifyPieces(player);
+        List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
 
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
 
@@ -148,8 +147,14 @@ public class Game {
         return currentMovablePositions;
     }
 
-    public void getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
+    public List<int[]> getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
         // position of winning tile, 6 on a player strip
+        for (int[] piecePos : currentMovablePositions) {
+            futureBoard.pieceMover(player, roll, piecePos);
+        }
+
+        List<int[]> futurePositions = futureBoard.identifyPieces(player); 
+        return futurePositions;
     }
 
     // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
