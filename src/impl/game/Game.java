@@ -156,13 +156,16 @@ public class Game {
     private boolean isMoveable(String player, int roll, int movePosition, int strip) {
         // validiation of moves happens, here, so the above method can be simplified more easily.
 
-        // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].IsRosette();
+        // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].isRosetta();
+        // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].getChip().getOwnership();
 
         // find when chip is not movable:
         // check if chip is moving onto a rosette tile
         // check the tile its moving to by using: currentBoard, the strip its moving to (p1, p2, middle)
         // if this rosette tile is unoccupied or has current player chip on it can move here.
         // otherwise, this is not a valid move.
+
+        
         return false;
     }
 
