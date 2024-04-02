@@ -89,6 +89,16 @@ public class GameGUI extends JFrame {
         }
     }
 
+    // For singleplayer and multiplayer (network) game modes
+    public void disableP2() {
+        rollButtonP2.setEnabled(false);
+    }
+
+    // For singleplayer and multiplayer (network) game modes
+    public void switchP1RollButton(boolean switcher) {
+        rollButtonP1.setEnabled(switcher);
+    }
+
 
     public void rollButtonActionListener(JButton rollbutton, JLabel rollAmountText) {
         rollbutton.addActionListener(new ActionListener() {

@@ -34,11 +34,7 @@ public class GameStartGUI extends JFrame {
             option.setText("Multiplayer (Local) Selected");
         } else if (network) {
             option.setText("Multiplayer (Network) Selected");
-            // Start connecting to server immediately (no need for a start button)
-            Client.initiateMatch();
-            if (Client.matchFound) {
-                startGame(); // No need to wait for the user to press start game
-            }
+            Client newPlayer = new Client();
         } else {
             option.setText("Singleplayer Selected");;
         }

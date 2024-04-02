@@ -20,6 +20,10 @@ public class Client {
      public static boolean rollPressed;
      public static boolean matchFound = false;
 
+     public Client() {
+          
+     }
+
      /**
      * Initiates a 1v1 match by first discovering the game server via a broadcast message
      * and then establishing a TCP connection to participate in a match.
