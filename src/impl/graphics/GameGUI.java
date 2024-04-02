@@ -144,15 +144,9 @@ public class GameGUI extends JFrame {
                         // turn the next non selectable button to selectable.
                         System.out.println("CHANGE THE NEXT SELECTED PIECE");
                         int strip = "P1".equals(player) ? 0 : 2;
-                        for (int i = 0; i < 16; i++) {
-                            if (i >=0 || i <=4) {
-                                if (buttonArray[strip][i].checkIsMoveSelection()) {
-                                    buttonArray[strip][i].setButtonSelectable();
-                                }
-                            }
-                            if () {
-                                
-                            }
+                        System.out.println(strip);
+                        for (int i = 4; i>-1; i--) {
+                            System.out.println(i);
                         }
                     }
                 } else if (button.checkIsMoveSelection()) {
