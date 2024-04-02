@@ -50,25 +50,28 @@ public class Ai {
 
                 if (LEVELS == 3) {
                     for (int j = 0; j < ROLL_PERCENTAGES.length; j++) {
-
-                    }
-                }
-
-                for (int j = 0; j < getValidMoves().length; j++) {
-                    Node childNode;
-
-                    String[] moves = getValidMoves();
-
-                    if (LEVELS == 4) { // ai move
-                        childNode = new Node(0, currentNode.getNextType(), moves[j]);
-                    } else if (LEVELS == 3) { // roll
+                        Node childNode;
+    
                         childNode = new Node(0, currentNode.getNextType(), null);
-                    } else { // player move
-                        childNode = new Node(getScore(moves[j]), currentNode.getNextType(), moves[j]);
+    
+                        currentNode.addChild(childNode); // Add the child node to the current node
+                        queue.add(childNode); // Add the child node to the queue for further processing
                     }
-
-                    currentNode.addChild(childNode); // Add the child node to the current node
-                    queue.add(childNode); // Add the child node to the queue for further processing
+                } else {
+                    for (int j = 0; j < getValidMoves().length; j++) {
+                        Node childNode;
+    
+                        String[] moves = getValidMoves();
+    
+                        if (LEVELS == 4) { // ai move
+                            childNode = new Node(0, currentNode.getNextType(), moves[j]);
+                        } else { // player move
+                            childNode = new Node(getScore(moves[j]), currentNode.getNextType(), moves[j]);
+                        }
+    
+                        currentNode.addChild(childNode); // Add the child node to the current node
+                        queue.add(childNode); // Add the child node to the queue for further processing
+                    }
                 }
             }
             LEVELS--; // Decrement the number of levels
@@ -164,14 +167,16 @@ public class Ai {
 
     public static Node filterChildren(double expectimax) {
         List<Node> children = root.getChildren();
-        for (Node c : children) {
+
+        for (Node c : children) { //
             System.out.println(c.getValue());
         }
 
         List<Node> filteredChildren = children.stream()
         .filter(child -> child.getValue() == expectimax)
         .toList(); // Collect the filtered objects into a new ArrayList
-        for (Node c : filteredChildren) {
+        
+        for (Node c : filteredChildren) { //
             System.out.println(c.getValue());
         }
 
