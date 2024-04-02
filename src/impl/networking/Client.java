@@ -124,6 +124,10 @@ public class Client {
                     heartbeatSender.start();
                     serverListener.start();
 
+                    if (matchFound) {
+                         // Start game + launch GUI
+                    }
+
                     // Main thread deals with sending messages to server
                     while (opponentAlive.get() && selfAlive.get()) {
                          if (myTurn.get()) {
