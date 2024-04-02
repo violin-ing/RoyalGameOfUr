@@ -105,8 +105,7 @@ public class Game {
         this.futureBoard = this.currentBoard;   
         List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, this.currentBoard.identifyPieces(player), currentPlayerCounter);
     
-        //futureBoard.pieceMover(player, roll, currentPositions);
-        List<int[]> futurePositions = this.futureBoard.identifyPieces(player);
+        List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
 
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
 
@@ -148,22 +147,53 @@ public class Game {
         return currentMovablePositions;
     }
 
-    public void getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
+    public List<int[]> getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
         // position of winning tile, 6 on a player strip
+        for (int[] piecePos : currentMovablePositions) {
+            futureBoard.pieceMover(player, roll, piecePos);
+        }
+
+        List<int[]> futurePositions = futureBoard.identifyPieces(player); 
+        return futurePositions;
     }
 
     // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
     private boolean isMoveable(String player, int roll, int movePosition, int strip) {
         // validiation of moves happens, here, so the above method can be simplified more easily.
 
-        // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].IsRosette();
+        // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].isRosetta();
+        // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].getChip().getOwnership();
 
         // find when chip is not movable:
         // check if chip is moving onto a rosette tile
         // check the tile its moving to by using: currentBoard, the strip its moving to (p1, p2, middle)
         // if this rosette tile is unoccupied or has current player chip on it can move here.
         // otherwise, this is not a valid move.
-        return false;
+        // Check if the tile before has a chip on it
+        
+        if (strip == 1) {
+            int checkTileAfter = movePosition + roll;
+            if (checkTileAfter > 7) {
+                    checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
+                    strip = 1;
+            }
+        } else {
+            int checkTileAfter = movePosition + roll;
+            if (checkTileAfter > 3) {
+                    checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
+                    strip = ("P1".equals(player)) ? 0 : 2;
+            }
+        }
+
+        if (strip == 1) {
+            if (currentBoard.getBoardStrip(strip)[movePosition].isRosetta()) {
+                if (!currentBoard.getBoardStrip(strip)[movePosition].getChip().getOwnership().equals(player)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
 

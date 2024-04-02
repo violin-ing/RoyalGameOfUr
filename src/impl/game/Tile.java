@@ -10,7 +10,7 @@ public class Tile {
     }
 
     public Chip getChip() {return chip;}
-    public boolean IsRosetta() {return isRosetta;}
+    public boolean isRosetta() {return isRosetta;}
     public int getPos() {return position;}
     
 
