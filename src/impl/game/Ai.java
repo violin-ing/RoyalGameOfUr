@@ -13,6 +13,11 @@ public class Ai {
     // different game tactics in order of move priority
     static String[] speedy = {"MOVE", "ADD CHIP", "TAKE CHIP", "STACK"};
 
+    // ai modes
+    static String[] medium = {"TAKE CHIP", "MOVE", "ADD CHIP", "STACK"};
+    static String[] hard = {"TAKE CHIP", "STACK", "MOVE", "ADD CHIP"};
+    static String[] extreme = {"ADD CHIP", "STACK", "MOVE", "TAKE CHIP"};
+
     static Map<String, String> behaviour = new HashMap<>();
 
     //public Game game = new Game(); // remove these when ai is added to base game
@@ -175,7 +180,7 @@ public class Ai {
         List<Node> filteredChildren = children.stream()
         .filter(child -> child.getValue() == expectimax)
         .toList(); // Collect the filtered objects into a new ArrayList
-        
+
         for (Node c : filteredChildren) { //
             System.out.println(c.getValue());
         }
@@ -189,6 +194,36 @@ public class Ai {
                     .filter(child -> child.getMove() == m)
                     .toList();
                 }
+            }
+
+            switch (aiMode) {
+                // ALL
+                // check if chip can move to rosette
+                case "EASY":
+                /* 
+                    Node furthestChild = filteredChildren.get(0);
+                    for (Node child : filteredChildren) {
+                        if (child.getMove())
+                    } */
+
+                    // calculate which node contains the furthest chip
+                    // return that node to move
+                case "MEDIUM":
+                    // filter through the medium array of moves
+                    // if there is still more than one child 
+                    // TAKE CHIP --> furthest
+                    // MOVE --> furthest
+                    // STACK --> furthest
+                case "HARD":
+                    // filter through hard array of moves
+                    // if there is still more than one child 
+                    // TAKE CHIP --> furthest
+                    // STACK --> furthest
+                    // MOVE --> furthest
+                case "EXTREME": //ros
+                    // STACK --> furthest
+                    // MOVE --> closest
+                    // TAKE CHIP --> closest
             }
         }
 
