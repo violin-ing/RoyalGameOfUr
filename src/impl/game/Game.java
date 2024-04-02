@@ -148,13 +148,15 @@ public class Game {
         return currentMovablePositions;
     }
 
-    public void getFuturePositions() {
+    public void getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
         
     }
 
     // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
     private boolean isMoveable(String player, int roll, int movePosition, int strip) {
         // validiation of moves happens, here, so the above method can be simplified more easily.
+
+        // find when chip is not movable, 
         return false;
     }
 
