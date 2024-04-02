@@ -50,9 +50,6 @@ public class Board {
     public Tile[][] getBoard() {return this.board;}
 
 
-
-
-
     // TODO: pieceMover method requires valid move checker so that user knows what piece can be implemented, provide wanted chip prevalidated before it enters pieceMover
     // TODO: make it so that adding token to the board is always an available move under certain circumstances.
     // Ensure an array of valid moves is returned by the checker, and then lists them to the user, and loops until they choose one of the options
