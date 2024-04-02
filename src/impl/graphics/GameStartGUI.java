@@ -34,7 +34,6 @@ public class GameStartGUI extends JFrame {
             option.setText("Multiplayer (Local) Selected");
         } else if (network) {
             option.setText("Multiplayer (Network) Selected");
-            Client newPlayer = new Client();
         } else {
             option.setText("Singleplayer Selected");;
         }
