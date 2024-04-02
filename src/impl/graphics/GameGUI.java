@@ -141,6 +141,19 @@ public class GameGUI extends JFrame {
                     } else {
                         button.setButtonFutureSelectable();
                         GraphicsButton.tileSelected = true;
+                        // turn the next non selectable button to selectable.
+                        System.out.println("CHANGE THE NEXT SELECTED PIECE");
+                        int strip = "P1".equals(player) ? 0 : 2;
+                        for (int i = 0; i < 16; i++) {
+                            if (i >=0 || i <=4) {
+                                if (buttonArray[strip][i].checkIsMoveSelection()) {
+                                    buttonArray[strip][i].setButtonSelectable();
+                                }
+                            }
+                            if () {
+                                
+                            }
+                        }
                     }
                 } else if (button.checkIsMoveSelection()) {
                     // send game the previous tile to be moved, and the position its moving to.

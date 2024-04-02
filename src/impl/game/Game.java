@@ -166,6 +166,8 @@ public class Game {
     // this method will calculate the strip and index position of where a chip will end up after a particular move.
     public int[] newPosition(int[] stripPos, String player, int roll) {
         int[] newPos = new int[2];
+        int strip = newPos[0];
+        int movePosition = newPos[1];
         
         // for each position, we are going to find only the STRIP (0,1,2) and index (0-7) that it ends up in. 
         // already know which player it is, so we just check for each valid move if:
@@ -175,7 +177,23 @@ public class Game {
         // then when it comes to moving the chips, we already know where a particular tile will end up if selected
         // so all we need to check is if its taking or stacking / ending up on a rosette 
 
-        
+        int checkTileAfter;
+        if (strip != 1) {
+            checkTileAfter = movePosition + roll;
+            if (checkTileAfter > 7) {
+                    checkTileAfter = (checkTileAfter - 8 + 3); // Position on new strip
+                    strip = 1;
+            }
+        } else {
+            checkTileAfter = movePosition + roll;
+            if (checkTileAfter > 3) {
+                    checkTileAfter = (checkTileAfter - 4 - 1); // Position on new strip
+                    strip = ("P1".equals(player)) ? 0 : 2;
+            }
+        }
+
+        newPos[0] = strip;
+        newPos[1] = checkTileAfter;
 
         return newPos;
     }
