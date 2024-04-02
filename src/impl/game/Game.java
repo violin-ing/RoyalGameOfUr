@@ -110,7 +110,11 @@ public class Game {
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
 
         // for each piece in the currentPositions map, we will print the strip its in and the position it is in
-        System.out.println("You have the following MOVEABLE Pieces");
+        System.out.println("You have the following FUTURE Pieces");
+
+        for (int[] furture : futurePositions) {
+            System.out.println(furture[0] + " "+ furture[1]);
+        }
 
         // for (Map.Entry<Integer, Integer> entry : currentMovablePositions.entrySet()) {
         //     System.out.println("Strip: " + entry.getKey() + " Tile: " + entry.getValue());
