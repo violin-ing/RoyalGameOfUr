@@ -152,13 +152,32 @@ public class Game {
     }
 
     public List<int[]> getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
+        List<int[]> futurePositions = new ArrayList<>();
         // position of winning tile, 6 on a player strip
         for (int[] piecePos : currentMovablePositions) {
-            futureBoard.pieceMover(player, roll, piecePos);
+            // futureBoard.pieceMover(player, roll, piecePos);
+            futurePositions.add(newPosition(piecePos, player, roll));
         }
+        //loop through current movable like above,
 
-        List<int[]> futurePositions = futureBoard.identifyPieces(player); 
+        // List<int[]> futurePositions = futureBoard.identifyPieces(player); 
         return futurePositions;
+    }
+    // this method will calculate the strip and index position of where a chip will end up after a particular move.
+    public int[] newPosition(int[] stripPos, String player, int roll) {
+        int[] newPos = new int[2];
+        
+        // for each position, we are going to find only the STRIP (0,1,2) and index (0-7) that it ends up in. 
+        // already know which player it is, so we just check for each valid move if:
+        // 1.) if you are in the p1strip / p2string: 
+        //        * take current position of a tile and add roll amount, if this is greater than the length of the first part of the strip
+        //        * otherwise you are just moving on this strip. 
+        // then when it comes to moving the chips, we already know where a particular tile will end up if selected
+        // so all we need to check is if its taking or stacking / ending up on a rosette 
+
+        
+
+        return newPos;
     }
 
     // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.

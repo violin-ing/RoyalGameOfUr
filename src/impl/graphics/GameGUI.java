@@ -144,6 +144,7 @@ public class GameGUI extends JFrame {
                     }
                 } else if (button.checkIsMoveSelection()) {
                     // send game the previous tile to be moved, and the position its moving to.
+                    System.out.println("MOVED A PIECE!");
                 }
             }
         });
