@@ -175,7 +175,7 @@ public class Game {
         // otherwise, this is not a valid move.
         // Check if the tile before has a chip on it
         
-        if (strip == 1) {
+        if (strip != 1) {
             int checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
                     checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
