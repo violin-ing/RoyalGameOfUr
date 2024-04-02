@@ -10,6 +10,9 @@ public class Ai {
     static String[] moves = {"MOVE", "TAKE CHIP", "STACK", "ADD CHIP"};
     static String[] tactics = {"SPEEDY", "HOSTILE", "ATTRITION", "SNEAKY"};
 
+    // different game tactics in order of move priority
+    static String[] speedy = {"MOVE", "ADD CHIP", "TAKE CHIP", "STACK"};
+
     static Map<String, String> behaviour = new HashMap<>();
 
     //public Game game = new Game(); // remove these when ai is added to base game
@@ -45,15 +48,23 @@ public class Ai {
             for (int i = 0; i < levelSize; i++) {
                 Node currentNode = queue.poll(); // Get the current node from the queue
 
+                if (LEVELS == 3) {
+                    for (int j = 0; j < ROLL_PERCENTAGES.length; j++) {
+
+                    }
+                }
+
                 for (int j = 0; j < getValidMoves().length; j++) {
                     Node childNode;
 
                     String[] moves = getValidMoves();
 
-                    if (LEVELS == 2) {
-                        childNode = new Node(getScore(moves[j]), currentNode.getNextType(), moves[j]);
-                    } else {
+                    if (LEVELS == 4) { // ai move
                         childNode = new Node(0, currentNode.getNextType(), moves[j]);
+                    } else if (LEVELS == 3) { // roll
+                        childNode = new Node(0, currentNode.getNextType(), null);
+                    } else { // player move
+                        childNode = new Node(getScore(moves[j]), currentNode.getNextType(), moves[j]);
                     }
 
                     currentNode.addChild(childNode); // Add the child node to the current node
@@ -88,26 +99,6 @@ public class Ai {
         }
         
     }
-
-    /* 
-    public static int getScore(String move) { //random for now --> need to calculate score
-        //Random random = new Random();
-        //return random.nextInt(10) + 1;
-
-        int Score = 0;
-        System.out.println(behaviour.get(aiMode));
-
-        if (move.equals(behaviour.get(aiMode))) {
-            Score += 3;
-        } else {
-            Score += 1;
-        }
-
-        System.out.println(Score + ":" + move);
-
-
-        return Score;
-    } */
 
     public static int getScore(String move) {
         int score = 0;
@@ -203,12 +194,16 @@ public class Ai {
         }
     }
 
+    public static void speedy(List<Node> filteredChildren) {
+        
+    }
+
     public static void main(String[] args) {
         //Ai ai = new Ai("SPEEDY");
         behaviour = mapScores();
         Node root = createTree();
         double expectimax = expectiminimax(root, "max");
-        System.out.println(expectimax);
+        root.setValue(expectimax);
         printTree(root, 0);
 
         Node bestChild = filterChildren(expectimax);
