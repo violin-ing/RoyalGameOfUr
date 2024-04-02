@@ -14,12 +14,15 @@ public class GraphicsButton extends JButton {
     // ALL OF THESE ARE GREEN BY DEFAULT?!?!?!
     private final int xPosition;
     private final int yPosition;
-    private boolean selectable;
-    private static boolean tileSelected;
+    private boolean chipSelection;
+    private boolean moveSelection;
+    public static boolean tileSelected;
 
     public GraphicsButton(int x, int y) {
         this.xPosition = x;
         this.yPosition = y;
+        this.chipSelection = false;
+        this.moveSelection = false;
         // addActionListenerToButton();
         this.setBorder(BorderFactory.createLineBorder(Color.GREEN,5));
         this.setBounds((WINDOWWIDTH/2)+(xPosition*BLOCKDIMENSION)-150,yPosition*BLOCKDIMENSION+75,BLOCKDIMENSION,BLOCKDIMENSION);
@@ -29,16 +32,26 @@ public class GraphicsButton extends JButton {
         this.setVisible(false);
     }
 
+    public boolean checkIsChipSelection() {return chipSelection;}
+
+    public boolean checkIsMoveSelection() {return moveSelection;}
+
     public void setButtonSelectable() {
         this.setBorder(BorderFactory.createLineBorder(Color.GREEN,5));
         this.setEnabled(true);
         this.setVisible(true);
+        if (!moveSelection) {
+            this.chipSelection = true;  
+        }
     }
 
     public void setButtonFutureSelectable() {
         this.setBorder(BorderFactory.createLineBorder(Color.ORANGE,5));
         this.setEnabled(false);
         this.setVisible(true);
+        if (!chipSelection) {
+            this.moveSelection = true;
+        }
     }
 
     public void setButtonInvisible(){

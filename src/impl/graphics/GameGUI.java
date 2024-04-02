@@ -2,7 +2,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.*;
 // TODO: make interface for frame
@@ -123,6 +122,28 @@ public class GameGUI extends JFrame {
                 // depending on the status of that button (waiting to select a move) / already selected move.
                 // some method will then need to be called which will change which other buttons are visible.
                 System.out.println("CLICKED");
+                // pass tile which was selected and move position to game.
+                if (button.checkIsChipSelection()) {
+                    if (GraphicsButton.tileSelected) {
+                        // make sure all moveselections are not selectable and all chip ones are selectable.
+                        // revert to orignal selecetion.
+                        for (int i = 0; i < 3; i++) {
+                            for (int j = 0; j < 8; j++) {
+                                if (buttonArray[i][j].checkIsChipSelection()) {
+                                    buttonArray[i][j].setButtonSelectable();
+                                } else if(buttonArray[i][j].checkIsMoveSelection()) {
+                                    buttonArray[i][j].setButtonFutureSelectable();
+                                }
+                            }
+                        }
+                        GraphicsButton.tileSelected = false;
+                    } else {
+                        button.setButtonFutureSelectable();
+                        GraphicsButton.tileSelected = true;
+                    }
+                } else if (button.checkIsMoveSelection()) {
+                    // send game the previous tile to be moved, and the position its moving to.
+                }
             }
         });
     }
@@ -142,7 +163,6 @@ public class GameGUI extends JFrame {
                 //side strips, this ensures the correct tile is chosen for position in our strip array.
                 if (stripPlace[1] == -1) {
                     buttonPosition = 4;
-                    // CHANGE FOR CURRENT PLAYER!!!
                     componentsArray[strip][buttonPosition].updateImage(1, player);
                 } else if(stripPlace[1] >= 0 || stripPlace[1] <= 3) {
                     buttonPosition = playerStringPos[stripPlace[1]];
@@ -155,6 +175,22 @@ public class GameGUI extends JFrame {
             buttonArray[strip][buttonPosition].setButtonSelectable();
         }
         // do the same as above but for the futureMovable tiles.
+        for (int[] stripPlace: futureMovable) {
+            strip = stripPlace[0];
+            if (strip == 0 || strip == 2) {
+                //side strips, this ensures the correct tile is chosen for position in our strip array.
+                if(stripPlace[1] >= 0 || stripPlace[1] <= 3) {
+                    buttonPosition = playerStringPos[stripPlace[1]];
+                } else if (stripPlace[1]==6) {
+                    buttonPosition = 5;
+                } else {
+                    buttonPosition = playerStringBottonPos[stripPlace[1]-4];
+                }
+            } else {
+                buttonPosition = stripPlace[1];
+            }
+            buttonArray[strip][buttonPosition].setButtonFutureSelectable();
+        }   
     }
 
     public void updateBoard() {
