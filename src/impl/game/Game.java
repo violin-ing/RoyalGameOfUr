@@ -169,9 +169,31 @@ public class Game {
         // check the tile its moving to by using: currentBoard, the strip its moving to (p1, p2, middle)
         // if this rosette tile is unoccupied or has current player chip on it can move here.
         // otherwise, this is not a valid move.
-
+        // Check if the tile before has a chip on it
         
-        return false;
+        if (strip == 1) {
+            int checkTileAfter = movePosition + roll;
+            if (checkTileAfter > 7) {
+                    checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
+                    strip = 1;
+            }
+        } else {
+            int checkTileAfter = movePosition + roll;
+            if (checkTileAfter > 3) {
+                    checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
+                    strip = ("P1".equals(player)) ? 0 : 2;
+            }
+        }
+
+        if (strip == 1) {
+            if (currentBoard.getBoardStrip(strip)[movePosition].isRosetta()) {
+                if (!currentBoard.getBoardStrip(strip)[movePosition].getChip().getOwnership().equals(player)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
 
