@@ -229,7 +229,9 @@ public class Game {
 
         if (strip == 1) {
             if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
-                if (!currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(player)) {
+                if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
+                    return true;
+                } else if (!currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(player)) {
                     return false;
                 }
             }
