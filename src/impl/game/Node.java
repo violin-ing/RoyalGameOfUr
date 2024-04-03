@@ -2,15 +2,22 @@ import java.util.*;
 
 public class Node {
     private String type;
-    private double value;
-    private String move;
+    private double score;
+    private Board board;
+    private String[] moves;
     private List<Node> children;
-    private Node parent;
 
-    public Node(double value, String type, String move) {
+    public Node(String type, double score, Board board, String[] moves) {
         this.type = type;
-        this.value = value;
-        this.move = move;
+        this.score = score;
+        this.board = board;
+        this.moves = moves;
+        this.children = new ArrayList<>();
+    }
+
+    public Node(String type, double score) {
+        this.type = type;
+        this.score = score;
         this.children = new ArrayList<>();
     }
 
@@ -18,12 +25,16 @@ public class Node {
         return this.type;
     }
 
-    public double getValue() {
-        return this.value;
+    public double getScore() {
+        return this.score;
     }
 
-    public String getMove() {
-        return this.move;
+    public Board getBoard() {
+        return this.board;
+    }
+
+    public String[] getMoves() {
+        return this.moves;
     }
 
     public List<Node> getChildren() {
@@ -34,19 +45,15 @@ public class Node {
         this.children.add(child);
     }
 
-    public void setValue(double newValue) {
-        this.value = newValue;
+    public void setScore(double newScore) {
+        this.score = newScore;
     }
 
-    public void setMove(String newMove) {
-        this.move = newMove;
+    public void setMove(String[] newMoves) {
+        this.moves = newMoves;
     }
 
-    public void setParent(Node parent) {
-        this.parent = parent;
-    } 
-
-    public String getNextType() { // move to nodes?
+    public String getNextType() { 
         switch (getType()) {
             case "max":
                 return "roll";

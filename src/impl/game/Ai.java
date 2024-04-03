@@ -30,9 +30,6 @@ public class Ai {
 
     public Game game;
 
-    public Ai(Game game) {
-        this.game = game;
-    } 
 
     public static Map<String, String> mapScores() {
         //behaviour = new HashMap<>();
@@ -44,7 +41,7 @@ public class Ai {
         return behaviour;
     }
 
-    public void aiTurn() {
+    public List<Integer> create() {
         int roll = dice.roll();
         int counter = game.getCounter().getP2Counter();
         List<Board> maxBoards = new ArrayList<>();
@@ -85,6 +82,8 @@ public class Ai {
                 }
             }
         }
+
+        return scores;
     }
 
     public Board createTempBoard(Board board, String player, int[] currentPos, int[] futurePos) {
@@ -103,8 +102,25 @@ public class Ai {
         return board.move(move, player);
     }
 
-    public static Node createTree() {
-        root =  new Node(0, "max", null);
+    public Node createTree() {
+        root = new Node("max", 0);
+
+        int roll = dice.roll(); // check if roll == 0
+        int counter = game.getCounter().getP2Counter();
+        List<Board> maxBoards = new ArrayList<>();
+        List<Board> minBoards = new ArrayList<>();
+        List<Integer> branches = new ArrayList<>();
+        List<Integer> scores = new ArrayList<>();
+    
+        List<int[]> maxCurrentMovablePositions = Game.getCurrentMovablePositions(p2, roll, game.getCurrentBoard().identifyPieces(p2), counter);
+
+        List<int[]> maxFuturePositions = Game.getFuturePositions(p2, roll, maxCurrentMovablePositions);
+
+            // calculates all possible boards after ai makes a move
+        for (int i = 0; i < maxFuturePositions.size(); i++) { 
+            maxBoards.add(createTempBoard(Game.getCurrentBoard(), p2, maxCurrentMovablePositions.get(i), maxFuturePositions.get(i)));
+        }
+        
 
         Queue<Node> queue = new LinkedList<>();
         queue.add(root); // Add the root node to the queue
@@ -118,32 +134,55 @@ public class Ai {
 
                 if (LEVELS == 3) {
                     for (int j = 0; j < ROLL_PERCENTAGES.length; j++) {
-                        Node childNode;
     
-                        childNode = new Node(0, currentNode.getNextType(), null);
+                        Node childNode = new Node(currentNode.getNextType(), 0);
     
                         currentNode.addChild(childNode); // Add the child node to the current node
                         queue.add(childNode); // Add the child node to the queue for further processing
                     }
-                } else {
-                    
-                    for (int j = 0; j < getValidMoves().length; j++) {
-                        Node childNode;
+                } else if (LEVELS == 4) {
+                    for (int j = 0; j < maxBoards.size(); j++) {
+
+                        List<String> movesList = getMoveTypes(maxBoards.get(j), p2, maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
+                        String[] movesArr = (String[]) movesList.toArray();
+                        
+                        Node childNode = new Node(currentNode.getNextType(), 0, maxBoards.get(j), movesArr);
+
+                        currentNode.addChild(childNode); // Add the child node to the current node
+                        queue.add(childNode); // Add the child node to the queue for further processing
     
-                        String[] moves = getValidMoves();
+                    }
+                } else if (LEVELS == 2) {
+                    int count = 0;
+
+                    for (int playerRoll = 1; playerRoll < 5; playerRoll++) {
+                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(count).identifyPieces(p1), counter);
+                        List<int[]> minFuturePositions = Game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
+
+                        int numBranches = 0;
+
+                        for (int j = 0; j < maxBoards.size(); j++) { 
+
+                            Board minBoard = createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+
+                            List<String> movesList = getMoveTypes(minBoard, p2, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+                            String[] movesArr = (String[]) movesList.toArray();
+
+                            Node childNode = new Node(currentNode.getNextType(), getScore(movesArr), minBoard, movesArr);
+
+                            currentNode.addChild(childNode); // Add the child node to the current node
+                            queue.add(childNode); // Add the child node to the queue for further processing
     
-                        if (LEVELS == 4) { // ai move
-                            childNode = new Node(0, currentNode.getNextType(), moves[j]);
-                        } else { // player move
-                            childNode = new Node(getScore(moves[j]), currentNode.getNextType(), moves[j]);
+                            numBranches++;
                         }
     
-                        currentNode.addChild(childNode); // Add the child node to the current node
-                        queue.add(childNode); // Add the child node to the queue for further processing
+                        branches.add(numBranches);
+                        count++;
                     }
                 }
-            }
+
             LEVELS--; // Decrement the number of levels
+            }
         }
 
         return root;
@@ -170,7 +209,8 @@ public class Ai {
         for (int i = 0; i < level; i++) {
             System.out.print("\t");
         }
-        System.out.println(node.getType() + ": " + node.getValue() + ": " + node.getMove());
+
+        System.out.println(node.getType() + ": " + node.getScore() + ": " + node.getMoves());
         for (Node child : node.getChildren()) {
             printTree(child, level + 1);
         }
@@ -178,7 +218,7 @@ public class Ai {
 
     public static double expectiminimax(Node node, String type) {
         if (node.getChildren().isEmpty()) {
-            return node.getValue();
+            return node.getScore();
         }
 
         List<Double> values;
@@ -202,42 +242,43 @@ public class Ai {
     }
 
     public static List<Double> iterateChildren(Node node, String type) {
-        List<Double> values = new ArrayList<>();
+        List<Double> scores = new ArrayList<>();
         
         for (Node child : node.getChildren()) {
-            double value = expectiminimax(child, type);
-            values.add(value);
-            child.setValue(value);
+            double score = expectiminimax(child, type);
+            scores.add(score);
+            child.setScore(score);
         }
 
-        return values;
+        return scores;
     }
 
     public static Node filterChildren(double expectimax) {
         List<Node> children = root.getChildren();
 
         for (Node c : children) { //
-            System.out.println(c.getValue());
+            System.out.println(c.getScore());
         }
 
         List<Node> filteredChildren = children.stream()
-        .filter(child -> child.getValue() == expectimax)
+        .filter(child -> child.getScore() == expectimax)
         .toList(); // Collect the filtered objects into a new ArrayList
 
         for (Node c : filteredChildren) { //
-            System.out.println(c.getValue());
+            System.out.println(c.getScore());
         }
 
         while (filteredChildren.size() > 1) {
             for (String m : moves) {
-                if (filteredChildren.stream().anyMatch(child -> child.getMove().equals(m))) {
+                if (filteredChildren.stream().anyMatch(child -> child.getMoves().equals(m))) {
                     System.out.println(m);
-                    System.out.println(filteredChildren.stream().anyMatch(child -> child.getMove().equals(m)));
+                    System.out.println(filteredChildren.stream().anyMatch(child -> child.getMoves().equals(m)));
                     filteredChildren = filteredChildren.stream()
-                    .filter(child -> child.getMove() == m)
-                    .toList();
+                        .filter(child -> child.getMoves().equals(m)) // Use .equals() for string comparison
+                        .toList();
                 }
             }
+            
 
             switch (aiMode) {
                 // ALL
@@ -282,14 +323,14 @@ public class Ai {
     }
 
     public static void main(String[] args) {
-        //Ai ai = new Ai("SPEEDY");
+        Ai ai = new Ai();
         behaviour = mapScores();
-        Node root = createTree();
+        Node root = ai.createTree();
         double expectimax = expectiminimax(root, "max");
-        root.setValue(expectimax);
+        root.setScore(expectimax);
         printTree(root, 0);
 
         Node bestChild = filterChildren(expectimax);
-        System.out.println(bestChild.getValue() + bestChild.getMove());
+        System.out.println(bestChild.getScore() + bestChild.getScore());
     }
 }
