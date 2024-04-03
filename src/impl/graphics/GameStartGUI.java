@@ -30,9 +30,13 @@ public class GameStartGUI extends JFrame {
         currentBoard = new Board(counter);
         dice = new Dice();
         Game game = new Game(currentBoard, counter, dice, muliplayer);
-        GameGUI gui = new GameGUI(game);
-        game.setGameGUI(gui);
-        game.start();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                GameGUI gui = new GameGUI(game);
+                game.setGameGUI(gui);
+                game.start();
+            }
+        });
         this.closeFrame();
     }
 
