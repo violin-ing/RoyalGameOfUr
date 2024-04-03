@@ -8,7 +8,9 @@ public class Game {
     private static Counter counter;
     private Dice dice;
     private Ai ai;
-    private GameGUI gui;
+    private static GameGUI gui;
+
+    public static boolean networkPlay = false;
 
     //TEMP
     public int rollAmount;
@@ -41,7 +43,6 @@ public class Game {
     */
 
     public Board getCurrentBoard() {return this.currentBoard;}
-    public Board getFutureBoard() {return this.futureBoard;}
 
     public Counter getCounter() {return this.counter;}
         
@@ -109,8 +110,9 @@ public class Game {
             // System.out.println(currentPlayer + " Please choose a move");
             // String targetPiece = scanner.nextLine();
 
-    }
+        }
 
+    
 
     /**
      * We will check the current positions of each of the player's pieces through invoking ".identifyPieces()" on the current board instance returning a map of <strip, position> pairs
@@ -131,7 +133,12 @@ public class Game {
     
         List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
 
-        gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+        if (networkPlay) {
+            Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+        } else {
+            gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+        }
+        
     }
 
     // this will check if a particular chip on the board is movable.
