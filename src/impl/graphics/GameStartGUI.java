@@ -9,6 +9,9 @@ public class GameStartGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
     private static final int WINDOWHEIGHT = 500;
     private boolean muliplayer, network;
+    private static Counter counter;
+    private static Board currentBoard;
+    private static Dice dice;
 
     public GameStartGUI(boolean muliplayer, boolean network) {
         this.muliplayer = muliplayer;
@@ -23,8 +26,14 @@ public class GameStartGUI extends JFrame {
     }
 
     public void startGame() {
-        closeFrame();
-        //new GameGUI();
+        counter = new Counter();
+        currentBoard = new Board(counter);
+        dice = new Dice();
+        Game game = new Game(currentBoard, counter, dice, muliplayer);
+        GameGUI gui = new GameGUI(game);
+        game.setGameGUI(gui);
+        game.start();
+        this.closeFrame();
     }
 
     public void addComponents() {

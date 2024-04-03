@@ -20,11 +20,11 @@ public class Game {
 
     public boolean multiplayer;
 
-    public Game(Board currentBoard, Counter counter, Dice dice) {
+    public Game(Board currentBoard, Counter counter, Dice dice, boolean muliplayer) {
         this.currentBoard = currentBoard;
         this.counter = counter;
         this.dice = dice;
-        multiplayer =true;
+        this.multiplayer = muliplayer;
     }
 
     Scanner scanner = new Scanner(System.in);
