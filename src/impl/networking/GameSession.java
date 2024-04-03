@@ -118,8 +118,9 @@ public class GameSession {
       * @throws IOException If an I/O error occurs during communication with the players.
       */
      private void playGame(PrintWriter p1Out, BufferedReader p1In, PrintWriter p2Out, BufferedReader p2In) throws IOException {
-          p1Out.println("Game has started!");
-          p2Out.println("Game has started!");
+          // Send signal for client to know if they start first or wait for their turn first
+          p1Out.println("startfirst");
+          p2Out.println("waitfirst");
 
           // Schedule a task to check for timeouts
           ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);

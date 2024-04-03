@@ -27,6 +27,9 @@ public class Client {
      public static boolean matchFound = false;
      public boolean moveSelected = false;
 
+     private boolean selfWin = false;
+     private boolean opponentWin = false;
+
      public String[] info = new String[5];
 
      public Client() {
@@ -111,18 +114,22 @@ public class Client {
                                    // System.out.println("Server: " + fromServer);
                                    if ("Match found!".equals(fromServer)) {
                                         matchFound = true;
+                                        String turnMsg = in.readLine();
+                                        if (turnMsg.equals("startfirst")) {
+                                             myTurn.set(true);
+                                        } else if (turnMsg.equals("waitfirst")) {
+                                             myTurn.set(false);
+                                        }
                                    }
 
-                                   if ("Your turn:".equals(fromServer.trim())) {
-                                        myTurn.set(true);
-                                   } else if ("You have disconnected.".equals(fromServer.trim())) {
+                                   if ("You have disconnected.".equals(fromServer.trim())) {
                                         selfAlive.set(false);
                                         System.out.println("You have disconnected and forfeited the match!");
-                                        System.exit(1); // Display an error screen here
+                                        // TODO: Display losing screen here
                                    } else if ("Opponent has disconnected.".equals(fromServer.trim())) {
                                         opponentAlive.set(false);
                                         System.out.println("You have won by default!");
-                                        System.exit(1); // Display some screen here as well
+                                        // TODO: Display winning screen
                                    } 
                               }
                          } catch (IOException e) {
@@ -134,7 +141,6 @@ public class Client {
                     serverListener.start();
 
                     if (matchFound) {
-                         // Initiate singleplayer game
                          // Close server connection display window after connecting to the server with another player
                          SwingUtilities.invokeLater(new Runnable() {
                               @Override
@@ -258,8 +264,17 @@ public class Client {
                } catch (Exception e) {
                     System.out.println("Error connecting to server!" + e);
                } 
-        } catch (Exception e) {
-            System.out.println("Client exception!" + e);
-        }
-    }
+          } catch (Exception e) {
+               System.out.println("Client exception!" + e);
+          }
+     }    
+
+    
+    // TODO: Temporary main method for debugging
+     public static void main(String[] args) {
+          Client client = new Client();
+          GameGUI gameGUI = new GameGUI(client);
+          client.setGUI(gameGUI);
+          client.initiateMatch(gameGUI);
+     }
 }
