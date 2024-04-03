@@ -46,7 +46,7 @@ public class Client {
      * messages to the server to indicate that the client is still connected.
      * The method also listens for user input to send game actions to the server.
      */
-     public static void initiateMatch(GameGUI gui) {
+     public void initiateMatch(GameGUI gui) {
           try {
                // Connecting to server display
                ServerConnectionGUI frame = ServerConnectionGUI.display();
