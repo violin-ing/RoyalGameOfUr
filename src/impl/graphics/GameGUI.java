@@ -47,6 +47,17 @@ public class GameGUI extends JFrame {
         setVisible(true);
     }
 
+    public GameGUI() {
+        addComponents();
+        this.networkPlay = true;
+        this.setLayout(null);
+        this.setSize(new Dimension(WINDOWWIDTH,WINDOWHEIGHT));
+        this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Royal Game of Ur");
+        setVisible(true);
+    }
+
     // adds all required components to the screen.
     public void addComponents() {
         componentsArray = new GraphicsTile[3][8];

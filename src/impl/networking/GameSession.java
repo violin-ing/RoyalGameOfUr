@@ -172,19 +172,21 @@ public class GameSession {
                     // Note: At the end of each do-while loop, the server should send the opponent the info
                     // At the end of the player's turn check if the game is over (ie. player has won)
 
-                    // PSEUDO-CODE:
                     boolean rosetta = false;
                     String diceRoll = p1In.readLine(); // Read dice roll
                     p2Out.println(diceRoll); // Send opponent dice roll
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
-                              String packet = p1In.readLine();
-                              String data[] = packet.split(",");
-                              
-                              // INFORMATION TO SEND TO OPPONENT:
-                              p2Out.println(data); // Send P1's moves to P2 after each move
-                              // rosettaTile = (currentTile.rosetta) ? true : false;
+                              String gamePacket = p1In.readLine();
+                              String data[] = gamePacket.split(",");
+                              // Check if the player stepped onto a rosetta
+                              if (data[4].equals("true")) {
+                                   rosetta = true;
+                              } else {
+                                   rosetta = false;
+                              }
+                              p2Out.println(gamePacket);
                          } while (rosetta);
                     } 
 
@@ -196,12 +198,15 @@ public class GameSession {
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
-                              // String move = p2In.readLine();
-                              // INFORMATION TO SEND:
-                              // 1. Origin tile and new tile coords
-                              // 2. Rosetta boolean 
-                              // p1Out.println(move); // Send 21's moves to P1 after each move
-                              // rosettaTile = (currentTile.rosetta) ? true : false;
+                              String gamePacket = p2In.readLine();
+                              String data[] = gamePacket.split(",");
+                              // Check if the player stepped onto a rosetta
+                              if (data[4].equals("true")) {
+                                   rosetta = true;
+                              } else {
+                                   rosetta = false;
+                              }
+                              p1Out.println(gamePacket);
                          } while (rosetta);
                     } 
                }
