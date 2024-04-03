@@ -184,15 +184,21 @@ public class Client {
                                         gui.updateBoard(currentBoard);
                                         moveSelected = false;
 
-                                        int currentStrip = move[]
+                                        int newStrip = move[2];
+                                        int newIndex = move[3];
 
                                         // INFORMATION TO SEND:
                                         // 1. Chip to move
                                         // 2. Chip's new position
                                         // 3. Rosetta boolean (of chip's new position)
-                                        Tile currentTile = currentBoard[][]
-                                        // out.println(move);
-                                        // rosetta = (currentTile.isRosetta()) ? true : false;
+                                        Tile newTile = currentBoard[newStrip][newIndex];
+                                        if (newTile.isRosetta()) {
+                                             info[4] = "true";
+                                             rosetta = true;
+                                        } else {
+                                             info[4] = "false";
+                                             rosetta = false;
+                                        }
                                    } while (rosetta);
                               } 
                               
