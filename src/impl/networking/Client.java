@@ -54,16 +54,6 @@ public class Client {
                String serverIP = new String(packet.getData(), 0, packet.getLength()).trim();
                // System.out.println("Connected to server at " + serverIP);
 
-               // Close server connection display window after connecting to the server
-               SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                         if (frame != null) {
-                              frame.closeWindow();
-                         }
-                    }
-               });
-
                // Connect to the server using the discovered IP address
                int serverPort = DEFAULT_PORT;
                try (Socket socket = new Socket(serverIP, serverPort);
@@ -128,7 +118,18 @@ public class Client {
                     serverListener.start();
 
                     if (matchFound) {
-                         // Launch singleplayer game (should be the same as AI)
+                         // Initiate singleplayer game
+                         // Close server connection display window after connecting to the server with another player
+                         SwingUtilities.invokeLater(new Runnable() {
+                              @Override
+                              public void run() {
+                                   if (frame != null) {
+                                        frame.closeWindow();
+                                   }
+                              }
+                         });
+
+                         gui.disableP2();
                     }
 
                     // Main thread deals with sending messages to server
@@ -139,7 +140,7 @@ public class Client {
                               // 3. Read for move again if the player ends up on a rosetta tile
 
                               // PSEUDO-CODE:
-                              // rollButtonP1.setVisible(true); // Enable P1 to click stuff on the GUI
+                              gui.switchP1RollButton(true);
                               boolean rosetta = false;
                               
                               while (!rollPressed) {}
@@ -166,7 +167,7 @@ public class Client {
                               
                               myTurn.set(false); // Reset turn after sending message
                               // check for win message
-                              // rollButtonP1.setVisible(false);
+                              gui.switchP1RollButton(false);
                               
                          } else {
                               // 1. Read opponent's dice roll and update GUI
