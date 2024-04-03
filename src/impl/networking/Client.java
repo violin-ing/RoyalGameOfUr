@@ -37,7 +37,6 @@ public class Client {
 
      public void setGUI(GameGUI gui) {
           this.gui = gui;
-          initiateMatch(this.gui);
      }
 
      /**
