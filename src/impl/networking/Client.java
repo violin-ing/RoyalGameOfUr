@@ -34,10 +34,7 @@ public class Client {
 
      public String[] info = new String[5];
 
-     public Client() {
-          Counter counter = new Counter();
-          Board currentBoard = new Board(counter);
-          Dice dice = new Dice();
+     public Client(Counter counter, Board currentBoard, Dice dice) {
           this.currentBoard = currentBoard;
           this.counter = counter;
           this.dice = dice;
@@ -57,7 +54,7 @@ public class Client {
      * messages to the server to indicate that the client is still connected.
      * The method also listens for user input to send game actions to the server.
      */
-     public void initiateMatch(GameGUI gui) {
+     public void initiateMatch() {
           try {
                // Connecting to server display
                ServerConnectionGUI frame = ServerConnectionGUI.display();
@@ -267,12 +264,14 @@ public class Client {
           }
      }    
 
-    
     // TODO: Temporary main method for debugging
-     public static void main(String[] args) {
-          Client client = new Client();
-          GameGUI gameGUI = new GameGUI(client);
-          client.setGUI(gameGUI);
-          client.initiateMatch(gameGUI);
-     }
+     // public static void main(String[] args) {
+     //      Counter counter = new Counter();
+     //      Board currentBoard = new Board(counter);
+     //      Dice dice = new Dice();
+     //      Client client = new Client(counter, currentBoard, dice);
+     //      GameGUI gameGUI = new GameGUI(client);
+     //      client.setGUI(gameGUI);
+     //      client.initiateMatch();
+     // }
 }
