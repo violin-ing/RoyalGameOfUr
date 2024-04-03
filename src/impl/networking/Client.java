@@ -225,6 +225,7 @@ public class Client {
                               boolean opponentTurn = true;
                               String dieRollStr = in.readLine(); // Read opponent's die roll
                               int dieRoll = Integer.parseInt(dieRollStr);
+                              
                               if (dieRoll > 0) {
                                    do {
                                         String data = in.readLine(); // Read opponent's move
