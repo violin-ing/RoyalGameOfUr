@@ -30,6 +30,7 @@ public class Client {
      private boolean selfWin = false;
      private boolean opponentWin = false;
      private boolean myTurn;
+     private boolean opponentAlive = true, selfAlive = true;
 
      public String[] info = new String[5];
 
@@ -79,11 +80,7 @@ public class Client {
                int serverPort = DEFAULT_PORT;
                try (Socket socket = new Socket(serverIP, serverPort);
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in)); ) {
-
-                    AtomicBoolean opponentAlive = new AtomicBoolean(true); // Tracks if opponent is connected
-                    AtomicBoolean selfAlive = new AtomicBoolean(true); // Tracks if self is connected
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
 
                     // Send periodic heartbeats to server in case of connection loss
                     Thread heartbeatSender = new Thread(() -> {
@@ -113,11 +110,11 @@ public class Client {
                          try {
                               while ((fromServer = in.readLine()) != null) {
                                    if ("selfdc".equals(fromServer)) {
-                                        selfAlive.set(false);
+                                        selfAlive = false;
                                         gui.closeFrame();
                                         ClientLoseGUI.display("You have disconnected and forfeited the match!");
                                    } else if ("opponentdc".equals(fromServer)) {
-                                        opponentAlive.set(false);
+                                        opponentAlive = false;
                                         gui.closeFrame();
                                         ClientWinGUI.display("Opponent has disconnected. You have won by default!");
                                    }
@@ -130,8 +127,25 @@ public class Client {
                     heartbeatSender.start();
                     serverListener.start();
 
+                    String startPacket;
+                    do {
+                         startPacket = in.readLine();
+                         if (startPacket == null) {continue;}
+                         if ("matchfound".equals(startPacket)) {
+                              frame.closeWindow();
+                              matchFound = true;
+                              String turnMsg = in.readLine();
+                              if (turnMsg.equals("startfirst")) {
+                                   myTurn = true;
+                              } else if (turnMsg.equals("waitfirst")) {
+                                   myTurn = false;
+                              }
+                         }
+                    } while (startPacket == null);
+
                     // Main thread deals with sending messages to server
-                    while (opponentAlive.get() && selfAlive.get()) {
+                    while (opponentAlive && selfAlive) {
+
                          if (myTurn) {
                               // 1. Read for dice roll and send user input to server
                               // 2. Read for move (ONLY if dice roll > 0)
