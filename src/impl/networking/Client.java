@@ -86,22 +86,19 @@ public class Client {
                     AtomicBoolean opponentAlive = new AtomicBoolean(true); // Tracks if opponent is connected
                     AtomicBoolean selfAlive = new AtomicBoolean(true); // Tracks if self is connected
          
-                    while (true) {
-                         String startMatchPacket = in.readLine();
+                    String startMatchPacket = in.readLine();
 
-                         if ("matchfound".equals(startMatchPacket)) {
-                              frame.closeWindow();
-                              matchFound = true;
-                              String turnMsg = in.readLine();
-                              if (turnMsg.equals("startfirst")) {
-                                   myTurn = true;
-                              } else if (turnMsg.equals("waitfirst")) {
-                                   myTurn = false;
-                              }
-                              break;
-                         } else {
-                              continue;
+                    if ("matchfound".equals(startMatchPacket)) {
+                         frame.closeWindow();
+                         matchFound = true;
+                         String turnMsg = in.readLine();
+                         if (turnMsg.equals("startfirst")) {
+                              myTurn = true;
+                         } else if (turnMsg.equals("waitfirst")) {
+                              myTurn = false;
                          }
+                    } else {
+                         
                     }
 
                     // Send periodic heartbeats to server in case of connection loss
