@@ -214,7 +214,7 @@ public class Game {
         
         int checkTileAfter;
         if (strip != 1) {
-            checkTileAfter = movePosition + roll;
+            checkTileAfter = movePosition + roll - 1;
             if (checkTileAfter > 7) {
                     checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
                     strip = 1;
