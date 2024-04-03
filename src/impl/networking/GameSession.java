@@ -122,6 +122,12 @@ public class GameSession {
           p1Out.println("startfirst");
           p2Out.println("waitfirst");
 
+          try {
+               Thread.sleep(1000);
+          } catch (InterruptedException e) {
+               e.printStackTrace();
+          }
+
           // Schedule a task to check for timeouts
           ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
           executorService.scheduleAtFixedRate(() -> {

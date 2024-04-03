@@ -47,6 +47,8 @@ public class Server {
                               player1Out.println("matchfound");
                               player2Out.println("matchfound");
 
+                              Thread.sleep(1000); // Ensure that clients receive the matchfound message
+
                               GameSession gameSession = new GameSession(player1, player2);
                               gameSession.connectionInit();
 

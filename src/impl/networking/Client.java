@@ -132,7 +132,11 @@ public class Client {
                          startPacket = in.readLine();
                          if (startPacket == null) {continue;}
                          if ("matchfound".equals(startPacket)) {
-                              frame.closeWindow();
+                              SwingUtilities.invokeLater(new Runnable() {
+                                   public void run() {
+                                       frame.closeWindow();
+                                   }
+                               });
                               matchFound = true;
                               String turnMsg = in.readLine();
                               if (turnMsg.equals("startfirst")) {
