@@ -4,12 +4,9 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.*;
-// TODO: make interface for frame
-// render this on a new thread 
 public class GameGUI extends JFrame {
     private static final int WINDOWWIDTH = 1200;
     private static final int WINDOWHEIGHT = 1000;
-    private static final int BLOCKDIMENSION = 100;
     private String player;
     private Dice dice = new Dice();
     private Game game;
@@ -20,23 +17,23 @@ public class GameGUI extends JFrame {
     private JButton rollButtonP2;
     private GraphicsButton[][] buttonArray;
     private GraphicsTile[][] componentsArray;
+    private JLabel scoreP1;
+    private JLabel scoreP2;
 
     private boolean networkPlay = false;
 
     // sets up the game screen on first run.
     public GameGUI(Game game) {
-        addComponents();
         this.game = game;
         this.setLayout(null);
         this.setSize(new Dimension(WINDOWWIDTH,WINDOWHEIGHT));
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Royal Game of Ur");
+        addComponents();
         setVisible(true);
     }
-
     public GameGUI(Client client) {
-        addComponents();
         this.networkPlay = true;
         this.client = client;
         this.setLayout(null);
@@ -44,17 +41,7 @@ public class GameGUI extends JFrame {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Royal Game of Ur");
-        setVisible(true);
-    }
-
-    public GameGUI() {
         addComponents();
-        this.networkPlay = true;
-        this.setLayout(null);
-        this.setSize(new Dimension(WINDOWWIDTH,WINDOWHEIGHT));
-        this.setResizable(false);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setTitle("Royal Game of Ur");
         setVisible(true);
     }
 
@@ -99,10 +86,10 @@ public class GameGUI extends JFrame {
         this.add(rollButtonP2);
         this.add(rollAmountP2);
 
-        JLabel scoreP1 = new JLabel("Score: 7-0");
+        scoreP1 = new JLabel("Score: 7-0");
         scoreP1.setBounds((WINDOWWIDTH/4)-200, (WINDOWHEIGHT/2), 200, 75);
         this.add(scoreP1);
-        JLabel scoreP2 = new JLabel("Score: 7-0");
+        scoreP2 = new JLabel("Score: 7-0");
         scoreP2.setBounds((WINDOWWIDTH/4)*3, (WINDOWHEIGHT/2), 200, 75);
         this.add(scoreP2);
     }
@@ -111,10 +98,14 @@ public class GameGUI extends JFrame {
         this.player = player;
         if (player.equals("P1")) {
             rollButtonP1.setVisible(true);
+           // rollAmountP1.setVisible(true);
             rollButtonP2.setVisible(false);
+            //rollAmountP2.setVisible(false);
         } else {
             rollButtonP1.setVisible(false);
+           // rollAmountP1.setVisible(false);
             rollButtonP2.setVisible(true);
+           // rollAmountP2.setVisible(true);
         }
     }
 
@@ -146,15 +137,19 @@ public class GameGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // depending on the status of that button (waiting to select a move) / already selected move.
                 // some method will then need to be called which will change which other buttons are visible.
-                int rollAmount = dice.roll();
-                rollAmountText.setText("" + rollAmount);
+                int roll = dice.roll();
+                rollAmountText.setText("" + roll);
                 if (networkPlay) {
-                    Client.rollAmount = rollAmount;
+                    Client.rollAmount = roll;
                     Client.rollPressed = true;
                 } else {
-                    game.rollAmount = rollAmount;
+                    game.rollAmount = roll;
                     game.rollPressed = true;
+                    // THESE VALUES ARE EVEN UPDATE HERE, BUT NOT IN THE ACTUAL GAME OBJECT
                 }
+
+                System.out.println("ROLLED");
+
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
                 rollbutton.setVisible(false);
             }
@@ -260,7 +255,7 @@ public class GameGUI extends JFrame {
             // if current movable is -1. make sure to print token there
             // add token image if you can add a token to the screen
             if (currentMovable.get(i)[1]==-1) {
-                componentsArray[currentMovable.get(i)[0]][4].updateImage(1, player);
+                componentsArray[currentMovable.get(i)[0]][4].updateImage(1, player,true);
             }
             
             System.out.println(currentMovable.get(i)[0] + " " + currentMovable.get(i)[1]);
@@ -305,6 +300,11 @@ public class GameGUI extends JFrame {
         return positionInArray;
     }
 
+    public void updateScore(Counter counter) {
+        scoreP1.setText("Score: " + counter.getP1Counter() + "-" + counter.getP1Score());
+        scoreP2.setText("Score: " + counter.getP2Counter() + "-" + counter.getP2Score());
+    }
+
     public void updateBoard(Board currentBoard) {
         // this will update the sprites on the board after a move has been made.
         // update side strips:
@@ -316,26 +316,26 @@ public class GameGUI extends JFrame {
         //p1Strip
         for (int i = 0; i < 8; i++) {
             if(i >= 0 && i <= 3) {
-                componentsArray[0][i].updateImage(p1Strip[inversedValues[i]].getChip().getAmn(), p1Strip[inversedValues[i]].getChip().getOwnership());
+                componentsArray[0][i].updateImage(p1Strip[inversedValues[i]].getChip().getAmn(), p1Strip[inversedValues[i]].getChip().getOwnership(),false);
             } else if (i >= 6) {
-                componentsArray[0][i].updateImage(p1Strip[inversedValuesBottom[i-6]].getChip().getAmn(),p1Strip[inversedValuesBottom[i-6]].getChip().getOwnership());
+                componentsArray[0][i].updateImage(p1Strip[inversedValuesBottom[i-6]].getChip().getAmn(),p1Strip[inversedValuesBottom[i-6]].getChip().getOwnership(),false);
             } else {
-                componentsArray[0][i].updateImage(0, "none");
+                componentsArray[0][i].updateImage(0, "none",false);
             }
         }
         //p2Strip
         for (int i = 0; i < 8; i++) {
             if(i >= 0 && i <= 3) {
-                componentsArray[2][i].updateImage(p2Strip[inversedValues[i]].getChip().getAmn(),p2Strip[inversedValues[i]].getChip().getOwnership());
+                componentsArray[2][i].updateImage(p2Strip[inversedValues[i]].getChip().getAmn(),p2Strip[inversedValues[i]].getChip().getOwnership(),false);
             } else if (i >= 6) {
-                componentsArray[2][i].updateImage(p2Strip[inversedValuesBottom[i-6]].getChip().getAmn(), p2Strip[inversedValuesBottom[i-6]].getChip().getOwnership());
+                componentsArray[2][i].updateImage(p2Strip[inversedValuesBottom[i-6]].getChip().getAmn(), p2Strip[inversedValuesBottom[i-6]].getChip().getOwnership(),false);
             } else {
-                componentsArray[2][i].updateImage(0, "none");
+                componentsArray[2][i].updateImage(0, "none",false);
             }
         }
         //middle string
         for (int i = 0; i < 7; i++) {
-            componentsArray[1][i].updateImage(middleStrip[i].getChip().getAmn(), middleStrip[i].getChip().getOwnership());
+            componentsArray[1][i].updateImage(middleStrip[i].getChip().getAmn(), middleStrip[i].getChip().getOwnership(),false);
         }
         // reset the properties of the buttons.
         for (GraphicsButton[] buttonStrip : buttonArray) {

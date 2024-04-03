@@ -27,6 +27,10 @@ public class Game {
         this.multiplayer = muliplayer;
     }
 
+    public void setGameGUI(GameGUI gameGui) {
+        this.gui = gameGui;
+    }
+
     Scanner scanner = new Scanner(System.in);
     Random random = new Random();
     String rollInput = "";  //Placeholder value for gui, this checks if the necessary input was provided
@@ -46,8 +50,14 @@ public class Game {
     public Board getCurrentBoard() {return this.currentBoard;}
 
     public Counter getCounter() {return this.counter;}
+
+    public void updateRoll(int rollAmount) {
+        this.rollAmount = rollAmount;
+        this.rollPressed = true;
+    }
         
     public void start() {
+        System.out.println("GAME STARTED");
         String currentPlayer = "";
 
         while (true) {
@@ -61,8 +71,9 @@ public class Game {
             if (!multiplayer && currentPlayer.equals("P2")) {
                 // ai turn
             } else {
+                System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
-                    System.out.println("Waiting for roll input");
+                    System.out.println("WAITING FOR INPUT");
                 }
             }
 
@@ -80,8 +91,9 @@ public class Game {
                 if (!availableMoves(currentPlayer, rollAmount)) {
                     continue;
                 }
+                System.out.println("WAITING FOR MOVE");
                 while (!moveSelected) {
-                    System.out.println("Waiting for move input");
+                    System.out.println("WAITING FOR INPUT");
                 }
                 // update the board.
                 // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
@@ -89,6 +101,7 @@ public class Game {
                 currentBoard.move(move, currentPlayer);
                 System.out.println("update the board");
                 gui.updateBoard(currentBoard);
+                gui.updateScore(counter);
                 // if (currentBoard.getBoard()[move[2]][move[3]].isRosetta()) {
                 //     for (int i = 0; i < 10000; i++) {
                 //         System.out.println(currentPlayer + " gets another turn");  
@@ -273,10 +286,5 @@ public class Game {
 
 
         return true;
-    }
-
-
-    public void setGameGUI(GameGUI gameGui) {
-        gui = gameGui;
     }
 }

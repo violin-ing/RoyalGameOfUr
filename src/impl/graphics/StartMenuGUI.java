@@ -23,8 +23,8 @@ public class StartMenuGUI extends JFrame {
     }
 
     public void initialiseGameStart(boolean muliplayer, boolean network) {
+        GameStartGUI gameStartGUI = new GameStartGUI(muliplayer, network);
         closeFrame();
-        new GameStartGUI(muliplayer, network);
         // pass some params somewhere if muliplayers (would also change UI)
     }
 
