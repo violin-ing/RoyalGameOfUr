@@ -14,6 +14,8 @@ public class GameGUI extends JFrame {
     private Dice dice = new Dice();
     private Game game;
     private JButton rollButtonP1;
+    private JLabel rollAmountP1;
+    private JLabel rollAmountP2;
     private JButton rollButtonP2;
     private GraphicsButton[][] buttonArray;
     private GraphicsTile[][] componentsArray;
@@ -56,7 +58,7 @@ public class GameGUI extends JFrame {
         // create roll buttons and add them to the screen.
         rollButtonP1 = new JButton("ROLL");
         rollButtonP1.setBounds((WINDOWWIDTH/4)-200, (WINDOWHEIGHT/2)-200, 200, 75);
-        JLabel rollAmountP1 = new JLabel("0");
+        rollAmountP1 = new JLabel("0");
         rollAmountP1.setBounds((WINDOWWIDTH/4)-100, (WINDOWHEIGHT/2)-100, 200, 75);
         rollButtonActionListener(rollButtonP1,rollAmountP1);
         this.add(rollButtonP1);
@@ -64,7 +66,7 @@ public class GameGUI extends JFrame {
 
         rollButtonP2 = new JButton("ROLL");
         rollButtonP2.setBounds((WINDOWWIDTH/4)*3, (WINDOWHEIGHT/2)-200, 200, 75);
-        JLabel rollAmountP2 = new JLabel("0");
+        rollAmountP2 = new JLabel("0");
         rollAmountP2.setBounds((WINDOWWIDTH/4)*3+100, (WINDOWHEIGHT/2)-100, 200, 75);
         rollButtonActionListener(rollButtonP2,rollAmountP2);
         this.add(rollButtonP2);
@@ -86,6 +88,14 @@ public class GameGUI extends JFrame {
         } else {
             rollButtonP1.setVisible(false);
             rollButtonP2.setVisible(true);
+        }
+    }
+
+    public void updateRollLabel(String player, int rollAmount) {
+        if (player.equals("P1")) {
+            rollAmountP1.setText(rollAmount+"");
+        } else {
+            rollAmountP2.setText(rollAmount+"");
         }
     }
 
@@ -152,8 +162,8 @@ public class GameGUI extends JFrame {
                         // revert to orignal selecetion.
                         resetChipSelection();
                     }
-                    button.setButtonFutureSelectable();
                     button.setSelected(true);
+                    button.setButtonFutureSelectable();
                     GraphicsButton.tileSelected = true;
                     // turn the next non selectable button to selectable.
                     if(!buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].checkIsBothSelection()) {
@@ -210,7 +220,7 @@ public class GameGUI extends JFrame {
             System.out.println(futureMovable.get(i)[0] + " " + futureMovable.get(i)[1]);
             int[] currentMovePos = getButtonArrayPosition(currentMovable.get(i));
             int[] futureMovePos = getButtonArrayPosition(futureMovable.get(i));
-
+            // checks to correctly set a tile to both a selection and move tile, if a chip can be moved to and from this position.
             if(buttonArray[currentMovePos[0]][currentMovePos[1]].checkIsMoveSelection()) {
                 buttonArray[currentMovePos[0]][currentMovePos[1]].setBothSelectableAndFutureSelectable();
             } else {
@@ -221,7 +231,6 @@ public class GameGUI extends JFrame {
                 buttonArray[futureMovePos[0]][futureMovePos[1]].setBothSelectableAndFutureSelectable();;
             } else {
                 buttonArray[futureMovePos[0]][futureMovePos[1]].setButtonFutureSelectable();
-                // MAKE SURE TO SET THE RIGHT BUTTON LOCATION THING!!
             }
             buttonArray[futureMovePos[0]][futureMovePos[1]].setMoveToLocation(futureMovePos[0], futureMovable.get(i)[1]);
             buttonArray[futureMovePos[0]][futureMovePos[1]].setMoveFromLocation(currentMovePos[0], currentMovable.get(i)[1]);

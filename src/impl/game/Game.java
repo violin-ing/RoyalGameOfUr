@@ -5,7 +5,6 @@ import java.util.*;
 
 public class Game {
     private Board currentBoard;
-    private Board futureBoard;
     private Counter counter;
     private Dice dice;
     private GameGUI gui;
@@ -38,8 +37,7 @@ public class Game {
     */
 
     public Board getCurrentBoard() {return this.currentBoard;}
-    public Board getFutureBoard() {return this.futureBoard;}
-        
+
     public void start() {
         String currentPlayer = "";
 
@@ -70,10 +68,15 @@ public class Game {
                 // update the board.
                 // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
                 // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
+                
                 currentBoard.move(move, currentPlayer);
                 System.out.println("update the board");
                 gui.updateBoard(currentBoard);
                 moveSelected = false;
+                if (currentBoard.getBoard()[move[2]][move[3]].isRosetta()) {
+                    currentPlayer = counter.getPlayerTurn();
+                    System.out.println("CURRENTPLAYER: " + currentPlayer);
+                }
             }
 
             //this will return the map of current and furture positions (being the current positions of tiles on the board, and the positions they can be moved)
@@ -178,14 +181,23 @@ public class Game {
         if (strip == 1) {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
-                    checkTileAfter = (checkTileAfter - 8 + 3); // Position on new strip
-                    strip = 1;
+                    checkTileAfter = (checkTileAfter - 4); // Position on new strip
+                    strip = ("P1".equals(player)) ? 0 : 2;
+            }
+            if (checkTileAfter > 5) {
+                checkTileAfter = 6;
             }
         } else {
             checkTileAfter = movePosition + roll;
-            if (checkTileAfter > 3) {
-                    checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
-                    strip = 1;
+            if (movePosition>=4) {
+                // moving off board on strip
+                if (checkTileAfter>5) {
+                    checkTileAfter=6;
+                    // don't change strip
+                }
+            } else if (checkTileAfter > 3) {
+                checkTileAfter = (checkTileAfter - 4); // Position on new strip
+                strip = 1;
             }
         }
 
@@ -212,29 +224,30 @@ public class Game {
         //TODO: MAKE THIS A METHOD BELOW 
         
         int checkTileAfter;
-        if (strip != 1) {
+        if (strip == 1) {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
-                    checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
+                    checkTileAfter = (checkTileAfter - 4); // Position on new strip
                     strip = ("P1".equals(player)) ? 0 : 2;
             }
         } else {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 3) {
-                    checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
-                    strip =1;
+                    checkTileAfter = (checkTileAfter - 4); // Position on new strip
+                    strip=1;
             }
         }
 
-        if (strip == 1) {
-            if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
-                if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
-                    return true;
-                } else if (!currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(player)) {
-                    return false;
-                }
+
+        if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
+            String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
+            if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
+                return true;
+            } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
+                return false;
             }
         }
+
 
         return true;
     }
