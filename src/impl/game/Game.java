@@ -178,8 +178,8 @@ public class Game {
         if (strip == 1) {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
-                    checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
-                    strip = ("P1".equals(player)) ? 0 : 2;
+                    checkTileAfter = (checkTileAfter - 8 + 3); // Position on new strip
+                    strip = 1;
             }
         } else {
             checkTileAfter = movePosition + roll;
@@ -212,7 +212,7 @@ public class Game {
         //TODO: MAKE THIS A METHOD BELOW 
         
         int checkTileAfter;
-        if (strip == 1) {
+        if (strip != 1) {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
                     checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip

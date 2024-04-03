@@ -16,11 +16,14 @@ public class Client {
      public static final int DEFAULT_PORT = 6969; // Server game port
      private final static int HEARTBEAT_PORT = 42069; // Heartbeat port
 
-     public static int diceRollGetter;
-     public static boolean rollPressed;
-     public static boolean matchFound = false;
-
+     private Board currentBoard;
+     private Board futureBoard;
+     private Counter counter;
+     private Dice dice;
      private GameGUI gui;
+     public static int rollAmount;
+     public static boolean rollPressed = false;
+     public static boolean matchFound = false;
 
      public Client(GameGUI gui) {
           this.gui = gui;
@@ -53,16 +56,6 @@ public class Client {
                // Extract the server IP address from the broadcast message
                String serverIP = new String(packet.getData(), 0, packet.getLength()).trim();
                // System.out.println("Connected to server at " + serverIP);
-
-               // Close server connection display window after connecting to the server
-               SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                         if (frame != null) {
-                              frame.closeWindow();
-                         }
-                    }
-               });
 
                // Connect to the server using the discovered IP address
                int serverPort = DEFAULT_PORT;
@@ -128,7 +121,18 @@ public class Client {
                     serverListener.start();
 
                     if (matchFound) {
-                         // Launch singleplayer game (should be the same as AI)
+                         // Initiate singleplayer game
+                         // Close server connection display window after connecting to the server with another player
+                         SwingUtilities.invokeLater(new Runnable() {
+                              @Override
+                              public void run() {
+                                   if (frame != null) {
+                                        frame.closeWindow();
+                                   }
+                              }
+                         });
+
+                         gui.disableP2();
                     }
 
                     // Main thread deals with sending messages to server
@@ -139,14 +143,14 @@ public class Client {
                               // 3. Read for move again if the player ends up on a rosetta tile
 
                               // PSEUDO-CODE:
-                              // rollButtonP1.setVisible(true); // Enable P1 to click stuff on the GUI
+                              gui.switchP1RollButton(true);
                               boolean rosetta = false;
                               
                               while (!rollPressed) {}
                               rollPressed = false;
 
                               // Send dice number to the server to send to opponent
-                              String diceRoll = Integer.toString(diceRollGetter);
+                              String diceRoll = Integer.toString(rollAmount);
                               out.println(diceRoll);
                               
                               int diceNum = Integer.parseInt(diceRoll);
@@ -166,7 +170,7 @@ public class Client {
                               
                               myTurn.set(false); // Reset turn after sending message
                               // check for win message
-                              // rollButtonP1.setVisible(false);
+                              gui.switchP1RollButton(false);
                               
                          } else {
                               // 1. Read opponent's dice roll and update GUI
