@@ -50,7 +50,7 @@ public class Ai {
         List<Board> maxBoards = new ArrayList<>();
         List<Board> minBoards = new ArrayList<>();
         List<Integer> branches = new ArrayList<>();
-        List<List<String[]>> moveTypes = new ArrayList<>();
+        List<Integer> scores = new ArrayList<>();
             
         if (roll != 0) {
             List<int[]> maxCurrentMovablePositions = game.getCurrentMovablePositions(p2, roll, game.getCurrentBoard().identifyPieces(p2), counter);
@@ -76,8 +76,9 @@ public class Ai {
                         // create array of possible moves for each branch
                         List<String> movesList = getMoveTypes(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
                         String[] movesArr = (String[]) movesList.toArray();
-                        moveTypes.add(movesArr);
+                        //moveTypes.add(movesArr);
                         numBranches++;
+                        scores.add(getScore(movesArr));
                     }
 
                     branches.add(numBranches);
@@ -148,41 +149,20 @@ public class Ai {
         return root;
     }
 
-    public static String[] getValidMoves() { //set to 3 for now --> need to get valid moves method
-        // get valid moves and store in string array as commands ("WIN", "TAKE CHIP", "STACK" ect)
-        // temporary values to test functionality
-        Random random = new Random();
-        int num = random.nextInt(3);
-        
-        switch (num) {
-            case 0:
-                String[] moves1 = {"TAKE CHIP", "STACK", "STACK"};
-                return moves1;
-            case 1:
-                String[] moves2 = {"MOVE", "TAKE CHIP", "ROSETTE"};
-                return moves2;
-            case 2:
-                String[] moves3 = {"STACK", "ADD CHIP", "MOVE"};
-                return moves3;
-            default:
-                String[] moves4 = {"MOVE"};
-                return moves4;
-        }
-        
-    }
-
-    public static int getScore(String move) {
+    public static int getScore(String[] moves) {
         int score = 0;
         
-        switch(move) {
-            case "TAKE CHIP":
-            case "STACK":
-            case "ROSETTE":
-                score--;
-                return score;
-            default:
-                return score;
+        for (String move : moves) {
+            switch(move) {
+                case "TAKE CHIP":
+                case "STACK":
+                case "ROSETTE":
+                case "WIN":
+                    score--;
+            }
         }
+
+        return score;
     }
 
     public static void printTree(Node node, int level) {

@@ -60,6 +60,7 @@ public class Game {
                 while(!rollPressed) {
                     System.out.println("Waiting for roll input");
                 }
+            }
 
             //pass current roll amount and player to available moves
             // available moves should also calculate if the player can add a token to the board:
@@ -89,6 +90,7 @@ public class Game {
                     System.out.println("CURRENTPLAYER: " + currentPlayer);
                 }
             }
+        }
 
             //this will return the map of current and furture positions (being the current positions of tiles on the board, and the positions they can be moved)
 
@@ -106,9 +108,9 @@ public class Game {
             // System.out.println(currentPlayer + " Please choose a move");
             // String targetPiece = scanner.nextLine();
 
-            }
         }
-    }
+
+    
 
     /**
      * We will check the current positions of each of the player's pieces through invoking ".identifyPieces()" on the current board instance returning a map of <strip, position> pairs
