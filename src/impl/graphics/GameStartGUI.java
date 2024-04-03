@@ -34,9 +34,9 @@ public class GameStartGUI extends JFrame {
             public void run() {
                 GameGUI gui = new GameGUI(game);
                 game.setGameGUI(gui);
-                game.start();
             }
         });
+        game.start();
         this.closeFrame();
     }
 
