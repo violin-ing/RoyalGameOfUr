@@ -199,11 +199,20 @@ public class Client {
                                              info[4] = "false";
                                              rosetta = false;
                                         }
+                                        StringBuffer gamePacket = new StringBuffer();
+                                        for (int i = 0; i < info.length; i++) {
+                                             if (i == info.length - 1) {
+                                                  gamePacket.append(info[i]);
+                                             } else {
+                                                  gamePacket.append(info[i] + ",");
+                                             }
+                                        }
+                                        out.println(gamePacket);
                                    } while (rosetta);
                               } 
                               
                               myTurn.set(false); // Reset turn after sending message
-                              // check for win message
+                              if (counter)
                               gui.switchP1RollButton(false);
                               
                          } else {
@@ -213,7 +222,6 @@ public class Client {
                               // PSEUDO-CODE:
                               boolean opponentTurn = true;
                               String dieRollStr = in.readLine();
-                              // update local GUI with opponent's roll 
                               int dieRoll = Integer.parseInt(dieRollStr);
                               if (dieRoll > 0) {
                                    do {

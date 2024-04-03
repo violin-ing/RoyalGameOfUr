@@ -179,11 +179,9 @@ public class GameSession {
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
-                              String data = p1In.readLine();
-                              // info[0] = chip to move
-                              // info[1] = chip's new position
-                              // info[2] = read again?
-
+                              String packet = p1In.readLine();
+                              String data[] = packet.split(",");
+                              
                               // INFORMATION TO SEND TO OPPONENT:
                               p2Out.println(data); // Send P1's moves to P2 after each move
                               // rosettaTile = (currentTile.rosetta) ? true : false;
