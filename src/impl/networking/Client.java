@@ -188,10 +188,15 @@ public class Client {
                                    do {
                                         String data = in.readLine();
                                         // INFORMATION TO RECEIVE:
-                                        // info[0] = original chip position
-                                        // info[1] = new chip position
-                                        // info[2] = if new chip tile is a rosetta tile (i.e. )
+                                        // info[0] = original chip strip
+                                        // info[1] = original chip pos (index)
+                                        // info[2] = new chip strip
+                                        // info[3] = new chip pos (index)
+                                        // info[4] = rosetta?
                                         String[] info = data.split(",");
+                                        String originalTile = info[0];
+                                        String newTile = info[1];
+
                                         // opponentTurn = (currentTile.rosettaTile) ? true : false;
                                         Thread.sleep(500);
                                    } while (opponentTurn);
