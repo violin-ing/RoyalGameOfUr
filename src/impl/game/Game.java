@@ -10,6 +10,8 @@ public class Game {
     private Ai ai;
     private static GameGUI gui;
 
+    public static boolean networkPlay = false;
+
     //TEMP
     public int rollAmount;
     public boolean rollPressed = false;
@@ -131,7 +133,12 @@ public class Game {
     
         List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
 
-        gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+        if (networkPlay) {
+            Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+        } else {
+            gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+        }
+        
     }
 
     // this will check if a particular chip on the board is movable.

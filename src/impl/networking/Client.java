@@ -20,7 +20,7 @@ public class Client {
      private Board futureBoard;
      private Counter counter;
      private Dice dice;
-     public GameGUI gui;
+     public static GameGUI gui;
 
      public static int rollAmount;
      public static boolean rollPressed = false;
@@ -36,6 +36,7 @@ public class Client {
           this.currentBoard = currentBoard;
           this.counter = counter;
           this.dice = dice;
+          Game.networkPlay = true;
       }
 
      public void setGUI(GameGUI gui) {
