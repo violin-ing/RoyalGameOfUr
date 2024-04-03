@@ -40,6 +40,10 @@ public class Ai {
         return behaviour;
     }
 
+    public static void calculateMove(List<int[]> currentMovablePositions, List<int[]> futurePositions) {
+
+    }
+
     public static Node createTree() {
         root =  new Node(0, "max", null);
 
