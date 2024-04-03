@@ -274,7 +274,7 @@ public class GameGUI extends JFrame {
             } else if (i >= 6) {
                 componentsArray[2][i].updateImage(p2Strip[inversedValuesBottom[i-6]].getChip().getAmn(), p2Strip[inversedValuesBottom[i-6]].getChip().getOwnership());
             } else {
-                componentsArray[0][i].updateImage(0, "none");
+                componentsArray[2][i].updateImage(0, "none");
             }
         }
         //middle string
