@@ -44,6 +44,8 @@ public class Client {
 
      public void setGUI(GameGUI gameGUI) {
           gui = gameGUI;
+          gui.disableP2();
+          gui.switchP1RollButton(false);
      }
 
      /**
@@ -113,6 +115,7 @@ public class Client {
                               while ((fromServer = in.readLine()) != null) {
                                    // System.out.println("Server: " + fromServer);
                                    if ("Match found!".equals(fromServer)) {
+                                        frame.closeWindow();
                                         matchFound = true;
                                         String turnMsg = in.readLine();
                                         if (turnMsg.equals("startfirst")) {
