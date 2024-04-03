@@ -109,6 +109,7 @@ public class Client {
                          String fromServer;
                          try {
                               while ((fromServer = in.readLine()) != null) {
+                                   Thread.sleep(1000);
                                    if ("selfdc".equals(fromServer)) {
                                         selfAlive = false;
                                         gui.closeFrame();
@@ -121,6 +122,9 @@ public class Client {
                               }
                          } catch (IOException e) {
                               // IGNORE
+                         } catch (InterruptedException e) {
+                              gui.closeFrame();
+                              ErrorWindowGUI.display();
                          }
                     });
 
