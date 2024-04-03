@@ -124,8 +124,13 @@ public class GameGUI extends JFrame {
                 // some method will then need to be called which will change which other buttons are visible.
                 int rollAmount = dice.roll();
                 rollAmountText.setText("" + rollAmount);
-                game.rollAmount = rollAmount;
-                game.rollPressed = true;
+                if (networkPlay) {
+                    Client.rollAmount = rollAmount;
+                    Client.rollPressed = true;
+                } else {
+                    game.rollAmount = rollAmount;
+                    game.rollPressed = true;
+                }
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
                 rollbutton.setVisible(false);
             }
