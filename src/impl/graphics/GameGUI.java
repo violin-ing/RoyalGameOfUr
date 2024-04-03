@@ -13,12 +13,15 @@ public class GameGUI extends JFrame {
     private String player;
     private Dice dice = new Dice();
     private Game game;
+    private Client client;
     private JButton rollButtonP1;
     private JLabel rollAmountP1;
     private JLabel rollAmountP2;
     private JButton rollButtonP2;
     private GraphicsButton[][] buttonArray;
     private GraphicsTile[][] componentsArray;
+
+    private boolean networkPlay = false;
 
     // sets up the game screen on first run.
     public GameGUI(Game game) {
@@ -31,6 +34,19 @@ public class GameGUI extends JFrame {
         this.setTitle("Royal Game of Ur");
         setVisible(true);
     }
+
+    public GameGUI(Client client) {
+        addComponents();
+        this.networkPlay = true;
+        this.client = client;
+        this.setLayout(null);
+        this.setSize(new Dimension(WINDOWWIDTH,WINDOWHEIGHT));
+        this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Royal Game of Ur");
+        setVisible(true);
+    }
+
     // adds all required components to the screen.
     public void addComponents() {
         componentsArray = new GraphicsTile[3][8];
@@ -109,6 +125,9 @@ public class GameGUI extends JFrame {
         rollButtonP1.setEnabled(switcher);
     }
 
+    public void editP2Roll(JLabel rollAmountText, int roll) {
+        rollAmountText.setText("" + roll);
+    }
 
     public void rollButtonActionListener(JButton rollbutton, JLabel rollAmountText) {
         rollbutton.addActionListener(new ActionListener() {
@@ -118,8 +137,13 @@ public class GameGUI extends JFrame {
                 // some method will then need to be called which will change which other buttons are visible.
                 int rollAmount = dice.roll();
                 rollAmountText.setText("" + rollAmount);
-                game.rollAmount = rollAmount;
-                game.rollPressed = true;
+                if (networkPlay) {
+                    Client.rollAmount = rollAmount;
+                    Client.rollPressed = true;
+                } else {
+                    game.rollAmount = rollAmount;
+                    game.rollPressed = true;
+                }
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
                 rollbutton.setVisible(false);
             }
@@ -142,7 +166,11 @@ public class GameGUI extends JFrame {
                     // check to see if the player is trying to move a chip here first:
                     // if moveFromTile is selected, then this is true.
                     if (buttonArray[button.getMoveFromStrip()][button.getMoveFromLocation()].isSelected()) {
-                        sendMoveInformation(button);
+                        if (networkPlay) {
+                            sendClientMoveInfo(button);
+                        } else { 
+                            sendMoveInformation(button);
+                        }
                     } else {
                         // button was clicked to select chip
                         if (GraphicsButton.tileSelected) {
@@ -203,6 +231,14 @@ public class GameGUI extends JFrame {
         game.move[3] = button.getMoveLocation();
         game.moveSelected = true;
     }
+
+    public void sendClientMoveInfo(GraphicsButton button) {
+        client.info[0] = String.valueOf(button.getMoveFromStrip());
+        client.info[1] = String.valueOf(button.getMoveFromLocation());
+        client.info[2] = String.valueOf(button.getMoveStrip());
+        client.info[3] = String.valueOf(button.getMoveLocation());
+        client.moveSelected = true;
+    } 
 
     public void closeFrame() {
         this.dispose();

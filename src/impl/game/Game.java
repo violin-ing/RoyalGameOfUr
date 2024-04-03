@@ -4,10 +4,11 @@ import java.util.*;
 // anywhere with a "system.out.println" message should be replaced with a call to the GUI to display the message, use general intuition to determine 
 
 public class Game {
-    private Board currentBoard;
-    private Counter counter;
+    private static Board currentBoard;
+    private Board futureBoard;
+    private static Counter counter;
     private Dice dice;
-    private GameGUI gui;
+    private static GameGUI gui;
     //TEMP
     public int rollAmount;
     public boolean rollPressed = false;
@@ -106,7 +107,7 @@ public class Game {
      *
      * @see Board#identifyPieces(String) runs through each tile of each strip of the board and "puts" the strip and position in it into a map as <strip, position>, then returns it
      */
-    public void availableMoves(String player, int roll) {
+    public static void availableMoves(String player, int roll) {
         int currentPlayerCounter;
         if (player.equals("P1")) {
             currentPlayerCounter = counter.getP1Counter();
@@ -114,17 +115,17 @@ public class Game {
             currentPlayerCounter = counter.getP2Counter();
         }
 
-        List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, this.currentBoard.identifyPieces(player), currentPlayerCounter);
+        List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
     
         List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
 
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
     }
 
-        // this will check if a particular chip on the board is movable.
+    // this will check if a particular chip on the board is movable.
     // TODO: make a method which will calculate where this particular piece will be moved (edit the above method).
 
-    public List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {
+    public static List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {
         List<int[]> currentMovablePositions = new ArrayList<>();
         int[] stringPos = new int[2];
 
@@ -151,7 +152,7 @@ public class Game {
         return currentMovablePositions;
     }
 
-    public List<int[]> getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
+    public static List<int[]> getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
         List<int[]> futurePositions = new ArrayList<>();
         // position of winning tile, 6 on a player strip
         for (int[] piecePos : currentMovablePositions) {
@@ -164,7 +165,7 @@ public class Game {
         return futurePositions;
     }
     // this method will calculate the strip and index position of where a chip will end up after a particular move.
-    public int[] newPosition(int[] stripPos, String player, int roll) {
+    public static int[] newPosition(int[] stripPos, String player, int roll) {
         int[] newPos = new int[2];
         int strip = stripPos[0];
         int movePosition = stripPos[1];
@@ -208,7 +209,7 @@ public class Game {
     }
 
     // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
-    private boolean isMoveable(String player, int roll, int movePosition, int strip) {
+    private static boolean isMoveable(String player, int roll, int movePosition, int strip) {
         // validiation of moves happens, here, so the above method can be simplified more easily.
 
         // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].isRosetta();
@@ -253,7 +254,7 @@ public class Game {
     }
 
 
-    public void setGameGUI(GameGUI gui) {
-        this.gui = gui;
+    public void setGameGUI(GameGUI gameGui) {
+        gui = gameGui;
     }
 }
