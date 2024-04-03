@@ -43,7 +43,7 @@ public class Server {
                          try (PrintWriter player2Out = new PrintWriter(player2.getOutputStream(), true);
                               BufferedReader player2In = new BufferedReader(new InputStreamReader(player2.getInputStream()));) {
 
-                              System.out.println("Server: Matchmaking completed.")
+                              System.out.println("Server: Matchmaking completed.");
                               player1Out.println("matchfound");
                               player2Out.println("matchfound");
 
