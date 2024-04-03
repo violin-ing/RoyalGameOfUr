@@ -4,9 +4,9 @@ import java.util.*;
 // anywhere with a "system.out.println" message should be replaced with a call to the GUI to display the message, use general intuition to determine 
 
 public class Game {
-    private Board currentBoard;
+    private static Board currentBoard;
     private Board futureBoard;
-    private Counter counter;
+    private static Counter counter;
     private Dice dice;
     private Ai ai;
     private GameGUI gui;
@@ -71,20 +71,24 @@ public class Game {
             rollPressed = false;
 
             // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
-                if (rollAmount == 0) {
-                    continue;
-                } else {
-                    availableMoves(currentPlayer, rollAmount);
-                    while (!moveSelected) {
-                        System.out.println("Waiting for move input");
-                    }
-                    // update the board.
-                    // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
-                    // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
-                    currentBoard.move(move, currentPlayer);
-                    System.out.println("update the board");
-                    gui.updateBoard(currentBoard);
-                    moveSelected = false;
+            if (rollAmount == 0) {
+                continue;
+            } else {
+                availableMoves(currentPlayer, rollAmount);
+                while (!moveSelected) {
+                    System.out.println("Waiting for move input");
+                }
+                // update the board.
+                // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
+                // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
+                
+                currentBoard.move(move, currentPlayer);
+                System.out.println("update the board");
+                gui.updateBoard(currentBoard);
+                moveSelected = false;
+                if (currentBoard.getBoard()[move[2]][move[3]].isRosetta()) {
+                    currentPlayer = counter.getPlayerTurn();
+                    System.out.println("CURRENTPLAYER: " + currentPlayer);
                 }
             }
 
@@ -115,7 +119,7 @@ public class Game {
      *
      * @see Board#identifyPieces(String) runs through each tile of each strip of the board and "puts" the strip and position in it into a map as <strip, position>, then returns it
      */
-    public void availableMoves(String player, int roll) {
+    public static void availableMoves(String player, int roll) {
         int currentPlayerCounter;
         if (player.equals("P1")) {
             currentPlayerCounter = counter.getP1Counter();
@@ -123,17 +127,17 @@ public class Game {
             currentPlayerCounter = counter.getP2Counter();
         }
 
-        List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, this.currentBoard.identifyPieces(player), currentPlayerCounter);
+        List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
     
         List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
 
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
     }
 
-        // this will check if a particular chip on the board is movable.
+    // this will check if a particular chip on the board is movable.
     // TODO: make a method which will calculate where this particular piece will be moved (edit the above method).
 
-    public List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {
+    public static List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {
         List<int[]> currentMovablePositions = new ArrayList<>();
         int[] stringPos = new int[2];
 
@@ -160,7 +164,7 @@ public class Game {
         return currentMovablePositions;
     }
 
-    public List<int[]> getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
+    public static List<int[]> getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
         List<int[]> futurePositions = new ArrayList<>();
         // position of winning tile, 6 on a player strip
         for (int[] piecePos : currentMovablePositions) {
@@ -173,7 +177,7 @@ public class Game {
         return futurePositions;
     }
     // this method will calculate the strip and index position of where a chip will end up after a particular move.
-    public int[] newPosition(int[] stripPos, String player, int roll) {
+    public static int[] newPosition(int[] stripPos, String player, int roll) {
         int[] newPos = new int[2];
         int strip = stripPos[0];
         int movePosition = stripPos[1];
@@ -190,14 +194,23 @@ public class Game {
         if (strip == 1) {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
-                    checkTileAfter = (checkTileAfter - 8 + 3); // Position on new strip
-                    strip = 1;
+                    checkTileAfter = (checkTileAfter - 4); // Position on new strip
+                    strip = ("P1".equals(player)) ? 0 : 2;
+            }
+            if (checkTileAfter > 5) {
+                checkTileAfter = 6;
             }
         } else {
             checkTileAfter = movePosition + roll;
-            if (checkTileAfter > 3) {
-                    checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
-                    strip = 1;
+            if (movePosition>=4) {
+                // moving off board on strip
+                if (checkTileAfter>5) {
+                    checkTileAfter=6;
+                    // don't change strip
+                }
+            } else if (checkTileAfter > 3) {
+                checkTileAfter = (checkTileAfter - 4); // Position on new strip
+                strip = 1;
             }
         }
 
@@ -208,7 +221,7 @@ public class Game {
     }
 
     // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
-    private boolean isMoveable(String player, int roll, int movePosition, int strip) {
+    private static boolean isMoveable(String player, int roll, int movePosition, int strip) {
         // validiation of moves happens, here, so the above method can be simplified more easily.
 
         // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].isRosetta();
@@ -224,35 +237,36 @@ public class Game {
         //TODO: MAKE THIS A METHOD BELOW 
         
         int checkTileAfter;
-        if (strip != 1) {
+        if (strip == 1) {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
-                    checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
+                    checkTileAfter = (checkTileAfter - 4); // Position on new strip
                     strip = ("P1".equals(player)) ? 0 : 2;
             }
         } else {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 3) {
-                    checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
-                    strip =1;
+                    checkTileAfter = (checkTileAfter - 4); // Position on new strip
+                    strip=1;
             }
         }
 
-        if (strip == 1) {
-            if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
-                if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
-                    return true;
-                } else if (!currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(player)) {
-                    return false;
-                }
+
+        if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
+            String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
+            if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
+                return true;
+            } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
+                return false;
             }
         }
+
 
         return true;
     }
 
 
-    public void setGameGUI(GameGUI gui) {
-        this.gui = gui;
+    public void setGameGUI(GameGUI gameGui) {
+        gui = gameGui;
     }
 }

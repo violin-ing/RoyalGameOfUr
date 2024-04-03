@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.swing.SwingUtilities;
 
 /**
@@ -20,16 +20,26 @@ public class Client {
      private Board futureBoard;
      private Counter counter;
      private Dice dice;
-     private GameGUI gui;
+     public GameGUI gui;
+
      public static int rollAmount;
      public static boolean rollPressed = false;
      public static boolean matchFound = false;
+     public boolean moveSelected = false;
 
-     public Client(GameGUI gui) {
-          Game game = new Game(currentBoard, counter, dice);
+     public String[] info = new String[5];
+
+     public Client() {
+          Counter counter = new Counter();
+          Board currentBoard = new Board(counter);
+          Dice dice = new Dice();
+          this.currentBoard = currentBoard;
+          this.counter = counter;
+          this.dice = dice;
+      }
+
+     public void setGUI(GameGUI gui) {
           this.gui = gui;
-          game.setGameGUI(this.gui);
-          initiateMatch(this.gui);
      }
 
      /**
@@ -39,7 +49,7 @@ public class Client {
      * messages to the server to indicate that the client is still connected.
      * The method also listens for user input to send game actions to the server.
      */
-     public static void initiateMatch(GameGUI gui) {
+     public void initiateMatch(GameGUI gui) {
           try {
                // Connecting to server display
                ServerConnectionGUI frame = ServerConnectionGUI.display();
@@ -64,7 +74,7 @@ public class Client {
                try (Socket socket = new Socket(serverIP, serverPort);
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in))) {
+                    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in)); ) {
 
                     AtomicBoolean myTurn = new AtomicBoolean(false); // Tracks player's turn
                     AtomicBoolean opponentAlive = new AtomicBoolean(true); // Tracks if opponent is connected
@@ -148,7 +158,9 @@ public class Client {
                               gui.switchP1RollButton(true);
                               boolean rosetta = false;
                               
-                              while (!rollPressed) {} // Wait until the player rolls the dice
+                              while (!rollPressed) {
+                                   // Wait until the player rolls the dice
+                              }
                               rollPressed = false;
 
                               // Send dice number to the server to send to opponent
@@ -159,21 +171,51 @@ public class Client {
                               
                               if (diceNum > 0) {
                                    do {
-                                        // String move = GUI chip move shit
-                                        // Tile currentTile = last destination tile;
-                                        // String move = "move";
+                                        Game.availableMoves("P1", diceNum);
+                                        while (!moveSelected) {
+                                             // Wait for player to make their move on the GUI
+                                        }
+                                        // Stream "info" array into a usable int[] array 
+                                        int[] move = Arrays.stream(info)
+                                             .limit(4)
+                                             .mapToInt(Integer::parseInt)
+                                             .toArray();
+                                        currentBoard.move(move, "P1");
+                                        gui.updateBoard(currentBoard);
+                                        moveSelected = false;
+
+                                        int newStrip = move[2];
+                                        int newIndex = move[3];
+
                                         // INFORMATION TO SEND:
-                                        // 1. Chip to move
-                                        // 2. Chip's new position
+                                        // 1. Chip's old position (strip + index)
+                                        // 2. Chip's new position (strip + index)
                                         // 3. Rosetta boolean (of chip's new position)
-                                        // out.println(move);
-                                        // rosetta = (currentTile.isRosetta()) ? true : false;
+                                        Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
+                                        if (newTile.isRosetta()) {
+                                             info[4] = "true";
+                                             rosetta = true;
+                                        } else {
+                                             info[4] = "false";
+                                             rosetta = false;
+                                        }
+                                        StringBuffer gamePacket = new StringBuffer();
+                                        for (int i = 0; i < info.length; i++) {
+                                             if (i == info.length - 1) {
+                                                  gamePacket.append(info[i]);
+                                             } else {
+                                                  gamePacket.append(info[i] + ",");
+                                             }
+                                        }
+                                        out.println(gamePacket);
                                    } while (rosetta);
                               } 
                               
                               myTurn.set(false); // Reset turn after sending message
-                              // check for win message
                               gui.switchP1RollButton(false);
+                              if (counter.getP1Score() == 7) {
+                                   gui.closeFrame();
+                              }
                               
                          } else {
                               // 1. Read opponent's dice roll and update GUI
@@ -181,19 +223,29 @@ public class Client {
                               
                               // PSEUDO-CODE:
                               boolean opponentTurn = true;
-                              String dieRollStr = in.readLine();
-                              // update local GUI with opponent's roll 
+                              String dieRollStr = in.readLine(); // Read opponent's die roll
                               int dieRoll = Integer.parseInt(dieRollStr);
+                              
                               if (dieRoll > 0) {
                                    do {
-                                        String data = in.readLine();
-                                        // INFORMATION TO RECEIVE:
-                                        // info[0] = original chip position
-                                        // info[1] = new chip position
-                                        // info[2] = if new chip tile is a rosetta tile (i.e. )
+                                        String data = in.readLine(); // Read opponent's move
                                         String[] info = data.split(",");
-                                        // opponentTurn = (currentTile.rosettaTile) ? true : false;
-                                        Thread.sleep(500);
+                                        String rosetta = info[4];
+
+                                        if ("true".equals(rosetta)) {
+                                             opponentTurn = true;
+                                        } else {
+                                             opponentTurn = false;
+                                        }
+
+                                        // Stream packet array into a usable int[] array
+                                        int[] move = Arrays.stream(info)
+                                             .limit(4)
+                                             .mapToInt(Integer::parseInt)
+                                             .toArray();
+                                        currentBoard.move(move, "P2");
+                                        gui.updateBoard(currentBoard);
+
                                    } while (opponentTurn);
                               }
                               // check if opponent has won (should get losing message if so)

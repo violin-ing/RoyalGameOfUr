@@ -33,7 +33,6 @@ public class Counter {
         }
     }
 
-
     /**
      * Toggle which checks the boolean value of "isPlayer1Turn",
      * if so, return "P1" and then set "isPlayer1Turn" to false for next time

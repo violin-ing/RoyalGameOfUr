@@ -17,9 +17,9 @@ public class GraphicsButton extends JButton {
     private final int xPosition;
     private final int yPosition;
     private boolean chipSelection;
+    private boolean moveSelection;
     private int moveStrip;
     private int moveLocation;
-    private boolean moveSelection;
     public static boolean tileSelected;
     private boolean isSelected;
     private int moveFromStrip;
@@ -81,7 +81,7 @@ public class GraphicsButton extends JButton {
 
     public void setButtonFutureSelectable() {
         this.setBorder(BorderFactory.createLineBorder(Color.ORANGE,5));
-        this.setEnabled(false);
+        this.setEnabled(true);
         this.setVisible(true);
         if (!chipSelection) {
             this.moveSelection = true;

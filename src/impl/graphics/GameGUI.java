@@ -13,10 +13,15 @@ public class GameGUI extends JFrame {
     private String player;
     private Dice dice = new Dice();
     private Game game;
+    private Client client;
     private JButton rollButtonP1;
+    private JLabel rollAmountP1;
+    private JLabel rollAmountP2;
     private JButton rollButtonP2;
     private GraphicsButton[][] buttonArray;
     private GraphicsTile[][] componentsArray;
+
+    private boolean networkPlay = false;
 
     // sets up the game screen on first run.
     public GameGUI(Game game) {
@@ -29,6 +34,19 @@ public class GameGUI extends JFrame {
         this.setTitle("Royal Game of Ur");
         setVisible(true);
     }
+
+    public GameGUI(Client client) {
+        addComponents();
+        this.networkPlay = true;
+        this.client = client;
+        this.setLayout(null);
+        this.setSize(new Dimension(WINDOWWIDTH,WINDOWHEIGHT));
+        this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setTitle("Royal Game of Ur");
+        setVisible(true);
+    }
+
     // adds all required components to the screen.
     public void addComponents() {
         componentsArray = new GraphicsTile[3][8];
@@ -56,7 +74,7 @@ public class GameGUI extends JFrame {
         // create roll buttons and add them to the screen.
         rollButtonP1 = new JButton("ROLL");
         rollButtonP1.setBounds((WINDOWWIDTH/4)-200, (WINDOWHEIGHT/2)-200, 200, 75);
-        JLabel rollAmountP1 = new JLabel("0");
+        rollAmountP1 = new JLabel("0");
         rollAmountP1.setBounds((WINDOWWIDTH/4)-100, (WINDOWHEIGHT/2)-100, 200, 75);
         rollButtonActionListener(rollButtonP1,rollAmountP1);
         this.add(rollButtonP1);
@@ -64,7 +82,7 @@ public class GameGUI extends JFrame {
 
         rollButtonP2 = new JButton("ROLL");
         rollButtonP2.setBounds((WINDOWWIDTH/4)*3, (WINDOWHEIGHT/2)-200, 200, 75);
-        JLabel rollAmountP2 = new JLabel("0");
+        rollAmountP2 = new JLabel("0");
         rollAmountP2.setBounds((WINDOWWIDTH/4)*3+100, (WINDOWHEIGHT/2)-100, 200, 75);
         rollButtonActionListener(rollButtonP2,rollAmountP2);
         this.add(rollButtonP2);
@@ -89,6 +107,14 @@ public class GameGUI extends JFrame {
         }
     }
 
+    public void updateRollLabel(String player, int rollAmount) {
+        if (player.equals("P1")) {
+            rollAmountP1.setText(rollAmount+"");
+        } else {
+            rollAmountP2.setText(rollAmount+"");
+        }
+    }
+
     // For singleplayer and multiplayer (network) game modes
     public void disableP2() {
         rollButtonP2.setEnabled(false);
@@ -99,6 +125,9 @@ public class GameGUI extends JFrame {
         rollButtonP1.setEnabled(switcher);
     }
 
+    public void editP2Roll(JLabel rollAmountText, int roll) {
+        rollAmountText.setText("" + roll);
+    }
 
     public void rollButtonActionListener(JButton rollbutton, JLabel rollAmountText) {
         rollbutton.addActionListener(new ActionListener() {
@@ -108,8 +137,13 @@ public class GameGUI extends JFrame {
                 // some method will then need to be called which will change which other buttons are visible.
                 int rollAmount = dice.roll();
                 rollAmountText.setText("" + rollAmount);
-                game.rollAmount = rollAmount;
-                game.rollPressed = true;
+                if (networkPlay) {
+                    Client.rollAmount = rollAmount;
+                    Client.rollPressed = true;
+                } else {
+                    game.rollAmount = rollAmount;
+                    game.rollPressed = true;
+                }
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
                 rollbutton.setVisible(false);
             }
@@ -132,7 +166,11 @@ public class GameGUI extends JFrame {
                     // check to see if the player is trying to move a chip here first:
                     // if moveFromTile is selected, then this is true.
                     if (buttonArray[button.getMoveFromStrip()][button.getMoveFromLocation()].isSelected()) {
-                        sendMoveInformation(button);
+                        if (networkPlay) {
+                            sendClientMoveInfo(button);
+                        } else { 
+                            sendMoveInformation(button);
+                        }
                     } else {
                         // button was clicked to select chip
                         if (GraphicsButton.tileSelected) {
@@ -152,8 +190,8 @@ public class GameGUI extends JFrame {
                         // revert to orignal selecetion.
                         resetChipSelection();
                     }
-                    button.setButtonFutureSelectable();
                     button.setSelected(true);
+                    button.setButtonFutureSelectable();
                     GraphicsButton.tileSelected = true;
                     // turn the next non selectable button to selectable.
                     if(!buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].checkIsBothSelection()) {
@@ -194,6 +232,14 @@ public class GameGUI extends JFrame {
         game.moveSelected = true;
     }
 
+    public void sendClientMoveInfo(GraphicsButton button) {
+        client.info[0] = String.valueOf(button.getMoveFromStrip());
+        client.info[1] = String.valueOf(button.getMoveFromLocation());
+        client.info[2] = String.valueOf(button.getMoveStrip());
+        client.info[3] = String.valueOf(button.getMoveLocation());
+        client.moveSelected = true;
+    } 
+
     public void closeFrame() {
         this.dispose();
     }
@@ -210,7 +256,7 @@ public class GameGUI extends JFrame {
             System.out.println(futureMovable.get(i)[0] + " " + futureMovable.get(i)[1]);
             int[] currentMovePos = getButtonArrayPosition(currentMovable.get(i));
             int[] futureMovePos = getButtonArrayPosition(futureMovable.get(i));
-
+            // checks to correctly set a tile to both a selection and move tile, if a chip can be moved to and from this position.
             if(buttonArray[currentMovePos[0]][currentMovePos[1]].checkIsMoveSelection()) {
                 buttonArray[currentMovePos[0]][currentMovePos[1]].setBothSelectableAndFutureSelectable();
             } else {
@@ -221,7 +267,6 @@ public class GameGUI extends JFrame {
                 buttonArray[futureMovePos[0]][futureMovePos[1]].setBothSelectableAndFutureSelectable();;
             } else {
                 buttonArray[futureMovePos[0]][futureMovePos[1]].setButtonFutureSelectable();
-                // MAKE SURE TO SET THE RIGHT BUTTON LOCATION THING!!
             }
             buttonArray[futureMovePos[0]][futureMovePos[1]].setMoveToLocation(futureMovePos[0], futureMovable.get(i)[1]);
             buttonArray[futureMovePos[0]][futureMovePos[1]].setMoveFromLocation(currentMovePos[0], currentMovable.get(i)[1]);
