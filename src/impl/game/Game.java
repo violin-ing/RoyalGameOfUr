@@ -118,7 +118,7 @@ public class Game {
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
     }
 
-       // this will check if a particular chip on the board is movable.
+    // this will check if a particular chip on the board is movable.
     // TODO: make a method which will calculate where this particular piece will be moved (edit the above method).
 
     public static List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {

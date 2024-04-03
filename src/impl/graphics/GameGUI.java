@@ -115,6 +115,9 @@ public class GameGUI extends JFrame {
         rollButtonP1.setEnabled(switcher);
     }
 
+    public void editP2Roll(JLabel rollAmountText, int roll) {
+        rollAmountText.setText("" + roll);
+    }
 
     public void rollButtonActionListener(JButton rollbutton, JLabel rollAmountText) {
         rollbutton.addActionListener(new ActionListener() {
