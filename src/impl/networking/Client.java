@@ -188,10 +188,10 @@ public class Client {
                                         int newIndex = move[3];
 
                                         // INFORMATION TO SEND:
-                                        // 1. Chip to move
-                                        // 2. Chip's new position
+                                        // 1. Chip's old position (strip + index)
+                                        // 2. Chip's new position (strip + index)
                                         // 3. Rosetta boolean (of chip's new position)
-                                        Tile newTile = currentBoard[newStrip][newIndex];
+                                        Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
                                         if (newTile.isRosetta()) {
                                              info[4] = "true";
                                              rosetta = true;
