@@ -183,12 +183,9 @@ public class GameSession {
                               // info[0] = chip to move
                               // info[1] = chip's new position
                               // info[2] = read again?
-                              String[] info = data.split(",");
-                              
+
                               // INFORMATION TO SEND TO OPPONENT:
-                              // 1. Origin tile and new tile coords
-                              // 2. Rosetta boolean 
-                              // p2Out.println(move); // Send P1's moves to P2 after each move
+                              p2Out.println(data); // Send P1's moves to P2 after each move
                               // rosettaTile = (currentTile.rosetta) ? true : false;
                          } while (rosetta);
                     } 

@@ -186,10 +186,12 @@ public class Client {
                               int dieRoll = Integer.parseInt(dieRollStr);
                               if (dieRoll > 0) {
                                    do {
-                                        String move = in.readLine();
+                                        String data = in.readLine();
                                         // INFORMATION TO RECEIVE:
-                                        // 1. Tile coordinates (before AND after)
-                                        // 2. Rosetta tile -> check if opponent's turn should end
+                                        // info[0] = original chip position
+                                        // info[1] = new chip position
+                                        // info[2] = if new chip tile is a rosetta tile (i.e. )
+                                        String[] info = data.split(",");
                                         // opponentTurn = (currentTile.rosettaTile) ? true : false;
                                         Thread.sleep(500);
                                    } while (opponentTurn);
