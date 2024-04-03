@@ -130,20 +130,6 @@ public class Client {
                     heartbeatSender.start();
                     serverListener.start();
 
-                    if (matchFound) {
-                         // Close server connection display window after connecting to the server with another player
-                         SwingUtilities.invokeLater(new Runnable() {
-                              @Override
-                              public void run() {
-                                   if (frame != null) {
-                                        frame.closeWindow();
-                                   }
-                              }
-                         });
-
-                         gui.disableP2();
-                    }
-
                     // Main thread deals with sending messages to server
                     while (opponentAlive.get() && selfAlive.get()) {
                          if (myTurn) {
