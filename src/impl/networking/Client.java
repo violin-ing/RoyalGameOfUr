@@ -39,8 +39,8 @@ public class Client {
           Game.networkPlay = true;
       }
 
-     public void setGUI(GameGUI gui) {
-          this.gui = gui;
+     public void setGUI(GameGUI gameGUI) {
+          gui = gameGUI;
      }
 
      /**
