@@ -5,7 +5,6 @@ import java.util.*;
 
 public class Game {
     private static Board currentBoard;
-    private Board futureBoard;
     private static Counter counter;
     private Dice dice;
     private static GameGUI gui;
