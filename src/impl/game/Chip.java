@@ -17,9 +17,10 @@ public class Chip {
         return;
     }
 
-    public void increaseAmn() {this.amount += 1;}
-    public void decreaseAmn() {this.amount -= 1;}
+    public void increaseAmn(int value) {this.amount += value;}
+    public void decreaseAmn(int value) {this.amount -= value;}
     public void setAmn(int amn) {this.amount = amn;}
+    public int getStackAmount() {return this.amount;}
 
     public String getOwnership() {return ownership;}
     public int getAmn() {return amount;}

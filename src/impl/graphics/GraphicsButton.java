@@ -15,8 +15,15 @@ public class GraphicsButton extends JButton {
     private final int xPosition;
     private final int yPosition;
     private boolean chipSelection;
+    private int moveStrip;
+    private int moveLocation;
     private boolean moveSelection;
     public static boolean tileSelected;
+    private int moveFromStrip;
+    private int moveFromLocation;
+    // corresponding location of button to move a chip.
+    private int moveButtonStrip;
+    private int moveButtonLocation;
 
     public GraphicsButton(int x, int y) {
         this.xPosition = x;
@@ -36,6 +43,14 @@ public class GraphicsButton extends JButton {
 
     public boolean checkIsMoveSelection() {return moveSelection;}
 
+    public boolean checkIsBothSelection() {
+        if (chipSelection && moveSelection) {
+            return true;
+        } else{
+            return false;
+        }
+    }
+
     public void setButtonSelectable() {
         this.setBorder(BorderFactory.createLineBorder(Color.GREEN,5));
         this.setEnabled(true);
@@ -43,6 +58,14 @@ public class GraphicsButton extends JButton {
         if (!moveSelection) {
             this.chipSelection = true;  
         }
+    }
+
+    public void setBothSelectableAndFutureSelectable() {
+        this.setBorder(BorderFactory.createBevelBorder(1,Color.GREEN,Color.ORANGE));
+        this.setEnabled(true);
+        this.setVisible(true);
+        this.chipSelection = true;
+        this.moveSelection = true;
     }
 
     public void setButtonFutureSelectable() {
@@ -56,5 +79,50 @@ public class GraphicsButton extends JButton {
 
     public void setButtonInvisible(){
         this.setVisible(false);
+    }
+
+    public void setChipButtonsMoveButton(int strip, int location) {
+        this.moveButtonStrip = strip;
+        this.moveButtonLocation = location;
+    }
+
+    public void setMoveToLocation(int strip, int location) {
+        this.moveStrip = strip;
+        this.moveLocation = location;
+    }
+
+    public int getMoveButtonStrip() {
+        return moveButtonStrip;
+    }
+
+    public int getMoveButtonLocation() {
+        return moveButtonLocation;
+    }
+
+    public int getMoveStrip() {
+        return moveStrip;
+    }
+
+    public int getMoveLocation() {
+        return moveLocation;
+    }
+
+    public void setMoveFromLocation(int strip, int location) {
+        this.moveFromStrip = strip;
+        this.moveFromLocation = location;
+    }
+
+    public int getMoveFromLocation() {
+        return moveFromLocation;
+    }
+
+    public int getMoveFromStrip() {
+        return moveFromStrip;
+    }
+
+    public void resetButton() {
+        setButtonInvisible();
+        this.chipSelection = false;
+        this.moveSelection = false;
     }
 }

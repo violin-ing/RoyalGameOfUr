@@ -12,10 +12,11 @@ public class Game {
     //TEMP
     public int rollAmount;
     public boolean rollPressed = false;
+    public boolean moveSelected = false;
+    public int[] move = new int[4];
 
-    public Game(Board currentBoard, Board futureBoard, Counter counter, Dice dice) {
+    public Game(Board currentBoard, Counter counter, Dice dice) {
         this.currentBoard = currentBoard;
-        this.futureBoard = futureBoard;
         this.counter = counter;
         this.dice = dice;
     }
@@ -55,7 +56,7 @@ public class Game {
             // available moves should also calculate if the player can add a token to the board:
             //  - this can be done if the roll amount does not == 0 
             //  - and the player has at least 1 token in reserve
-            System.out.println("ROLL: " + rollAmount);
+            //System.out.println("ROLL: " + rollAmount);
             rollPressed = false;
 
             // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
@@ -63,8 +64,17 @@ public class Game {
                 continue;
             } else {
                 availableMoves(currentPlayer, rollAmount);
+                while (!moveSelected) {
+                    System.out.println("Waiting for move input");
+                }
+                // update the board.
+                // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
+                // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
+                currentBoard.move(move, currentPlayer);
+                System.out.println("update the board");
+                gui.updateBoard(currentBoard);
+                moveSelected = false;
             }
-            
 
             //this will return the map of current and furture positions (being the current positions of tiles on the board, and the positions they can be moved)
 
@@ -81,7 +91,6 @@ public class Game {
             // TODO: Form part of gameloop that checks for valid moves, and returns a map of valid moves for the player to choose, then from those valid moves, ask which piece the player wants to move
             // System.out.println(currentPlayer + " Please choose a move");
             // String targetPiece = scanner.nextLine();
-            break;
 
         }
     }
@@ -102,23 +111,11 @@ public class Game {
             currentPlayerCounter = counter.getP2Counter();
         }
 
-        this.futureBoard = this.currentBoard;   
         List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, this.currentBoard.identifyPieces(player), currentPlayerCounter);
     
         List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
 
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
-
-        // for each piece in the currentPositions map, we will print the strip its in and the position it is in
-        System.out.println("You have the following FUTURE Pieces");
-
-        for (int[] furture : futurePositions) {
-            System.out.println(furture[0] + " "+ furture[1]);
-        }
-
-        // for (Map.Entry<Integer, Integer> entry : currentMovablePositions.entrySet()) {
-        //     System.out.println("Strip: " + entry.getKey() + " Tile: " + entry.getValue());
-        // }
     }
 
         // this will check if a particular chip on the board is movable.
@@ -166,8 +163,8 @@ public class Game {
     // this method will calculate the strip and index position of where a chip will end up after a particular move.
     public int[] newPosition(int[] stripPos, String player, int roll) {
         int[] newPos = new int[2];
-        int strip = newPos[0];
-        int movePosition = newPos[1];
+        int strip = stripPos[0];
+        int movePosition = stripPos[1];
         
         // for each position, we are going to find only the STRIP (0,1,2) and index (0-7) that it ends up in. 
         // already know which player it is, so we just check for each valid move if:
@@ -178,17 +175,17 @@ public class Game {
         // so all we need to check is if its taking or stacking / ending up on a rosette 
 
         int checkTileAfter;
-        if (strip != 1) {
+        if (strip == 1) {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
-                    checkTileAfter = (checkTileAfter - 8 + 3); // Position on new strip
-                    strip = 1;
+                    checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
+                    strip = ("P1".equals(player)) ? 0 : 2;
             }
         } else {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 3) {
-                    checkTileAfter = (checkTileAfter - 4 - 1); // Position on new strip
-                    strip = ("P1".equals(player)) ? 0 : 2;
+                    checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
+                    strip = 1;
             }
         }
 
@@ -211,19 +208,21 @@ public class Game {
         // if this rosette tile is unoccupied or has current player chip on it can move here.
         // otherwise, this is not a valid move.
         // Check if the tile before has a chip on it
+
+        //TODO: MAKE THIS A METHOD BELOW 
         
         int checkTileAfter;
-        if (strip != 1) {
+        if (strip == 1) {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 7) {
                     checkTileAfter = (checkTileAfter - 7 + 3); // Position on new strip
-                    strip = 1;
+                    strip = ("P1".equals(player)) ? 0 : 2;
             }
         } else {
             checkTileAfter = movePosition + roll;
             if (checkTileAfter > 3) {
                     checkTileAfter = (checkTileAfter - 3 - 1); // Position on new strip
-                    strip = ("P1".equals(player)) ? 0 : 2;
+                    strip =1;
             }
         }
 

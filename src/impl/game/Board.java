@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Board {
-    private Counter counter = new Counter();
+    private Counter counter;
     
     private int lengthOfPlayerStrip = 6;
     private int lengthOfPlayerStripSectionOne = 4;
@@ -21,7 +21,8 @@ public class Board {
     // The chip is initialized with ownership "none" and amount 0, and the position is set to the index of the tile
     // We then form a board 2D array with the initialised strips
 
-    public Board() {
+    public Board(Counter counter) {
+        this.counter = counter;
         for (int i = 0; i < p1Strip.length; i++) 
         {
             p1Strip[i] = new Tile(new Chip(), i);   //It's important to have a quick indexable way to access the position of the tile, to be able to identify the current position of a chip, and evalute to what tile it can move
@@ -71,6 +72,72 @@ public class Board {
         }
 
         for (Tile tile : midStrip) moveLogic(tile, player, roll, wantedPiece, "midStrip");
+    }
+
+    public void move(int[] moveChoice, String player) {
+        Tile movingFromTile;
+        Tile movingToTile;
+        boolean addedChip  = false;
+        boolean removedChip = false;
+        
+        // if statment sets up tile we are moving from and to.
+        // this will also check if we are adding a chip to the board / or removing one (scoring).
+        if (moveChoice[1]==-1) {
+            movingFromTile = null;
+            movingToTile = board[moveChoice[2]][moveChoice[3]];
+            addedChip = true;
+        } else if((moveChoice[2]==0  || moveChoice[2]==2) && moveChoice[3]==6) {
+            movingToTile = null;
+            movingFromTile = board[moveChoice[0]][moveChoice[1]];
+            removedChip = true;
+        } else {
+            movingFromTile = board[moveChoice[0]][moveChoice[1]];
+            movingToTile = board[moveChoice[2]][moveChoice[3]];
+        }
+
+        if (removedChip) {
+            // clear from tile
+            // add tile amount to score
+            counter.increasePlayerScore(player, movingFromTile.getChip().getAmn());
+            // CLEAR TILE AFTER
+        } else if(addedChip){
+            // increase value of tile we are moving to, and check if we are on a rosetta tile
+            // if we are on a rosetta give player another turn
+            movingToTile.getChip().increaseAmn(1);
+            movingToTile.getChip().setOwnership(player);
+            if (movingToTile.isRosetta()) {
+                // this has the effect of giving the player another turn.
+                counter.getPlayerTurn();
+            }
+            // decrement the counter value for player
+            counter.reduceCounter(player);
+        } else {
+            // if chip is our own;
+            // increase stack amount
+            // check if this is a rosetta tile
+            // MOVING TO OWN TILE
+            if (movingToTile.getChip().getOwnership().equals(player)) {
+                movingToTile.getChip().increaseAmn(movingFromTile.getChip().getStackAmount());
+            } else {
+                // MOVING TO ENEMY TILE
+                String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
+                if (movingToTile.getChip().getOwnership().equals(enemyPlayer)) {
+                    counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
+                }
+                // IF MOVING TO EMPTY TILE WE DO THIS ASWELL
+                movingToTile.getChip().setOwnership(player);
+                movingToTile.getChip().setAmn(movingFromTile.getChip().getAmn());
+            }
+            // give player another turn if this is a rosetta.
+            if (movingToTile.isRosetta()) {
+                counter.getPlayerTurn();
+            }
+        }
+        if (!addedChip) {
+            // clear the previous tile.
+            movingFromTile.getChip().setOwnership("none");
+            movingFromTile.getChip().setAmn(0);
+        }
     }
 
     /**

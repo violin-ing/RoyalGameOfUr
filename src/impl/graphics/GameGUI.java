@@ -124,6 +124,17 @@ public class GameGUI extends JFrame {
                 // some method will then need to be called which will change which other buttons are visible.
                 System.out.println("CLICKED");
                 // pass tile which was selected and move position to game.
+
+                // if button is both chip and move then do the extend check, then do the checks below
+                // extended check: 
+
+
+
+
+
+
+
+
                 if (button.checkIsChipSelection()) {
                     if (GraphicsButton.tileSelected) {
                         // make sure all moveselections are not selectable and all chip ones are selectable.
@@ -142,16 +153,16 @@ public class GameGUI extends JFrame {
                         button.setButtonFutureSelectable();
                         GraphicsButton.tileSelected = true;
                         // turn the next non selectable button to selectable.
-                        System.out.println("CHANGE THE NEXT SELECTED PIECE");
-                        int strip = "P1".equals(player) ? 0 : 2;
-                        System.out.println(strip);
-                        for (int i = 4; i>-1; i--) {
-                            System.out.println(i);
-                        }
+                        buttonArray[button.getMoveStrip()][button.getMoveLocation()].setButtonSelectable();
                     }
                 } else if (button.checkIsMoveSelection()) {
                     // send game the previous tile to be moved, and the position its moving to.
                     System.out.println("MOVED A PIECE!");
+                    game.move[0] = button.getMoveFromStrip();
+                    game.move[1] = button.getMoveFromLocation();
+                    game.move[2] = button.getMoveStrip();
+                    game.move[3] = button.getMoveLocation();
+                    game.moveSelected = true;
                 }
             }
         });
@@ -162,47 +173,89 @@ public class GameGUI extends JFrame {
     }
 
     public void updateSelectableTiles(List<int[]> currentMovable, List<int[]> futureMovable) {
-        int buttonPosition;
-        int strip;
+        for (int i = 0; i < currentMovable.size(); i++) {
+            // if current movable is -1. make sure to print token there
+            // add token image if you can add a token to the screen
+            if (currentMovable.get(i)[1]==-1) {
+                componentsArray[currentMovable.get(i)[0]][4].updateImage(1, player);
+            }
+            
+            System.out.println(currentMovable.get(i)[0] + " " + currentMovable.get(i)[1]);
+            System.out.println(futureMovable.get(i)[0] + " " + futureMovable.get(i)[1]);
+            int[] currentMovePos = getButtonArrayPosition(currentMovable.get(i));
+            int[] futureMovePos = getButtonArrayPosition(futureMovable.get(i));
+
+            if(buttonArray[currentMovePos[0]][currentMovePos[1]].checkIsMoveSelection()) {
+                buttonArray[currentMovePos[0]][currentMovePos[1]].setBothSelectableAndFutureSelectable();
+            } else {
+                buttonArray[currentMovePos[0]][currentMovePos[1]].setButtonSelectable();
+            }
+            buttonArray[currentMovePos[0]][currentMovePos[1]].setChipButtonsMoveButton(futureMovePos[0], futureMovePos[1]);
+            if(buttonArray[futureMovePos[0]][futureMovePos[1]].checkIsChipSelection()){
+                buttonArray[futureMovePos[0]][futureMovePos[1]].setBothSelectableAndFutureSelectable();;
+            } else {
+                buttonArray[futureMovePos[0]][futureMovePos[1]].setButtonFutureSelectable();
+                // MAKE SURE TO SET THE RIGHT BUTTON LOCATION THING!!
+            }
+            buttonArray[futureMovePos[0]][futureMovePos[1]].setMoveToLocation(futureMovePos[0], futureMovable.get(i)[1]);
+            buttonArray[futureMovePos[0]][futureMovePos[1]].setMoveFromLocation(currentMovePos[0], currentMovable.get(i)[1]);
+        }
+    }
+    // converts position of tile in strips to a position in the graphicbutton array.
+    public int[] getButtonArrayPosition(int[] stripPlace) {
+        int[] positionInArray = new int[2];
+        positionInArray[0] = stripPlace[0];
         int[] playerStringPos = {3,2,1,0};
         int[] playerStringBottonPos = {7,6};
-        for (int[] stripPlace: currentMovable) {
-            strip = stripPlace[0];
-            if (strip == 0 || strip == 2) {
-                //side strips, this ensures the correct tile is chosen for position in our strip array.
-                if (stripPlace[1] == -1) {
-                    buttonPosition = 4;
-                    componentsArray[strip][buttonPosition].updateImage(1, player);
-                } else if(stripPlace[1] >= 0 || stripPlace[1] <= 3) {
-                    buttonPosition = playerStringPos[stripPlace[1]];
-                } else {
-                    buttonPosition = playerStringBottonPos[stripPlace[1]-4];
-                }
+        if (stripPlace[0]==0 || stripPlace[0] ==2) {
+            if (stripPlace[1]==-1) {
+                positionInArray[1] = 4;
+            } else if(stripPlace[1]==6) {
+                positionInArray[1] = 5;
+            } else if(stripPlace[1] >= 0 || stripPlace[1] <= 3) {
+                positionInArray[1] = playerStringPos[stripPlace[1]];
             } else {
-                buttonPosition = stripPlace[1];
+                positionInArray[1] = playerStringBottonPos[stripPlace[1]-4];
             }
-            buttonArray[strip][buttonPosition].setButtonSelectable();
+        } else {
+            positionInArray[1] = stripPlace[1];
         }
-        // do the same as above but for the futureMovable tiles.
-        for (int[] stripPlace: futureMovable) {
-            strip = stripPlace[0];
-            if (strip == 0 || strip == 2) {
-                //side strips, this ensures the correct tile is chosen for position in our strip array.
-                if(stripPlace[1] >= 0 || stripPlace[1] <= 3) {
-                    buttonPosition = playerStringPos[stripPlace[1]];
-                } else if (stripPlace[1]==6) {
-                    buttonPosition = 5;
-                } else {
-                    buttonPosition = playerStringBottonPos[stripPlace[1]-4];
-                }
-            } else {
-                buttonPosition = stripPlace[1];
-            }
-            buttonArray[strip][buttonPosition].setButtonFutureSelectable();
-        }   
+        return positionInArray;
     }
 
-    public void updateBoard() {
+    public void updateBoard(Board currentBoard) {
         // this will update the sprites on the board after a move has been made.
+        // update side strips:
+        Tile[] p1Strip = currentBoard.getBoardStrip(0);
+        Tile[] p2Strip = currentBoard.getBoardStrip(2);
+        Tile[] middleStrip = currentBoard.getBoardStrip(1);
+        int[] inversedValues =  {3,2,1,0};
+        int[] inversedValuesBottom = {5,4};
+        //p1Strip
+        for (int i = 0; i < 8; i++) {
+            if(i >= 0 && i <= 3) {
+                componentsArray[0][i].updateImage(p1Strip[inversedValues[i]].getChip().getAmn(), p1Strip[inversedValues[i]].getChip().getOwnership());
+            } else if (i >= 6) {
+                componentsArray[0][i].updateImage(p1Strip[inversedValuesBottom[i-6]].getChip().getAmn(),p1Strip[inversedValuesBottom[i-6]].getChip().getOwnership());
+            }
+        }
+        //p2Strip
+        for (int i = 0; i < 8; i++) {
+            if(i >= 0 && i <= 3) {
+                componentsArray[2][i].updateImage(p2Strip[inversedValues[i]].getChip().getAmn(),p2Strip[inversedValues[i]].getChip().getOwnership());
+            } else if (i >= 6) {
+                componentsArray[2][i].updateImage(p2Strip[inversedValuesBottom[i-6]].getChip().getAmn(), p2Strip[inversedValuesBottom[i-6]].getChip().getOwnership());
+            }
+        }
+        //middle string
+        for (int i = 0; i < 7; i++) {
+            componentsArray[1][i].updateImage(middleStrip[i].getChip().getAmn(), middleStrip[i].getChip().getOwnership());
+        }
+        // reset the properties of the buttons.
+        for (GraphicsButton[] buttonStrip : buttonArray) {
+            for (GraphicsButton button : buttonStrip) {
+                button.resetButton();
+            }
+        }
     }
 }
