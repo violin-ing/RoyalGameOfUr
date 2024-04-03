@@ -131,8 +131,8 @@ public class GameSession {
                          if (ipAddr.equals(p1Address)) {
                               System.out.println("Server: Player 1 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   p1Out.println("You have disconnected.");
-                                   p2Out.println("Opponent has disconnected.");
+                                   p1Out.println("selfdc");
+                                   p2Out.println("opponentdc");
                                    player1.close();
                               } catch (Exception e) {
                                    e.printStackTrace();
@@ -140,8 +140,8 @@ public class GameSession {
                          } else {
                               System.out.println("Server: Player 2 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   p2Out.println("You have disconnected.");
-                                   p1Out.println("Opponent has disconnected.");
+                                   p2Out.println("selfdc");
+                                   p1Out.println("opponentdc");
                                    player2.close();
                               } catch (Exception e) {
                                    e.printStackTrace();
