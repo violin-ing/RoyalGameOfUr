@@ -174,23 +174,38 @@ public class GameSession {
 
                     // PSEUDO-CODE:
                     boolean rosetta = false;
-                    String diceRoll = p1In.readLine();
+                    String diceRoll = p1In.readLine(); // Read dice roll
                     p2Out.println(diceRoll); // Send opponent dice roll
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
-                              // String move = p1In.readLine();
-                              // INFORMATION TO SEND:
-                              // 1. Origin tile and new tile coords
-                              // 2. Rosetta boolean 
-                              // p2Out.println(move); // Send P1's moves to P2 after each move
+                              String data = p1In.readLine();
+                              // info[0] = chip to move
+                              // info[1] = chip's new position
+                              // info[2] = read again?
+
+                              // INFORMATION TO SEND TO OPPONENT:
+                              p2Out.println(data); // Send P1's moves to P2 after each move
                               // rosettaTile = (currentTile.rosetta) ? true : false;
                          } while (rosetta);
                     } 
 
                } else {
-                    // TO EDIT: THIS WILL BE THE MAIN GAME THING
                     // Same as above, but just swap players (ie. p1 <-> p2)
+                    boolean rosetta = false;
+                    String diceRoll = p2In.readLine(); // Read dice roll
+                    p1Out.println(diceRoll); // Send opponent dice roll
+                    int diceNum = Integer.parseInt(diceRoll);
+                    if (diceNum > 0) {
+                         do {
+                              // String move = p2In.readLine();
+                              // INFORMATION TO SEND:
+                              // 1. Origin tile and new tile coords
+                              // 2. Rosetta boolean 
+                              // p1Out.println(move); // Send 21's moves to P1 after each move
+                              // rosettaTile = (currentTile.rosetta) ? true : false;
+                         } while (rosetta);
+                    } 
                }
                // Swap turns
                p1Turn = !p1Turn;
