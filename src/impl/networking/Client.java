@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.swing.SwingUtilities;
 
 /**
@@ -20,11 +20,14 @@ public class Client {
      private Board futureBoard;
      private Counter counter;
      private Dice dice;
-     private GameGUI gui;
+     public GameGUI gui;
 
      public static int rollAmount;
      public static boolean rollPressed = false;
      public static boolean matchFound = false;
+     public boolean moveSelected = false;
+
+     public String[] info = new String[5];
 
      public Client() {
           Counter counter = new Counter();
@@ -155,7 +158,9 @@ public class Client {
                               gui.switchP1RollButton(true);
                               boolean rosetta = false;
                               
-                              while (!rollPressed) {} // Wait until the player rolls the dice
+                              while (!rollPressed) {
+                                   // Wait until the player rolls the dice
+                              }
                               rollPressed = false;
 
                               // Send dice number to the server to send to opponent
@@ -166,13 +171,26 @@ public class Client {
                               
                               if (diceNum > 0) {
                                    do {
-                                        // String move = GUI chip move shit
-                                        // Tile currentTile = last destination tile;
-                                        // String move = "move";
+                                        Game.availableMoves("P1", diceNum);
+                                        while (!moveSelected) {
+                                             // Wait for player to make their move on the GUI
+                                        }
+                                        int[] move = Arrays.stream(info)
+                                             .limit(4)
+                                             .mapToInt(Integer::parseInt)
+                                             .toArray();
+                                        currentBoard.move(move, "P1");
+                                        System.out.println("update the board");
+                                        gui.updateBoard(currentBoard);
+                                        moveSelected = false;
+
+                                        int currentStrip = move[]
+
                                         // INFORMATION TO SEND:
                                         // 1. Chip to move
                                         // 2. Chip's new position
                                         // 3. Rosetta boolean (of chip's new position)
+                                        Tile currentTile = currentBoard[][]
                                         // out.println(move);
                                         // rosetta = (currentTile.isRosetta()) ? true : false;
                                    } while (rosetta);
