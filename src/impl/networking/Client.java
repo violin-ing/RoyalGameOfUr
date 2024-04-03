@@ -194,8 +194,11 @@ public class Client {
                                         // info[3] = new chip pos (index)
                                         // info[4] = rosetta?
                                         String[] info = data.split(",");
-                                        String originalTile = info[0];
-                                        String newTile = info[1];
+                                        String originalStrip = info[0];
+                                        String originalPos = info[1];
+                                        String newStrip = info[2];
+                                        String newPos = info[3];
+                                        String rosetta = info[4];
 
                                         // opponentTurn = (currentTile.rosettaTile) ? true : false;
                                         Thread.sleep(500);
