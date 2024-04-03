@@ -127,45 +127,71 @@ public class GameGUI extends JFrame {
 
                 // if button is both chip and move then do the extend check, then do the checks below
                 // extended check: 
-
-
-
-
-
-
-
-
-                if (button.checkIsChipSelection()) {
+                // 
+                if (button.checkIsBothSelection()) {
+                    // check to see if the player is trying to move a chip here first:
+                    // if moveFromTile is selected, then this is true.
+                    if (buttonArray[button.getMoveFromStrip()][button.getMoveFromLocation()].isSelected()) {
+                        sendMoveInformation(button);
+                    } else {
+                        // button was clicked to select chip
+                        if (GraphicsButton.tileSelected) {
+                            // clear all moveselection tiles, make sure they are no selectable.
+                            resetChipSelection();
+                        }
+                        // make this chip button selected
+                        button.setSelected(true);
+                        GraphicsButton.tileSelected = true;
+                        if (!buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].checkIsBothSelection()) {
+                            buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].setButtonSelectable();
+                        }
+                    }
+                } else if (button.checkIsChipSelection()) {
                     if (GraphicsButton.tileSelected) {
                         // make sure all moveselections are not selectable and all chip ones are selectable.
                         // revert to orignal selecetion.
-                        for (int i = 0; i < 3; i++) {
-                            for (int j = 0; j < 8; j++) {
-                                if (buttonArray[i][j].checkIsChipSelection()) {
-                                    buttonArray[i][j].setButtonSelectable();
-                                } else if(buttonArray[i][j].checkIsMoveSelection()) {
-                                    buttonArray[i][j].setButtonFutureSelectable();
-                                }
-                            }
-                        }
-                        GraphicsButton.tileSelected = false;
-                    } else {
-                        button.setButtonFutureSelectable();
-                        GraphicsButton.tileSelected = true;
-                        // turn the next non selectable button to selectable.
-                        buttonArray[button.getMoveStrip()][button.getMoveLocation()].setButtonSelectable();
+                        resetChipSelection();
+                    }
+                    button.setButtonFutureSelectable();
+                    button.setSelected(true);
+                    GraphicsButton.tileSelected = true;
+                    // turn the next non selectable button to selectable.
+                    if(!buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].checkIsBothSelection()) {
+                        buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].setButtonSelectable();
                     }
                 } else if (button.checkIsMoveSelection()) {
                     // send game the previous tile to be moved, and the position its moving to.
                     System.out.println("MOVED A PIECE!");
-                    game.move[0] = button.getMoveFromStrip();
-                    game.move[1] = button.getMoveFromLocation();
-                    game.move[2] = button.getMoveStrip();
-                    game.move[3] = button.getMoveLocation();
-                    game.moveSelected = true;
+                    sendMoveInformation(button);
                 }
             }
         });
+    }
+    // this method is called if a button is already selected and the player selected another chip
+    // this will reset all the selected and selectable properties of the buttons.
+    public void resetChipSelection() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (buttonArray[i][j].checkIsBothSelection()) {
+                    buttonArray[i][j].setSelected(false);
+                }
+                if (buttonArray[i][j].checkIsChipSelection()) {
+                    buttonArray[i][j].setButtonSelectable();
+                    buttonArray[i][j].setSelected(false);
+                } else if(buttonArray[i][j].checkIsMoveSelection()) {
+                    buttonArray[i][j].setButtonFutureSelectable();
+                    buttonArray[i][j].setSelected(false);
+                }
+            }
+        }
+    }
+
+    public void sendMoveInformation(GraphicsButton button) {
+        game.move[0] = button.getMoveFromStrip();
+        game.move[1] = button.getMoveFromLocation();
+        game.move[2] = button.getMoveStrip();
+        game.move[3] = button.getMoveLocation();
+        game.moveSelected = true;
     }
 
     public void closeFrame() {
@@ -237,6 +263,8 @@ public class GameGUI extends JFrame {
                 componentsArray[0][i].updateImage(p1Strip[inversedValues[i]].getChip().getAmn(), p1Strip[inversedValues[i]].getChip().getOwnership());
             } else if (i >= 6) {
                 componentsArray[0][i].updateImage(p1Strip[inversedValuesBottom[i-6]].getChip().getAmn(),p1Strip[inversedValuesBottom[i-6]].getChip().getOwnership());
+            } else {
+                componentsArray[0][i].updateImage(0, "none");
             }
         }
         //p2Strip
@@ -245,6 +273,8 @@ public class GameGUI extends JFrame {
                 componentsArray[2][i].updateImage(p2Strip[inversedValues[i]].getChip().getAmn(),p2Strip[inversedValues[i]].getChip().getOwnership());
             } else if (i >= 6) {
                 componentsArray[2][i].updateImage(p2Strip[inversedValuesBottom[i-6]].getChip().getAmn(), p2Strip[inversedValuesBottom[i-6]].getChip().getOwnership());
+            } else {
+                componentsArray[0][i].updateImage(0, "none");
             }
         }
         //middle string

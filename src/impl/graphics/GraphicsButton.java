@@ -4,6 +4,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 // this class will handle drawing tiles as buttons.
 public class GraphicsButton extends JButton {
     private static final int WINDOWWIDTH = 1200;
@@ -19,6 +21,7 @@ public class GraphicsButton extends JButton {
     private int moveLocation;
     private boolean moveSelection;
     public static boolean tileSelected;
+    private boolean isSelected;
     private int moveFromStrip;
     private int moveFromLocation;
     // corresponding location of button to move a chip.
@@ -39,6 +42,12 @@ public class GraphicsButton extends JButton {
         this.setVisible(false);
     }
 
+    public void updateSelection(boolean selection) {
+        this.isSelected = selection;
+    }
+
+    public boolean getSelection() {return this.isSelected;}
+
     public boolean checkIsChipSelection() {return chipSelection;}
 
     public boolean checkIsMoveSelection() {return moveSelection;}
@@ -46,7 +55,7 @@ public class GraphicsButton extends JButton {
     public boolean checkIsBothSelection() {
         if (chipSelection && moveSelection) {
             return true;
-        } else{
+        } else {
             return false;
         }
     }
@@ -61,11 +70,13 @@ public class GraphicsButton extends JButton {
     }
 
     public void setBothSelectableAndFutureSelectable() {
-        this.setBorder(BorderFactory.createBevelBorder(1,Color.GREEN,Color.ORANGE));
-        this.setEnabled(true);
-        this.setVisible(true);
         this.chipSelection = true;
         this.moveSelection = true;
+        Border border1 = BorderFactory.createLineBorder(Color.GREEN,5);
+        Border border2 = BorderFactory.createLineBorder(Color.ORANGE, 5);
+        this.setBorder(new CompoundBorder(border1,border2));
+        this.setEnabled(true);
+        this.setVisible(true);
     }
 
     public void setButtonFutureSelectable() {
