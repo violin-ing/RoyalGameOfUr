@@ -29,6 +29,7 @@ public class Client {
 
      private boolean selfWin = false;
      private boolean opponentWin = false;
+     private boolean myTurn;
 
      public String[] info = new String[5];
 
@@ -82,10 +83,27 @@ public class Client {
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in)); ) {
 
-                    AtomicBoolean myTurn = new AtomicBoolean(false); // Tracks player's turn
                     AtomicBoolean opponentAlive = new AtomicBoolean(true); // Tracks if opponent is connected
                     AtomicBoolean selfAlive = new AtomicBoolean(true); // Tracks if self is connected
          
+                    while (true) {
+                         String startMatchPacket = in.readLine();
+
+                         if ("matchfound".equals(startMatchPacket)) {
+                              frame.closeWindow();
+                              matchFound = true;
+                              String turnMsg = in.readLine();
+                              if (turnMsg.equals("startfirst")) {
+                                   myTurn = true;
+                              } else if (turnMsg.equals("waitfirst")) {
+                                   myTurn = false;
+                              }
+                              break;
+                         } else {
+                              continue;
+                         }
+                    }
+
                     // Send periodic heartbeats to server in case of connection loss
                     Thread heartbeatSender = new Thread(() -> {
                          String host = serverIP; 
@@ -113,18 +131,6 @@ public class Client {
                          String fromServer;
                          try {
                               while ((fromServer = in.readLine()) != null) {
-                                   // System.out.println("Server: " + fromServer);
-                                   if ("Match found!".equals(fromServer)) {
-                                        frame.closeWindow();
-                                        matchFound = true;
-                                        String turnMsg = in.readLine();
-                                        if (turnMsg.equals("startfirst")) {
-                                             myTurn.set(true);
-                                        } else if (turnMsg.equals("waitfirst")) {
-                                             myTurn.set(false);
-                                        }
-                                   }
-
                                    if ("You have disconnected.".equals(fromServer.trim())) {
                                         selfAlive.set(false);
                                         System.out.println("You have disconnected and forfeited the match!");
@@ -133,7 +139,7 @@ public class Client {
                                         opponentAlive.set(false);
                                         System.out.println("You have won by default!");
                                         // TODO: Display winning screen
-                                   } 
+                                   }
                               }
                          } catch (IOException e) {
                               // IGNORE
@@ -159,7 +165,7 @@ public class Client {
 
                     // Main thread deals with sending messages to server
                     while (opponentAlive.get() && selfAlive.get()) {
-                         if (myTurn.get()) {
+                         if (myTurn) {
                               // 1. Read for dice roll and send user input to server
                               // 2. Read for move (ONLY if dice roll > 0)
                               // 3. Read for move again if the player ends up on a rosetta tile
@@ -221,7 +227,7 @@ public class Client {
                                    } while (rosetta);
                               } 
                               
-                              myTurn.set(false); // Reset turn after sending message
+                              myTurn = false; // Reset turn after sending message
                               gui.switchP1RollButton(false);
                               if (counter.getP1Score() == 7) {
                                    gui.closeFrame();
