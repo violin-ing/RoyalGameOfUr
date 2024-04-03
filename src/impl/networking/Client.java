@@ -21,14 +21,22 @@ public class Client {
      private Counter counter;
      private Dice dice;
      private GameGUI gui;
+
      public static int rollAmount;
      public static boolean rollPressed = false;
      public static boolean matchFound = false;
 
-     public Client(GameGUI gui) {
-          Game game = new Game(currentBoard, counter, dice);
+     public Client() {
+          Counter counter = new Counter();
+          Board currentBoard = new Board(counter);
+          Dice dice = new Dice();
+          this.currentBoard = currentBoard;
+          this.counter = counter;
+          this.dice = dice;
+      }
+
+     public void setGUI(GameGUI gui) {
           this.gui = gui;
-          game.setGameGUI(this.gui);
           initiateMatch(this.gui);
      }
 
