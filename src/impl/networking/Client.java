@@ -26,7 +26,9 @@ public class Client {
      public static boolean matchFound = false;
 
      public Client(GameGUI gui) {
+          Game game = new Game(currentBoard, counter, dice);
           this.gui = gui;
+          game.setGameGUI(this.gui);
           initiateMatch(this.gui);
      }
 
