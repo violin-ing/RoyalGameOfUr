@@ -131,14 +131,14 @@ public class Client {
                          String fromServer;
                          try {
                               while ((fromServer = in.readLine()) != null) {
-                                   if ("You have disconnected.".equals(fromServer.trim())) {
+                                   if ("selfdc".equals(fromServer)) {
                                         selfAlive.set(false);
-                                        System.out.println("You have disconnected and forfeited the match!");
-                                        // TODO: Display losing screen here
-                                   } else if ("Opponent has disconnected.".equals(fromServer.trim())) {
+                                        gui.closeFrame();
+                                        ClientLoseGUI.display("You have disconnected and forfeited the match!");
+                                   } else if ("opponentdc".equals(fromServer)) {
                                         opponentAlive.set(false);
-                                        System.out.println("You have won by default!");
-                                        // TODO: Display winning screen
+                                        gui.closeFrame();
+                                        ClientWinGUI.display("Opponent has disconnected. You have won by default!");
                                    }
                               }
                          } catch (IOException e) {
