@@ -148,12 +148,12 @@ public class Client {
                               gui.switchP1RollButton(true);
                               boolean rosetta = false;
                               
-                              while (!rollPressed) {}
+                              while (!rollPressed) {} // Wait until the player rolls the dice
                               rollPressed = false;
 
                               // Send dice number to the server to send to opponent
                               String diceRoll = Integer.toString(rollAmount);
-                              out.println(diceRoll);
+                              out.println(diceRoll); // Sends die roll to server
                               
                               int diceNum = Integer.parseInt(diceRoll);
                               
@@ -163,8 +163,9 @@ public class Client {
                                         // Tile currentTile = last destination tile;
                                         // String move = "move";
                                         // INFORMATION TO SEND:
-                                        // 1. Tile coordinates (before AND after)
-                                        // 2. Rosetta boolean // For server to check if it should listen for more inputs
+                                        // 1. Chip to move
+                                        // 2. Chip's new position
+                                        // 3. Rosetta boolean (of chip's new position)
                                         // out.println(move);
                                         // rosetta = (currentTile.isRosetta()) ? true : false;
                                    } while (rosetta);
