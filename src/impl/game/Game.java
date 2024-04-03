@@ -8,12 +8,16 @@ public class Game {
     private Board futureBoard;
     private Counter counter;
     private Dice dice;
+    private Ai ai;
     private GameGUI gui;
+
     //TEMP
     public int rollAmount;
     public boolean rollPressed = false;
     public boolean moveSelected = false;
     public int[] move = new int[4];
+
+    public boolean multiplayer;
 
     public Game(Board currentBoard, Counter counter, Dice dice) {
         this.currentBoard = currentBoard;
@@ -39,6 +43,8 @@ public class Game {
 
     public Board getCurrentBoard() {return this.currentBoard;}
     public Board getFutureBoard() {return this.futureBoard;}
+
+    public Counter getCounter() {return this.counter;}
         
     public void start() {
         String currentPlayer = "";
@@ -48,9 +54,14 @@ public class Game {
             gui.changePlayerTurn(currentPlayer);
             // method to change the P1/P2 value for GUI
 
-            while(!rollPressed) {
-                System.out.println("Waiting for roll input");
-            }
+            // ai player turn 
+            if (!multiplayer && currentPlayer.equals("P2")) {
+                // ai turn
+            } else {
+
+                while(!rollPressed) {
+                    System.out.println("Waiting for roll input");
+                }
 
             //pass current roll amount and player to available moves
             // available moves should also calculate if the player can add a token to the board:
@@ -60,20 +71,21 @@ public class Game {
             rollPressed = false;
 
             // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
-            if (rollAmount == 0) {
-                continue;
-            } else {
-                availableMoves(currentPlayer, rollAmount);
-                while (!moveSelected) {
-                    System.out.println("Waiting for move input");
+                if (rollAmount == 0) {
+                    continue;
+                } else {
+                    availableMoves(currentPlayer, rollAmount);
+                    while (!moveSelected) {
+                        System.out.println("Waiting for move input");
+                    }
+                    // update the board.
+                    // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
+                    // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
+                    currentBoard.move(move, currentPlayer);
+                    System.out.println("update the board");
+                    gui.updateBoard(currentBoard);
+                    moveSelected = false;
                 }
-                // update the board.
-                // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
-                // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
-                currentBoard.move(move, currentPlayer);
-                System.out.println("update the board");
-                gui.updateBoard(currentBoard);
-                moveSelected = false;
             }
 
             //this will return the map of current and furture positions (being the current positions of tiles on the board, and the positions they can be moved)

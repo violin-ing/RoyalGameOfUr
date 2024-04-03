@@ -74,11 +74,12 @@ public class Board {
         for (Tile tile : midStrip) moveLogic(tile, player, roll, wantedPiece, "midStrip");
     }
 
-    public void move(int[] moveChoice, String player) {
+    public List<String> move(int[] moveChoice, String player) {
         Tile movingFromTile;
         Tile movingToTile;
         boolean addedChip  = false;
         boolean removedChip = false;
+        List<String> moveType = new ArrayList<>();
         
         // if statment sets up tile we are moving from and to.
         // this will also check if we are adding a chip to the board / or removing one (scoring).
@@ -99,15 +100,19 @@ public class Board {
             // clear from tile
             // add tile amount to score
             counter.increasePlayerScore(player, movingFromTile.getChip().getAmn());
+            moveType.add("WIN");
             // CLEAR TILE AFTER
         } else if(addedChip){
             // increase value of tile we are moving to, and check if we are on a rosetta tile
             // if we are on a rosetta give player another turn
             movingToTile.getChip().increaseAmn(1);
             movingToTile.getChip().setOwnership(player);
+            moveType.add("ADD CHIP");
+
             if (movingToTile.isRosetta()) {
                 // this has the effect of giving the player another turn.
                 counter.getPlayerTurn();
+                moveType.add("ROSETTA");
             }
             // decrement the counter value for player
             counter.reduceCounter(player);
@@ -118,19 +123,23 @@ public class Board {
             // MOVING TO OWN TILE
             if (movingToTile.getChip().getOwnership().equals(player)) {
                 movingToTile.getChip().increaseAmn(movingFromTile.getChip().getStackAmount());
+                moveType.add("STACK");
             } else {
                 // MOVING TO ENEMY TILE
                 String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
                 if (movingToTile.getChip().getOwnership().equals(enemyPlayer)) {
                     counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
+                    moveType.add("TAKE CHIP");
                 }
                 // IF MOVING TO EMPTY TILE WE DO THIS ASWELL
                 movingToTile.getChip().setOwnership(player);
                 movingToTile.getChip().setAmn(movingFromTile.getChip().getAmn());
+                moveType.add("MOVE");
             }
             // give player another turn if this is a rosetta.
             if (movingToTile.isRosetta()) {
                 counter.getPlayerTurn();
+                moveType.add("ROSETTA");
             }
         }
         if (!addedChip) {
@@ -138,6 +147,9 @@ public class Board {
             movingFromTile.getChip().setOwnership("none");
             movingFromTile.getChip().setAmn(0);
         }
+
+        return moveType;
+
     }
 
     /**
