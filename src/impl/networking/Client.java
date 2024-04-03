@@ -216,16 +216,11 @@ public class Client {
                               if (counter.getP1Score() == 7) {
                                    gui.closeFrame();
                               }
-                              
                          } else {
-                              // 1. Read opponent's dice roll and update GUI
-                              // 2. Read opponent's move and update GUI
-                              
-                              // PSEUDO-CODE:
                               boolean opponentTurn = true;
                               String dieRollStr = in.readLine(); // Read opponent's die roll
                               int dieRoll = Integer.parseInt(dieRollStr);
-                              
+
                               if (dieRoll > 0) {
                                    do {
                                         String data = in.readLine(); // Read opponent's move
@@ -245,7 +240,10 @@ public class Client {
                                              .toArray();
                                         currentBoard.move(move, "P2");
                                         gui.updateBoard(currentBoard);
-
+                                        if (counter.getP2Score() == 7) {
+                                             gui.closeFrame();
+                                             break;
+                                        }
                                    } while (opponentTurn);
                               }
                               // check if opponent has won (should get losing message if so)

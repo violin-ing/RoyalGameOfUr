@@ -6,6 +6,9 @@ public class Ai {
     public static double[] ROLL_PERCENTAGES = {0.0625, 0.25, 0.375, 0.25, 0.0625};
     public static int LEVELS = 4;
 
+    public static String p1 = "P1";
+    public static String p2 = "P2";
+
     //String[] moves = {"MOVE", "ROSETTE", "ADD CHIP", "STACK", "TAKE CHIP", "WIN", "BLOCK"};
     static String[] moves = {"MOVE", "TAKE CHIP", "STACK", "ADD CHIP"};
     static String[] tactics = {"SPEEDY", "HOSTILE", "ATTRITION", "SNEAKY"};
@@ -25,10 +28,11 @@ public class Ai {
 
     public static String aiMode = "SPEEDY";
 
-    /* 
-    public Ai(String aiMode) {
-        this.aiMode = aiMode;
-    } */
+    public Game game;
+
+    public Ai(Game game) {
+        this.game = game;
+    } 
 
     public static Map<String, String> mapScores() {
         //behaviour = new HashMap<>();
@@ -40,8 +44,62 @@ public class Ai {
         return behaviour;
     }
 
-    public static void calculateMove(List<int[]> currentMovablePositions, List<int[]> futurePositions) {
+    public void aiTurn() {
+        int roll = dice.roll();
+        int counter = game.getCounter().getP2Counter();
+        List<Board> maxBoards = new ArrayList<>();
+        List<Board> minBoards = new ArrayList<>();
+        List<Integer> branches = new ArrayList<>();
+        List<List<String[]>> moveTypes = new ArrayList<>();
+            
+        if (roll != 0) {
+            List<int[]> maxCurrentMovablePositions = game.getCurrentMovablePositions(p2, roll, game.getCurrentBoard().identifyPieces(p2), counter);
 
+            // checks that there is current movable positions 
+            if (maxCurrentMovablePositions.isEmpty()) {
+                List<int[]> maxFuturePositions = game.getFuturePositions(p2, roll, maxCurrentMovablePositions);
+    
+                 // calculates all possible boards after ai makes a move
+                for (int i = 0; i < maxFuturePositions.size(); i++) { 
+                    maxBoards.add(createTempBoard(game.getCurrentBoard(), p2, maxCurrentMovablePositions.get(i), maxFuturePositions.get(i)));
+                }
+    
+                // calculates all the possible player boards, for each roll combination
+                for (int playerRoll = 1; playerRoll < 5; playerRoll++) {
+                    int numBranches = 0;
+                    for (int j = 0; j < maxBoards.size(); j++) { 
+                        List<int[]> minCurrentMovablePositions = game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(j).identifyPieces(p1), counter);
+                        List<int[]> minFuturePositions = game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
+    
+                        minBoards.add(createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j)));
+
+                        // create array of possible moves for each branch
+                        List<String> movesList = getMoveTypes(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+                        String[] movesArr = (String[]) movesList.toArray();
+                        moveTypes.add(movesArr);
+                        numBranches++;
+                    }
+
+                    branches.add(numBranches);
+                }
+            }
+        }
+    }
+
+    public Board createTempBoard(Board board, String player, int[] currentPos, int[] futurePos) {
+        Board tempBoard = board;
+
+        int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
+
+        tempBoard.move(move, player);
+
+        return tempBoard;
+    }
+
+    public List<String> getMoveTypes(Board board, String player, int[] currentPos, int[] futurePos) {
+        int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
+
+        return board.move(move, player);
     }
 
     public static Node createTree() {
@@ -67,6 +125,7 @@ public class Ai {
                         queue.add(childNode); // Add the child node to the queue for further processing
                     }
                 } else {
+                    
                     for (int j = 0; j < getValidMoves().length; j++) {
                         Node childNode;
     

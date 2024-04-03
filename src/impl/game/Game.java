@@ -7,12 +7,16 @@ public class Game {
     private static Board currentBoard;
     private static Counter counter;
     private Dice dice;
-    private static GameGUI gui;
+    private Ai ai;
+    private GameGUI gui;
+
     //TEMP
     public int rollAmount;
     public boolean rollPressed = false;
     public boolean moveSelected = false;
     public int[] move = new int[4];
+
+    public boolean multiplayer;
 
     public Game(Board currentBoard, Counter counter, Dice dice) {
         this.currentBoard = currentBoard;
@@ -37,7 +41,10 @@ public class Game {
     */
 
     public Board getCurrentBoard() {return this.currentBoard;}
+    public Board getFutureBoard() {return this.futureBoard;}
 
+    public Counter getCounter() {return this.counter;}
+        
     public void start() {
         String currentPlayer = "";
 
@@ -46,9 +53,14 @@ public class Game {
             gui.changePlayerTurn(currentPlayer);
             // method to change the P1/P2 value for GUI
 
-            while(!rollPressed) {
-                System.out.println("Waiting for roll input");
-            }
+            // ai player turn 
+            if (!multiplayer && currentPlayer.equals("P2")) {
+                // ai turn
+            } else {
+
+                while(!rollPressed) {
+                    System.out.println("Waiting for roll input");
+                }
 
             //pass current roll amount and player to available moves
             // available moves should also calculate if the player can add a token to the board:

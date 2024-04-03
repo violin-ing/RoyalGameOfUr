@@ -59,11 +59,36 @@ public class Board {
     public Tile[] getBoardStrip(int index) {return this.board[index];}
     public Tile[][] getBoard() {return this.board;}
 
-    public void move(int[] moveChoice, String player) {
+
+    // TODO: pieceMover method requires valid move checker so that user knows what piece can be implemented, provide wanted chip prevalidated before it enters pieceMover
+    // TODO: make it so that adding token to the board is always an available move under certain circumstances.
+    // Ensure an array of valid moves is returned by the checker, and then lists them to the user, and loops until they choose one of the options
+
+    // Will handle movement through the arrays
+    // Iterates through each possible position a player chip could be, and passes the ownership, roll, and wanted piece to the moveLogic method
+    // so that it can handle with identifying the strip the chip is in, and moving it to the specified location
+    
+    public void pieceMover(String player, int roll, int[] wantedPiece) {
+        // loop through all the pieces in the current board, if p1, only check p1 string and middle, if p2 only check p2 and middle
+        // we then want to update this current board to only have all available moves.
+        // we also need to do an additional check to see if we can add a token to the board in the availalbe moves.
+        if (player.equals("P1")) {
+            for (Tile tile : p1Strip) moveLogic(tile, player, roll, wantedPiece, "p1Strip");        //We can call {p1, p2, mid}strip as it is a property of this class
+        }
+    
+        else if (player.equals("P2")) {
+            for (Tile tile : p2Strip) moveLogic(tile, player, roll, wantedPiece, "p2Strip");
+        }
+
+        for (Tile tile : midStrip) moveLogic(tile, player, roll, wantedPiece, "midStrip");
+    }
+
+    public List<String> move(int[] moveChoice, String player) {
         Tile movingFromTile;
         Tile movingToTile;
         boolean addedChip  = false;
         boolean removedChip = false;
+        List<String> moveType = new ArrayList<>();
         
         // if statment sets up tile we are moving from and to.
         // this will also check if we are adding a chip to the board / or removing one (scoring).
@@ -84,15 +109,19 @@ public class Board {
             // clear from tile
             // add tile amount to score
             counter.increasePlayerScore(player, movingFromTile.getChip().getAmn());
+            moveType.add("WIN");
             // CLEAR TILE AFTER
         } else if(addedChip){
             // increase value of tile we are moving to, and check if we are on a rosetta tile
             // if we are on a rosetta give player another turn
             movingToTile.getChip().increaseAmn(1);
             movingToTile.getChip().setOwnership(player);
+            moveType.add("ADD CHIP");
+
             if (movingToTile.isRosetta()) {
                 // this has the effect of giving the player another turn.
                 counter.getPlayerTurn();
+                moveType.add("ROSETTA");
             }
             // decrement the counter value for player
             counter.reduceCounter(player);
@@ -103,22 +132,23 @@ public class Board {
             // MOVING TO OWN TILE
             if (movingToTile.getChip().getOwnership().equals(player)) {
                 movingToTile.getChip().increaseAmn(movingFromTile.getChip().getStackAmount());
+                moveType.add("STACK");
             } else {
                 // MOVING TO ENEMY TILE
                 String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
                 if (movingToTile.getChip().getOwnership().equals(enemyPlayer)) {
                     counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
+                    moveType.add("TAKE CHIP");
                 }
                 // IF MOVING TO EMPTY TILE WE DO THIS ASWELL
                 movingToTile.getChip().setOwnership(player);
                 movingToTile.getChip().setAmn(movingFromTile.getChip().getAmn());
+                moveType.add("MOVE");
             }
             // give player another turn if this is a rosetta.
             if (movingToTile.isRosetta()) {
                 counter.getPlayerTurn();
-                for (int i = 0; i < 1000; i++) {
-                    System.out.println("ON ROSETTA!!!");
-                }
+                moveType.add("ROSETTA");
             }
         }
         if (!addedChip) {
