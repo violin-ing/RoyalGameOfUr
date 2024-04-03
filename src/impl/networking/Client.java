@@ -212,8 +212,10 @@ public class Client {
                               } 
                               
                               myTurn.set(false); // Reset turn after sending message
-                              if (counter)
                               gui.switchP1RollButton(false);
+                              if (counter.getP1Score() == 7) {
+                                   gui.closeFrame();
+                              }
                               
                          } else {
                               // 1. Read opponent's dice roll and update GUI
