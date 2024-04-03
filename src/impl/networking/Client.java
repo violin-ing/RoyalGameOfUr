@@ -74,7 +74,7 @@ public class Client {
                try (Socket socket = new Socket(serverIP, serverPort);
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in))) {
+                    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in)); ) {
 
                     AtomicBoolean myTurn = new AtomicBoolean(false); // Tracks player's turn
                     AtomicBoolean opponentAlive = new AtomicBoolean(true); // Tracks if opponent is connected
@@ -175,12 +175,12 @@ public class Client {
                                         while (!moveSelected) {
                                              // Wait for player to make their move on the GUI
                                         }
+                                        // Stream "info" array into a usable int[] array 
                                         int[] move = Arrays.stream(info)
                                              .limit(4)
                                              .mapToInt(Integer::parseInt)
                                              .toArray();
                                         currentBoard.move(move, "P1");
-                                        System.out.println("update the board");
                                         gui.updateBoard(currentBoard);
                                         moveSelected = false;
 
@@ -223,26 +223,28 @@ public class Client {
                               
                               // PSEUDO-CODE:
                               boolean opponentTurn = true;
-                              String dieRollStr = in.readLine();
+                              String dieRollStr = in.readLine(); // Read opponent's die roll
                               int dieRoll = Integer.parseInt(dieRollStr);
                               if (dieRoll > 0) {
                                    do {
-                                        String data = in.readLine();
-                                        // INFORMATION TO RECEIVE:
-                                        // info[0] = original chip strip
-                                        // info[1] = original chip pos (index)
-                                        // info[2] = new chip strip
-                                        // info[3] = new chip pos (index)
-                                        // info[4] = rosetta?
+                                        String data = in.readLine(); // Read opponent's move
                                         String[] info = data.split(",");
-                                        String originalStrip = info[0];
-                                        String originalPos = info[1];
-                                        String newStrip = info[2];
-                                        String newPos = info[3];
                                         String rosetta = info[4];
 
-                                        // opponentTurn = (currentTile.rosettaTile) ? true : false;
-                                        Thread.sleep(500);
+                                        if ("true".equals(rosetta)) {
+                                             opponentTurn = true;
+                                        } else {
+                                             opponentTurn = false;
+                                        }
+
+                                        // Stream packet array into a usable int[] array
+                                        int[] move = Arrays.stream(info)
+                                             .limit(4)
+                                             .mapToInt(Integer::parseInt)
+                                             .toArray();
+                                        currentBoard.move(move, "P2");
+                                        gui.updateBoard(currentBoard);
+
                                    } while (opponentTurn);
                               }
                               // check if opponent has won (should get losing message if so)
