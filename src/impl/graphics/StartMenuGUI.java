@@ -7,7 +7,7 @@ import javax.swing.*;
 // render this on a new thread 
 public class StartMenuGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
-    private static final int WINDOWHEIGHT = 500;
+    private static final int WINDOWHEIGHT = 800;
     public static void main(String[] args) {
         new StartMenuGUI();
     }

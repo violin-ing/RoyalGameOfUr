@@ -136,11 +136,6 @@ public class Client {
                          startPacket = in.readLine();
                          if (startPacket == null) {continue;}
                          if ("matchfound".equals(startPacket)) {
-                              SwingUtilities.invokeLater(new Runnable() {
-                                   public void run() {
-                                       frame.closeWindow();
-                                   }
-                               });
                               matchFound = true;
                               String turnMsg = in.readLine();
                               if (turnMsg.equals("startfirst")) {
@@ -148,18 +143,21 @@ public class Client {
                               } else if (turnMsg.equals("waitfirst")) {
                                    myTurn = false;
                               }
+                              SwingUtilities.invokeLater(new Runnable() {
+                                   public void run() {
+                                       frame.closeWindow();
+                                   }
+                               });
                          }
                     } while (startPacket == null);
 
                     // Main thread deals with sending messages to server
                     while (opponentAlive && selfAlive) {
-
                          if (myTurn) {
                               // 1. Read for dice roll and send user input to server
                               // 2. Read for move (ONLY if dice roll > 0)
                               // 3. Read for move again if the player ends up on a rosetta tile
 
-                              // PSEUDO-CODE:
                               gui.switchP1RollButton(true);
                               boolean rosetta = false;
                               
@@ -225,6 +223,8 @@ public class Client {
                               boolean opponentTurn = true;
                               String dieRollStr = in.readLine(); // Read opponent's die roll
                               int dieRoll = Integer.parseInt(dieRollStr);
+                              
+                              gui.updateRollLabel("P2", dieRoll);
 
                               if (dieRoll > 0) {
                                    do {
