@@ -16,11 +16,14 @@ public class Client {
      public static final int DEFAULT_PORT = 6969; // Server game port
      private final static int HEARTBEAT_PORT = 42069; // Heartbeat port
 
-     public static int diceRollGetter;
-     public static boolean rollPressed;
-     public static boolean matchFound = false;
-
+     private Board currentBoard;
+     private Board futureBoard;
+     private Counter counter;
+     private Dice dice;
      private GameGUI gui;
+     public static int rollAmount;
+     public static boolean rollPressed = false;
+     public static boolean matchFound = false;
 
      public Client(GameGUI gui) {
           this.gui = gui;
@@ -147,7 +150,7 @@ public class Client {
                               rollPressed = false;
 
                               // Send dice number to the server to send to opponent
-                              String diceRoll = Integer.toString(diceRollGetter);
+                              String diceRoll = Integer.toString(rollAmount);
                               out.println(diceRoll);
                               
                               int diceNum = Integer.parseInt(diceRoll);
