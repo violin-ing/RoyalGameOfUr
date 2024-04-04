@@ -138,26 +138,41 @@ public class Game {
     public static boolean availableMoves(String player, int roll) {
         boolean possibleMoves;
         int currentPlayerCounter;
-        if (player.equals("P1")) {
-            currentPlayerCounter = counter.getP1Counter();
+        
+        if (networkPlay) {
+            if (player.equals("P1")) {
+                currentPlayerCounter = Client.counter.getP1Counter();
+            } else {
+                currentPlayerCounter = Client.counter.getP2Counter();
+            }
         } else {
-            currentPlayerCounter = counter.getP2Counter();
-        }
-
-        List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
-        List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
-
-        if (futurePositions.size()==0) {
-            possibleMoves = false;
-        } else {
-            possibleMoves = true;
+            if (player.equals("P1")) {
+                currentPlayerCounter = counter.getP1Counter();
+            } else {
+                currentPlayerCounter = counter.getP2Counter();
+            }
         }
 
         if (networkPlay) {
+            List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, Client.currentBoard.identifyPieces(player), currentPlayerCounter);
+            List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
+            if (futurePositions.size()==0) {
+                possibleMoves = false;
+            } else {
+                possibleMoves = true;
+            }
             Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
         } else {
+            List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
+            List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
+            if (futurePositions.size()==0) {
+                possibleMoves = false;
+            } else {
+                possibleMoves = true;
+            }
             gui.updateSelectableTiles(currentMovablePositions, futurePositions);
         }
+
         return possibleMoves;
     }
 

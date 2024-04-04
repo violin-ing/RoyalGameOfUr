@@ -16,10 +16,10 @@ public class Client {
      public static final int DEFAULT_PORT = 6969; // Server game port
      private final static int HEARTBEAT_PORT = 42069; // Heartbeat port
 
-     private static Board currentBoard;
-     private static Board futureBoard;
-     private static Counter counter;
-     private static Dice dice;
+     public static Board currentBoard;
+     public static Board futureBoard;
+     public static Counter counter;
+     public static Dice dice;
      public static GameGUI gui;
 
      public static int rollAmount;
