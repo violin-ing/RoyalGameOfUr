@@ -146,9 +146,11 @@ public class Client {
 
                               gui.switchP1RollButton(true);
                               boolean rosetta = false;
+
+                              System.out.println("TEST: Testing rolling functionality");
                               
                               while (!rollPressed) {
-                                   System.out.println("rolling...");
+                                   // System.out.println("rolling...");
                               }
                               rollPressed = false;
 

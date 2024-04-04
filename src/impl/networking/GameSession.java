@@ -116,34 +116,53 @@ public class GameSession {
                          if (ipAddr.equals(p1Address)) {
                               System.out.println("Server: Player 1 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
+                                   // Start the timer
+                                   final long durationMillis = 10000; // 10 seconds
+                                   long startTime = System.currentTimeMillis();
+                               
+                                   // Create the socket outside the loop to reuse for all packets
                                    try (DatagramSocket socket = new DatagramSocket()) {
-                                        byte[] buffer = "opponentdc".getBytes();
-                                        InetAddress address = player2.getInetAddress();
-                                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 4445);
-                                        socket.send(packet);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                                       while (System.currentTimeMillis() - startTime < durationMillis) {
+                                           byte[] buffer = "opponentdc".getBytes();
+                                           InetAddress address = player2.getInetAddress();
+                                           DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 4445);
+                                           socket.send(packet);
+                               
+                                           // Sleep for a short period to avoid flooding
+                                           Thread.sleep(500); // Sleep for 500 milliseconds
+                                       }
+                                   } catch (Exception e) {
+                                       e.printStackTrace();
+                                   }
                                    player2.close();
-                              } catch (Exception e) {
+                               } catch (Exception e) {
                                    e.printStackTrace();
-                              }
+                               }                          
                          } else {
                               System.out.println("Server: Player 2 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   
+                                   // Start the timer
+                                   final long durationMillis = 10000; // 10 seconds
+                                   long startTime = System.currentTimeMillis();
+                               
+                                   // Create the socket outside the loop to reuse for all packets
                                    try (DatagramSocket socket = new DatagramSocket()) {
-                                        byte[] buffer = "opponentdc".getBytes();
-                                        InetAddress address = player1.getInetAddress();
-                                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 4445);
-                                        socket.send(packet);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                                       while (System.currentTimeMillis() - startTime < durationMillis) {
+                                           byte[] buffer = "opponentdc".getBytes();
+                                           InetAddress address = player1.getInetAddress();
+                                           DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 4445);
+                                           socket.send(packet);
+                               
+                                           // Sleep for a short period to avoid flooding
+                                           Thread.sleep(500); // Sleep for 500 milliseconds
+                                       }
+                                   } catch (Exception e) {
+                                       e.printStackTrace();
+                                   }
                                    player1.close();
-                              } catch (Exception e) {
+                               } catch (Exception e) {
                                    e.printStackTrace();
-                              }
+                               }     
                          }
                          executorService.shutdown();
                     }
