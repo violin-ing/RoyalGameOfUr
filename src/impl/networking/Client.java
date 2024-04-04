@@ -173,49 +173,62 @@ public class Client {
                               
                               if (diceNum > 0) {
                                    do {
-                                        Game.availableMoves("P1", diceNum);
-                                        while (!moveSelected) {
-                                             // Wait for player to make their move on the GUI
-                                             System.out.println("waiting for opponent roll...");
-                                        }
-                                        // Stream "info" array into a usable int[] array 
-                                        int[] move = Arrays.stream(info)
-                                             .limit(4)
-                                             .mapToInt(Integer::parseInt)
-                                             .toArray();
-                                        currentBoard.move(move, "P1");
-                                        SwingUtilities.invokeLater(() -> {
-                                             gui.updateBoard(currentBoard);
-                                        });
-                                        moveSelected = false;
+                                        // go to next iteration if there are no available moves
+                                        if (Game.availableMoves("P1", diceNum)) {
+                                             System.out.println("WAITING FOR MOVE");
+                                             while (!moveSelected) {
+                                                  try { 
+                                                       Thread.sleep(3000); // Wait for 10 seconds 
+                                                       System.out.println("WAITING FOR INPUT");
+                                                  } catch (InterruptedException e) { 
+                                                       // Handle the exception 
+                                                  }
+                                             }
 
-                                        int newStrip = move[2];
-                                        int newIndex = move[3];
+                                             System.out.println("update the board");
 
-                                        // INFORMATION TO SEND:
-                                        // 1. Chip's old position (strip + index)
-                                        // 2. Chip's new position (strip + index)
-                                        // 3. Rosetta boolean (of chip's new position)
-                                        Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
-                                        if (newTile.isRosetta()) {
-                                             info[4] = "true";
-                                             rosetta = true;
+                                             // Stream "info" array into a usable int[] array 
+                                             int[] move = Arrays.stream(info)
+                                                  .limit(4)
+                                                  .mapToInt(Integer::parseInt)
+                                                  .toArray();
+                                             
+                                             currentBoard.move(move, "P1");
+                                             SwingUtilities.invokeLater(() -> {
+                                                  gui.updateBoard(currentBoard);
+                                                  gui.updateScore(counter);
+                                             });
+                                             moveSelected = false;
+     
+                                             int newStrip = move[2];
+                                             int newIndex = move[3];
+     
+                                             // INFORMATION TO SEND:
+                                             // 1. Chip's old position (strip + index)
+                                             // 2. Chip's new position (strip + index)
+                                             // 3. Rosetta boolean (of chip's new position)
+                                             Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
+                                             if (newTile.isRosetta()) {
+                                                  info[4] = "true";
+                                                  rosetta = true;
+                                             } else {
+                                                  info[4] = "false";
+                                                  rosetta = false;
+                                             }
+                                             StringBuffer gamePacket = new StringBuffer();
+                                             for (int i = 0; i < info.length; i++) {
+                                                  if (i == info.length - 1) {
+                                                       gamePacket.append(info[i]);
+                                                  } else {
+                                                       gamePacket.append(info[i] + ",");
+                                                  }
+                                             }
+                                             new Thread(() -> {
+                                                  out.println(gamePacket);
+                                             }).start();
                                         } else {
-                                             info[4] = "false";
                                              rosetta = false;
                                         }
-                                        StringBuffer gamePacket = new StringBuffer();
-                                        for (int i = 0; i < info.length; i++) {
-                                             if (i == info.length - 1) {
-                                                  gamePacket.append(info[i]);
-                                             } else {
-                                                  gamePacket.append(info[i] + ",");
-                                             }
-                                        }
-                                        new Thread(() -> {
-                                             out.println(gamePacket);
-                                        }).start();
-                                        
                                    } while (rosetta);
                               } 
                               
