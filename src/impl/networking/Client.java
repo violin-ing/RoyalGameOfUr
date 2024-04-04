@@ -103,24 +103,20 @@ public class Client {
 
                     // Start a thread to listen for messages from the server
                     Thread serverListener = new Thread(() -> {
-                         String fromServer;
-                         try {
-                              while ((fromServer = in.readLine()) != null) {
-                                   Thread.sleep(1000);
-                                   if ("selfdc".equals(fromServer)) {
-                                        selfAlive = false;
+                         try (DatagramSocket dcSocket = new DatagramSocket(4445)) {
+                              byte[] dcMsgBuffer = new byte[256];
+                  
+                              while (true) {
+                                   DatagramPacket dcPacket = new DatagramPacket(buffer, buffer.length);
+                                   dcSocket.receive(packet);
+                                   String received = new String(packet.getData(), 0, packet.getLength());
+                                   if (received.equals("opponentdc")) {
                                         gui.closeFrame();
-                                        ClientLoseGUI.display("You have disconnected and forfeited the match!");
-                                   } else if ("opponentdc".equals(fromServer)) {
-                                        opponentAlive = false;
-                                        gui.closeFrame();
-                                        ClientWinGUI.display("Opponent has disconnected. You have won by default!");
+                                        ClientWinGUI.display("Opponent disconnected. You have won the game by default.");
                                         heartbeatSender.interrupt();
-                                   }
+                                   } 
                               }
-                         } catch (IOException e) {
-                              // IGNORE
-                         } catch (InterruptedException e) {
+                         } catch (Exception e) {
                               gui.closeFrame();
                               ErrorWindowGUI.display();
                          }
@@ -213,17 +209,6 @@ public class Client {
                          } else {
                               boolean opponentTurn = true;
                               String dieRollStr = in.readLine(); // Read opponent's die roll
-
-                              if ("selfdc".equals(dieRollStr)) {
-                                   selfAlive = false;
-                                   gui.closeFrame();
-                                   ClientLoseGUI.display("You have disconnected and forfeited the match!");
-                              } else if ("opponentdc".equals(dieRollStr)) {
-                                   opponentAlive = false;
-                                   gui.closeFrame();
-                                   ClientWinGUI.display("Opponent has disconnected. You have won by default!");
-                                   heartbeatSender.interrupt();
-                              }
 
                               int dieRoll = Integer.parseInt(dieRollStr);
                               

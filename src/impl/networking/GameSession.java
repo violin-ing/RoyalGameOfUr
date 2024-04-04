@@ -116,18 +116,31 @@ public class GameSession {
                          if (ipAddr.equals(p1Address)) {
                               System.out.println("Server: Player 1 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   p1Out.println("selfdc");
-                                   p2Out.println("opponentdc");
-                                   player1.close();
+                                   try (DatagramSocket socket = new DatagramSocket()) {
+                                        byte[] buffer = "opponentdc".getBytes();
+                                        InetAddress address = player2.getInetAddress();
+                                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 4445);
+                                        socket.send(packet);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                   player2.close();
                               } catch (Exception e) {
                                    e.printStackTrace();
                               }
                          } else {
                               System.out.println("Server: Player 2 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   p2Out.println("selfdc");
-                                   p1Out.println("opponentdc");
-                                   player2.close();
+                                   
+                                   try (DatagramSocket socket = new DatagramSocket()) {
+                                        byte[] buffer = "opponentdc".getBytes();
+                                        InetAddress address = player1.getInetAddress();
+                                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 4445);
+                                        socket.send(packet);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                   player1.close();
                               } catch (Exception e) {
                                    e.printStackTrace();
                               }
