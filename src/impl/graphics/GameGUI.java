@@ -138,7 +138,9 @@ public class GameGUI extends JFrame {
                 // depending on the status of that button (waiting to select a move) / already selected move.
                 // some method will then need to be called which will change which other buttons are visible.
                 int roll = dice.roll();
-                rollAmountText.setText("" + roll);
+                SwingUtilities.invokeLater(() -> {
+                    rollAmountText.setText("" + roll);
+                });
                 if (networkPlay) {
                     Client.rollAmount = roll;
                     Client.rollPressed = true;
@@ -151,7 +153,9 @@ public class GameGUI extends JFrame {
                 System.out.println("ROLLED");
 
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
-                rollbutton.setEnabled(false);
+                SwingUtilities.invokeLater(() -> {
+                    rollbutton.setEnabled(false);
+                });
             }
         });
     }

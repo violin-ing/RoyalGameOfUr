@@ -147,7 +147,10 @@ public class Client {
                               // 2. Read for move (ONLY if dice roll > 0)
                               // 3. Read for move again if the player ends up on a rosetta tile
 
-                              gui.switchP1RollButton(true);
+                              SwingUtilities.invokeLater(() -> {
+                                   gui.switchP1RollButton(true);
+                              });
+                              
                               boolean rosetta = false;
                               
                               while (!rollPressed) {
@@ -179,7 +182,9 @@ public class Client {
                                              .mapToInt(Integer::parseInt)
                                              .toArray();
                                         currentBoard.move(move, "P1");
-                                        gui.updateBoard(currentBoard);
+                                        SwingUtilities.invokeLater(() -> {
+                                             gui.updateBoard(currentBoard);
+                                        });
                                         moveSelected = false;
 
                                         int newStrip = move[2];
@@ -210,10 +215,16 @@ public class Client {
                               } 
                               
                               myTurn = false; // Reset turn after sending message
-                              gui.switchP1RollButton(false);
+                              SwingUtilities.invokeLater(() -> {
+                                   gui.switchP1RollButton(false);
+                              });
+                              
                               if (counter.getP1Score() == 7) {
+                                   SwingUtilities.invokeLater(() -> {
+                                        gui.closeFrame();
+                                   });
                                    ClientWinGUI.display("You have won the game!");
-                                   gui.closeFrame();
+                                   return;
                               }
                          } else {
                               boolean opponentTurn = true;
@@ -221,22 +232,13 @@ public class Client {
 
                               int dieRoll = Integer.parseInt(dieRollStr);
                               
-                              gui.updateRollLabel("P2", dieRoll);
-
+                              SwingUtilities.invokeLater(() -> {
+                                   gui.updateRollLabel("P2", dieRoll);
+                              });
+                              
                               if (dieRoll > 0) {
                                    do {
                                         String data = in.readLine(); // Read opponent's move
-
-                                        if ("selfdc".equals(data)) {
-                                             selfAlive = false;
-                                             gui.closeFrame();
-                                             ClientLoseGUI.display("You have disconnected and forfeited the match!");
-                                        } else if ("opponentdc".equals(data)) {
-                                             opponentAlive = false;
-                                             gui.closeFrame();
-                                             ClientWinGUI.display("Opponent has disconnected. You have won by default!");
-                                             heartbeatSender.interrupt();
-                                        }
 
                                         String[] info = data.split(",");
                                         String rosetta = info[4];
@@ -255,9 +257,11 @@ public class Client {
                                         currentBoard.move(move, "P2");
                                         gui.updateBoard(currentBoard);
                                         if (counter.getP2Score() == 7) {
+                                             SwingUtilities.invokeLater(() -> {
+                                                  gui.closeFrame();
+                                             });
                                              ClientLoseGUI.display("You have lost the game!");
-                                             gui.closeFrame();
-                                             break;
+                                             return;
                                         }
                                    } while (opponentTurn);
                               }
@@ -268,7 +272,7 @@ public class Client {
                     // Cleanup resources
                     heartbeatSender.interrupt();
                     serverListener.interrupt();
-                    System.exit(0);
+                    return;
                } catch (Exception e) {
                     System.out.println("Error connecting to server! " + e);
                } 
