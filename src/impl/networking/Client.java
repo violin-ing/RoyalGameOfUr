@@ -56,8 +56,6 @@ public class Client {
      */
      public void initiateMatch() {
           try {
-               matchFound = false;
-
                // Connecting to server display
                // ServerConnectionGUI frame = ServerConnectionGUI.display();
 
@@ -101,29 +99,7 @@ public class Client {
                          }
                     });
 
-                    // Start a thread to listen for messages from the server
                     Thread serverListener = new Thread(() -> {
-                         try (DatagramSocket dcSocket = new DatagramSocket(4445)) {
-                              byte[] dcMsgBuffer = new byte[256];
-                  
-                              while (true) {
-                                   DatagramPacket dcPacket = new DatagramPacket(dcMsgBuffer, dcMsgBuffer.length);
-                                   dcSocket.receive(dcPacket);
-                                   String received = new String(dcPacket.getData(), 0, dcPacket.getLength());
-                                   if (received.equals("opponentdc")) {
-                                        gui.closeFrame();
-                                        ClientWinGUI.display("Opponent disconnected. You have won the game by default.");
-                                        heartbeatSender.interrupt();
-                                        return;
-                                   } 
-                              }
-                         } catch (Exception e) {
-                              gui.closeFrame();
-                              ErrorWindowGUI.display();
-                         } 
-                    });
-
-                    Thread opponentMoveListener = new Thread(() -> {
                          while (true) {
                               try {
                                    String opponentPkt = in.readLine();
@@ -155,10 +131,16 @@ public class Client {
                                                        gui.closeFrame();
                                                   });
                                                   ClientLoseGUI.display("You have lost the game!");
-                                                  serverListener.interrupt();
                                                   heartbeatSender.interrupt();
                                                   return;
                                              }
+                                        } else if (opponentPkt.equals("opponentdc")) {
+                                             SwingUtilities.invokeLater(() -> {
+                                                  gui.closeFrame();
+                                             });
+                                             ClientWinGUI.display("Opponent disconnected. You win!");
+                                             heartbeatSender.interrupt();
+                                             return;
                                         }
                                    } else {
                                         continue;
@@ -170,7 +152,6 @@ public class Client {
                     });
 
                     heartbeatSender.start();
-                    serverListener.start();
 
                     String startPacket;
                     startPacket = in.readLine();
@@ -182,7 +163,7 @@ public class Client {
                          // frame.closeWindow();
                     }
 
-                    opponentMoveListener.start();
+                    serverListener.start();
 
                     // Main thread deals with sending messages to server
                     while (opponentAlive && selfAlive) {
@@ -288,7 +269,6 @@ public class Client {
                                    ClientWinGUI.display("You have won the game!");
                                    serverListener.interrupt();
                                    heartbeatSender.interrupt();
-                                   opponentMoveListener.interrupt();
                                    return;
                               }
                          }
@@ -297,7 +277,6 @@ public class Client {
                     // Cleanup resources
                     heartbeatSender.interrupt();
                     serverListener.interrupt();
-                    opponentMoveListener.interrupt();
                     return;
                } catch (Exception e) {
                     e.printStackTrace();
