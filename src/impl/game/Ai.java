@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Ai {
     private static Node root;
@@ -26,7 +27,7 @@ public class Ai {
     //public Game game = new Game(); // remove these when ai is added to base game
     public Dice dice = new Dice();
 
-    public static String aiMode = "SPEEDY";
+    public static String aiMode = "EASY";
 
     public Game game;
 
@@ -101,11 +102,9 @@ public class Ai {
         return board.move(move, player);
     }
 
-    public Node createTree() {
+    public Node createTree(int roll, int counter) {
         root = new Node("max", 0);
 
-        int roll = dice.roll(); // check if roll == 0
-        int counter = Game.getCounter().getP2Counter();
         List<Board> maxBoards = new ArrayList<>();
         List<Board> minBoards = new ArrayList<>();
         List<Integer> branches = new ArrayList<>();
@@ -143,8 +142,9 @@ public class Ai {
                     for (int j = 0; j < maxBoards.size(); j++) {
 
                         HashSet<String> movesList = getMoveTypes(maxBoards.get(j), p2, maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
-                        
-                        Node childNode = new Node(currentNode.getNextType(), 0, maxBoards.get(j), movesList);
+                        int[] pos = getPos(maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
+
+                        Node childNode = new Node(currentNode.getNextType(), 0, maxBoards.get(j), movesList, pos);
 
                         currentNode.addChild(childNode); // Add the child node to the current node
                         queue.add(childNode); // Add the child node to the queue for further processing
@@ -164,8 +164,9 @@ public class Ai {
                             Board minBoard = createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
 
                             HashSet<String> movesList = getMoveTypes(minBoard, p2, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+                            int[] pos = getPos(minCurrentMovablePositions.get(j), minFuturePositions.get(j));
 
-                            Node childNode = new Node(currentNode.getNextType(), getScore(movesList), minBoard, movesList);
+                            Node childNode = new Node(currentNode.getNextType(), getScore(movesList), minBoard, movesList, pos);
 
                             currentNode.addChild(childNode); // Add the child node to the current node
                             queue.add(childNode); // Add the child node to the queue for further processing
@@ -183,6 +184,12 @@ public class Ai {
         }
 
         return root;
+    }
+
+    public int[] getPos(int[] currentPos, int[] futurePos) { 
+        return Stream.of(currentPos, futurePos)
+        .flatMapToInt(Arrays::stream)
+        .toArray();
     }
 
     public static int getScore(HashSet<String> moves) {
@@ -283,14 +290,17 @@ public class Ai {
                 // ALL
                 // check if chip can move to rosette
                 case "EASY":
-                /* 
+                    // calculate which node contains the furthest chip
+                    // return that node to move
+                    /* 
                     Node furthestChild = filteredChildren.get(0);
                     for (Node child : filteredChildren) {
                         if (child.getMove())
-                    } */
+                    }  */
 
-                    // calculate which node contains the furthest chip
-                    // return that node to move
+
+
+                    
                 case "MEDIUM":
                     // filter through the medium array of moves
                     // if there is still more than one child 
@@ -319,17 +329,5 @@ public class Ai {
 
     public static void speedy(List<Node> filteredChildren) {
         
-    }
-
-    public static void main(String[] args) {
-        Ai ai = new Ai();
-        behaviour = mapScores();
-        Node root = ai.createTree();
-        double expectimax = expectiminimax(root, "max");
-        root.setScore(expectimax);
-        printTree(root, 0);
-
-        Node bestChild = filterChildren(expectimax);
-        System.out.println(bestChild.getScore() + bestChild.getScore());
     }
 }
