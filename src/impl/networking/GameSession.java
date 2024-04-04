@@ -68,8 +68,7 @@ public class GameSession {
       * Initializes the game session by starting the game logic and handling for each player.
       */
      public void connectionInit() {
-          handlePlayer(player1, "Player 1");
-          handlePlayer(player2, "Player 2");
+          handlePlayers(player1, player2);
      }
 
      /**
@@ -79,31 +78,15 @@ public class GameSession {
       * @param playerSocket The socket of the player to handle.
       * @param playerLabel A label identifying the player (e.g., "Player 1").
       */
-     private void handlePlayer(Socket playerSocket, String playerLabel) {
-          try (PrintWriter out = new PrintWriter(playerSocket.getOutputStream(), true);
-               BufferedReader in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()))) {
-               
-               if (playerLabel.equals("Player 1")) {
-                    playGame(out, in, new PrintWriter(player2.getOutputStream(), true), new BufferedReader(new InputStreamReader(player2.getInputStream())));
-               } else {
-                    playGame(new PrintWriter(player1.getOutputStream(), true), new BufferedReader(new InputStreamReader(player1.getInputStream())), out, in);
-               }
-          } catch (SocketTimeoutException e) {
-               String ipAddr;
-               if (playerLabel.equals("Player 1")) {
-                    ipAddr = p1Address;
-               } else {
-                    ipAddr = p2Address;
-               }
-               System.out.println("Server: " + ipAddr + " has timed out due to inactivity.");
-          } catch (IOException e) {
-               String ipAddr;
-               if (playerLabel.equals("Player 1")) {
-                    ipAddr = p1Address;
-               } else {
-                    ipAddr = p2Address;
-               }
-               System.out.println("An IOException occurred with " + ipAddr + ": " + e.getMessage());
+     private void handlePlayers(Socket p1Socket, Socket p2Socket) {
+          try (PrintWriter p1Out = new PrintWriter(p1Socket.getOutputStream(), true);
+               BufferedReader p1In = new BufferedReader(new InputStreamReader(p1Socket.getInputStream()));
+               PrintWriter p2Out = new PrintWriter(p2Socket.getOutputStream(), true);
+               BufferedReader p2In = new BufferedReader(new InputStreamReader(p2Socket.getInputStream()));) { 
+               // Run game   
+               playGame(p1Out, p1In, p2Out, p2In);
+          } catch (Exception e) {
+               System.out.println("An exception occurred with a player: " + e.getMessage());
           }
      }
 
@@ -122,11 +105,7 @@ public class GameSession {
           p1Out.println("startfirst");
           p2Out.println("waitfirst");
 
-          try {
-               Thread.sleep(1000);
-          } catch (InterruptedException e) {
-               e.printStackTrace();
-          }
+          System.out.println("Server: Player turns assigned.");
 
           // Schedule a task to check for timeouts
           ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
