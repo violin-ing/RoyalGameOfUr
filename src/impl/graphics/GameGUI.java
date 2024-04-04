@@ -4,8 +4,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
-
 import javax.swing.*;
+
 public class GameGUI extends JFrame {
     private static final int WINDOWWIDTH = 1200;
     private static final int WINDOWHEIGHT = 1000;
@@ -100,9 +100,7 @@ public class GameGUI extends JFrame {
         this.player = player;
         if (player.equals("P1")) {
             rollButtonP1.setVisible(true);
-           // rollAmountP1.setVisible(true);
             rollButtonP2.setVisible(false);
-            //rollAmountP2.setVisible(false);
         } else {
             rollButtonP1.setVisible(false);
            // rollAmountP1.setVisible(false);
@@ -156,7 +154,7 @@ public class GameGUI extends JFrame {
 
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
                 SwingUtilities.invokeLater(() -> {
-                    rollbutton.setEnabled(false);
+                    rollbutton.setVisible(false);
                 });
             }
         });
@@ -164,7 +162,7 @@ public class GameGUI extends JFrame {
 
     public void addButtonActionListener(GraphicsButton button) {
         button.addMouseListener(new MouseListener() {
-
+            
             @Override
             public void mousePressed(MouseEvent e) {}
 
@@ -181,7 +179,6 @@ public class GameGUI extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 // if left mouse button is clicked, they are selecting a chip
                 if (e.getButton() == MouseEvent.BUTTON1) {
-                    System.out.println("CLICEKD1");
                     if (button.checkIsChipSelection()) {
                         System.out.println(button.getSelection());
                         if (button.getSelection()) {
@@ -196,7 +193,6 @@ public class GameGUI extends JFrame {
                     }
                 }
                 if (e.getButton()==MouseEvent.BUTTON3) {
-                    System.out.println("CLICEKD2");
                     button.updateSelection(false);
                     resetChipSelection();
                 }
