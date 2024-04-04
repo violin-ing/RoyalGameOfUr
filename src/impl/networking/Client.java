@@ -146,16 +146,18 @@ public class Client {
 
                               gui.switchP1RollButton(true);
                               boolean rosetta = false;
-
-                              System.out.println("TEST: Testing rolling functionality");
                               
                               while (!rollPressed) {
                                    // System.out.println("rolling...");
                               }
                               rollPressed = false;
 
+                              System.out.println("TEST: Testing rolling functionality");
+                              System.out.println(rollAmount);
+
                               // Send dice number to the server to send to opponent
                               String diceRoll = Integer.toString(rollAmount);
+                              out.println("sending_dice_roll");
                               out.println(diceRoll); // Sends die roll to server
                               
                               int diceNum = Integer.parseInt(diceRoll);
@@ -263,7 +265,7 @@ public class Client {
                     serverListener.interrupt();
                     System.exit(0);
                } catch (Exception e) {
-                    System.out.println("Error connecting to server!" + e);
+                    System.out.println("Error connecting to server! " + e);
                } 
           } catch (Exception e) {
                System.out.println("Client exception!" + e);

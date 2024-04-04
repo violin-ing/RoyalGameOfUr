@@ -181,7 +181,7 @@ public class GameSession {
                }
 
                if (p1Turn) {
-                    // TO EDIT: THIS WILL BE THE MAIN GAME THING
+                    // TODO: 
                     // Roll dice, save the number, then send it to the server -> send to the opponent
                     // Opponent's local GUI will update the die number info
                     // If the number rolled > 0, then read for the next input (player's move)
@@ -192,9 +192,8 @@ public class GameSession {
 
                     boolean rosetta = false;
                     String diceRoll;
-                    do {
-                         diceRoll = p1In.readLine(); // Read dice roll
-                    } while (diceRoll == null);
+                    System.out.println(p1In.readLine()); // "sending_dice_roll"
+                    diceRoll = p1In.readLine(); // Read dice roll
                     p2Out.println(diceRoll); // Send opponent dice roll
                     System.out.println("Player 1: " + diceRoll);
                     int diceNum = Integer.parseInt(diceRoll);
