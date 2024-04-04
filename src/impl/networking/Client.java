@@ -123,21 +123,16 @@ public class Client {
                                                   .toArray();
 
                                              currentBoard.move(move, "P2");
-                                             SwingUtilities.invokeLater(() -> {
-                                                  gui.updateBoard(currentBoard);
-                                             });
+                                             gui.updateBoard(currentBoard);
+                                             
                                              if (counter.getP2Score() == 7) {
-                                                  SwingUtilities.invokeLater(() -> {
-                                                       gui.closeFrame();
-                                                  });
+                                                  gui.closeFrame();
                                                   ClientLoseGUI.display("You have lost the game!");
                                                   heartbeatSender.interrupt();
                                                   return;
                                              }
                                         } else if (opponentPkt.equals("opponentdc")) {
-                                             SwingUtilities.invokeLater(() -> {
-                                                  gui.closeFrame();
-                                             });
+                                             gui.closeFrame();
                                              ClientWinGUI.display("Opponent disconnected. You win!");
                                              heartbeatSender.interrupt();
                                              return;
@@ -166,7 +161,7 @@ public class Client {
                     serverListener.start();
 
                     // Main thread deals with sending messages to server
-                    while (opponentAlive && selfAlive) {
+                    while (true) {
                          if (myTurn) {
                               SwingUtilities.invokeLater(() -> {
                                    gui.switchP1RollButton(true);
@@ -182,13 +177,14 @@ public class Client {
                                    rollPressed = false;
      
                                    System.out.println("TEST: Testing rolling functionality");
+                                   int diceNum = rollAmount;
                                    System.out.println(rollAmount);
      
-                                   String diceRoll = Integer.toString(rollAmount);
+                                   String diceRoll = Integer.toString(diceNum);
                                    packetBuilder.append(diceRoll);
 
-                                   if (rollAmount != 0) {
-                                        if (Game.availableMoves("P1", rollAmount)) {
+                                   if (diceNum != 0) {
+                                        if (Game.availableMoves("P1", diceNum)) {
                                              System.out.println("WAITING FOR MOVE");
                                              while (!moveSelected) {
                                                   System.out.println("WAITING FOR INPUT");
@@ -203,7 +199,7 @@ public class Client {
                                              System.out.println("update the board");
                                              gui.updateBoard(currentBoard);
                                              gui.updateScore(counter);
-                                             
+
                                              moveSelected = false;
      
                                              int newStrip = move[2];
@@ -227,7 +223,7 @@ public class Client {
                                              }
 
                                              new Thread(() -> {
-                                                  out.print(packetBuilder.toString() + "\r\n");
+                                                  out.println(packetBuilder.toString());
                                                   // packetBuilder = {
                                                   //      diceRoll, 
                                                   //      oldStrip, 
@@ -240,7 +236,7 @@ public class Client {
                                         } else {
                                              packetBuilder.append(",nil");
                                              new Thread(() -> {
-                                                  out.print(packetBuilder.toString() + "\r\n");
+                                                  out.println(packetBuilder.toString());
                                                   // packetBuilder = {diceRoll, "nil"}
                                              }).start();
                                              rosetta = false;
@@ -262,13 +258,10 @@ public class Client {
                                    heartbeatSender.interrupt();
                                    return;
                               }
+                         } else {
+                              out.println("0,nil");
                          }
                     }
-                    
-                    // Cleanup resources
-                    heartbeatSender.interrupt();
-                    serverListener.interrupt();
-                    return;
                } catch (Exception e) {
                     e.printStackTrace();
                } 

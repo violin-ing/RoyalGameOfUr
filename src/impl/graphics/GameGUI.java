@@ -99,12 +99,12 @@ public class GameGUI extends JFrame {
     public void changePlayerTurn(String player) {
         this.player = player;
         if (player.equals("P1")) {
-            rollButtonP1.setVisible(true);
-            rollButtonP2.setVisible(false);
+            rollButtonP1.setEnabled(true);
+            rollButtonP2.setEnabled(false);
         } else {
-            rollButtonP1.setVisible(false);
+            rollButtonP1.setEnabled(false);
            // rollAmountP1.setVisible(false);
-            rollButtonP2.setVisible(true);
+            rollButtonP2.setEnabled(true);
            // rollAmountP2.setVisible(true);
         }
     }
@@ -243,7 +243,7 @@ public class GameGUI extends JFrame {
         client.info[1] = String.valueOf(button.getMoveFromLocation());
         client.info[2] = String.valueOf(button.getMoveStrip());
         client.info[3] = String.valueOf(button.getMoveLocation());
-        client.moveSelected = true;
+        Client.moveSelected = true;
     } 
 
     public void closeFrame() {
