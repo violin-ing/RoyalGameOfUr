@@ -135,6 +135,12 @@ public class Client {
                          if ("startfirst".equals(startPacket)) {
                               matchFound = true;
                               myTurn = true;
+                              frame.closeWindow();
+                              // SwingUtilities.invokeLater(new Runnable() {
+                              //      public void run() {
+                              //          frame.closeWindow();
+                              //      }
+                              // });
                          } else if (startPacket.equals("waitfirst")) {
                               matchFound = true;
                               myTurn = false;
