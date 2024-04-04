@@ -50,32 +50,31 @@ public class Ai {
         List<Integer> scores = new ArrayList<>();
             
         if (roll != 0) {
-            List<int[]> maxCurrentMovablePositions = game.getCurrentMovablePositions(p2, roll, game.getCurrentBoard().identifyPieces(p2), counter);
+            List<int[]> maxCurrentMovablePositions = Game.getCurrentMovablePositions(p2, roll, game.getCurrentBoard().identifyPieces(p2), counter);
 
             // checks that there is current movable positions 
             if (maxCurrentMovablePositions.isEmpty()) {
-                List<int[]> maxFuturePositions = game.getFuturePositions(p2, roll, maxCurrentMovablePositions);
+                List<int[]> maxFuturePositions = Game.getFuturePositions(p2, roll, maxCurrentMovablePositions);
     
                  // calculates all possible boards after ai makes a move
                 for (int i = 0; i < maxFuturePositions.size(); i++) { 
-                    maxBoards.add(createTempBoard(game.getCurrentBoard(), p2, maxCurrentMovablePositions.get(i), maxFuturePositions.get(i)));
+                    maxBoards.add(createTempBoard(Game.getCurrentBoard(), p2, maxCurrentMovablePositions.get(i), maxFuturePositions.get(i)));
                 }
     
                 // calculates all the possible player boards, for each roll combination
                 for (int playerRoll = 1; playerRoll < 5; playerRoll++) {
                     int numBranches = 0;
                     for (int j = 0; j < maxBoards.size(); j++) { 
-                        List<int[]> minCurrentMovablePositions = game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(j).identifyPieces(p1), counter);
-                        List<int[]> minFuturePositions = game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
+                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(j).identifyPieces(p1), counter);
+                        List<int[]> minFuturePositions = Game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
     
                         minBoards.add(createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j)));
 
                         // create array of possible moves for each branch
-                        List<String> movesList = getMoveTypes(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
-                        String[] movesArr = (String[]) movesList.toArray();
+                        HashSet<String> movesList = getMoveTypes(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
                         //moveTypes.add(movesArr);
                         numBranches++;
-                        scores.add(getScore(movesArr));
+                        scores.add(getScore(movesList));
                     }
 
                     branches.add(numBranches);
@@ -96,7 +95,7 @@ public class Ai {
         return tempBoard;
     }
 
-    public List<String> getMoveTypes(Board board, String player, int[] currentPos, int[] futurePos) {
+    public HashSet<String> getMoveTypes(Board board, String player, int[] currentPos, int[] futurePos) {
         int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
 
         return board.move(move, player);
@@ -112,7 +111,7 @@ public class Ai {
         List<Integer> branches = new ArrayList<>();
         List<Integer> scores = new ArrayList<>();
     
-        List<int[]> maxCurrentMovablePositions = Game.getCurrentMovablePositions(p2, roll, game.getCurrentBoard().identifyPieces(p2), counter);
+        List<int[]> maxCurrentMovablePositions = Game.getCurrentMovablePositions(p2, roll, Game.getCurrentBoard().identifyPieces(p2), counter);
 
         List<int[]> maxFuturePositions = Game.getFuturePositions(p2, roll, maxCurrentMovablePositions);
 
@@ -143,10 +142,9 @@ public class Ai {
                 } else if (LEVELS == 4) {
                     for (int j = 0; j < maxBoards.size(); j++) {
 
-                        List<String> movesList = getMoveTypes(maxBoards.get(j), p2, maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
-                        String[] movesArr = (String[]) movesList.toArray();
+                        HashSet<String> movesList = getMoveTypes(maxBoards.get(j), p2, maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
                         
-                        Node childNode = new Node(currentNode.getNextType(), 0, maxBoards.get(j), movesArr);
+                        Node childNode = new Node(currentNode.getNextType(), 0, maxBoards.get(j), movesList);
 
                         currentNode.addChild(childNode); // Add the child node to the current node
                         queue.add(childNode); // Add the child node to the queue for further processing
@@ -165,10 +163,9 @@ public class Ai {
 
                             Board minBoard = createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
 
-                            List<String> movesList = getMoveTypes(minBoard, p2, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
-                            String[] movesArr = (String[]) movesList.toArray();
+                            HashSet<String> movesList = getMoveTypes(minBoard, p2, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
 
-                            Node childNode = new Node(currentNode.getNextType(), getScore(movesArr), minBoard, movesArr);
+                            Node childNode = new Node(currentNode.getNextType(), getScore(movesList), minBoard, movesList);
 
                             currentNode.addChild(childNode); // Add the child node to the current node
                             queue.add(childNode); // Add the child node to the queue for further processing
@@ -188,7 +185,7 @@ public class Ai {
         return root;
     }
 
-    public static int getScore(String[] moves) {
+    public static int getScore(HashSet<String> moves) {
         int score = 0;
         
         for (String move : moves) {
@@ -270,14 +267,16 @@ public class Ai {
 
         while (filteredChildren.size() > 1) {
             for (String m : moves) {
-                if (filteredChildren.stream().anyMatch(child -> child.getMoves().equals(m))) {
+                if (filteredChildren.stream().anyMatch(child -> child.getMoves().contains(m))) {
                     System.out.println(m);
-                    System.out.println(filteredChildren.stream().anyMatch(child -> child.getMoves().equals(m)));
+                    System.out.println(filteredChildren.stream().anyMatch(child -> child.getMoves().contains(m)));
                     filteredChildren = filteredChildren.stream()
-                        .filter(child -> child.moveExists(m)) 
+                        .filter(child -> child.getMoves().contains(m)) 
                         .toList();
                 }
+
             }
+        
             
 
             switch (aiMode) {
