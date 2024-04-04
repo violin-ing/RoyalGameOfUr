@@ -85,8 +85,10 @@ public class GameSession {
                BufferedReader p2In = new BufferedReader(new InputStreamReader(p2Socket.getInputStream()));) { 
                // Run game   
                playGame(p1Out, p1In, p2Out, p2In);
-          } catch (Exception e) {
-               System.out.println("An exception occurred with a player: " + e.getMessage());
+          } catch (IOException e) {
+               System.out.println("An IOException occurred with a player: " + e.getMessage());
+          } catch (InterruptedException e) {
+               return;
           }
      }
 
@@ -100,7 +102,7 @@ public class GameSession {
       * @param p2In BufferedReader for player 2 input.
       * @throws IOException If an I/O error occurs during communication with the players.
       */
-     private void playGame(PrintWriter p1Out, BufferedReader p1In, PrintWriter p2Out, BufferedReader p2In) throws IOException {
+     private void playGame(PrintWriter p1Out, BufferedReader p1In, PrintWriter p2Out, BufferedReader p2In) throws IOException, InterruptedException {
           // Send signal for client to know if they start first or wait for their turn first
           p1Out.println("startfirst");
           p2Out.println("waitfirst");
@@ -134,7 +136,9 @@ public class GameSession {
                                    } catch (Exception e) {
                                        e.printStackTrace();
                                    }
+                                   System.out.println("Server: Player 2 (" + p2Address + ") socket closed.");
                                    player2.close();
+                                   throw new InterruptedException();
                                } catch (Exception e) {
                                    e.printStackTrace();
                                }                          
@@ -159,7 +163,9 @@ public class GameSession {
                                    } catch (Exception e) {
                                        e.printStackTrace();
                                    }
+                                   System.out.println("Server: Player 1 (" + p1Address + ") socket closed.");
                                    player1.close();
+                                   throw new InterruptedException();
                                } catch (Exception e) {
                                    e.printStackTrace();
                                }     
@@ -192,8 +198,10 @@ public class GameSession {
 
                     boolean rosetta = false;
                     String diceRoll;
+
                     System.out.println(p1In.readLine()); // "sending_dice_roll"
                     diceRoll = p1In.readLine(); // Read dice roll
+
                     p2Out.println(diceRoll); // Send opponent dice roll
                     System.out.println("Player 1: " + diceRoll);
                     int diceNum = Integer.parseInt(diceRoll);

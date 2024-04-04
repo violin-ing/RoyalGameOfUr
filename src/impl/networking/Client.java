@@ -154,19 +154,20 @@ public class Client {
                               boolean rosetta = false;
                               
                               while (!rollPressed) {
-                                   // System.out.println("rolling...");
+                                   System.out.println("rolling...");
                               }
                               rollPressed = false;
 
                               System.out.println("TEST: Testing rolling functionality");
                               System.out.println(rollAmount);
 
-                              // Send dice number to the server to send to opponent
                               String diceRoll = Integer.toString(rollAmount);
-                              out.println("sending_dice_roll");
-                              out.flush();
-                              out.println(diceRoll); // Sends die roll to server
-                              out.flush();
+
+                              // Send dice number to the server to send to opponent
+                              new Thread(() -> {
+                                   out.println("sending_dice_roll");
+                                   out.println(diceRoll); // Sends die roll to server
+                              }).start();
                               
                               int diceNum = Integer.parseInt(diceRoll);
                               
@@ -175,6 +176,7 @@ public class Client {
                                         Game.availableMoves("P1", diceNum);
                                         while (!moveSelected) {
                                              // Wait for player to make their move on the GUI
+                                             System.out.println("waiting for opponent roll...");
                                         }
                                         // Stream "info" array into a usable int[] array 
                                         int[] move = Arrays.stream(info)
@@ -210,7 +212,10 @@ public class Client {
                                                   gamePacket.append(info[i] + ",");
                                              }
                                         }
-                                        out.println(gamePacket);
+                                        new Thread(() -> {
+                                             out.println(gamePacket);
+                                        }).start();
+                                        
                                    } while (rosetta);
                               } 
                               
@@ -229,7 +234,7 @@ public class Client {
                          } else {
                               boolean opponentTurn = true;
                               String dieRollStr = in.readLine(); // Read opponent's die roll
-
+                              
                               int dieRoll = Integer.parseInt(dieRollStr);
                               
                               SwingUtilities.invokeLater(() -> {
