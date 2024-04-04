@@ -1,10 +1,7 @@
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 // this class will handle drawing tiles as buttons.
 public class GraphicsButton extends JButton {
@@ -17,10 +14,8 @@ public class GraphicsButton extends JButton {
     private final int xPosition;
     private final int yPosition;
     private boolean chipSelection;
-    private boolean moveSelection;
     private int moveStrip;
     private int moveLocation;
-    public static boolean tileSelected;
     private boolean isSelected;
     private int moveFromStrip;
     private int moveFromLocation;
@@ -32,8 +27,6 @@ public class GraphicsButton extends JButton {
         this.xPosition = x;
         this.yPosition = y;
         this.chipSelection = false;
-        this.moveSelection = false;
-        // addActionListenerToButton();
         this.setBorder(BorderFactory.createLineBorder(Color.GREEN,5));
         this.setBounds((WINDOWWIDTH/2)+(xPosition*BLOCKDIMENSION)-150,yPosition*BLOCKDIMENSION+75,BLOCKDIMENSION,BLOCKDIMENSION);
         this.setOpaque(false);
@@ -41,6 +34,9 @@ public class GraphicsButton extends JButton {
         this.setBorderPainted(true);
         this.setVisible(false);
     }
+
+    public int getX(){return xPosition;}
+    public int getY(){return yPosition;}
 
     public void updateSelection(boolean selection) {
         this.isSelected = selection;
@@ -50,46 +46,24 @@ public class GraphicsButton extends JButton {
 
     public boolean checkIsChipSelection() {return chipSelection;}
 
-    public boolean checkIsMoveSelection() {return moveSelection;}
-
-    public boolean checkIsBothSelection() {
-        if (chipSelection && moveSelection) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public void setButtonSelectable() {
         this.setBorder(BorderFactory.createLineBorder(Color.GREEN,5));
         this.setEnabled(true);
         this.setVisible(true);
-        if (!moveSelection) {
-            this.chipSelection = true;  
-        }
-    }
-
-    public void setBothSelectableAndFutureSelectable() {
         this.chipSelection = true;
-        this.moveSelection = true;
-        Border border1 = BorderFactory.createLineBorder(Color.GREEN,5);
-        Border border2 = BorderFactory.createLineBorder(Color.ORANGE, 5);
-        this.setBorder(new CompoundBorder(border1,border2));
-        this.setEnabled(true);
-        this.setVisible(true);
     }
 
-    public void setButtonFutureSelectable() {
+    public void setButtonAsFutureMove() {
         this.setBorder(BorderFactory.createLineBorder(Color.ORANGE,5));
-        this.setEnabled(true);
+        this.setEnabled(false);
+        // still not visible, only when other button is selected.
         this.setVisible(true);
-        if (!chipSelection) {
-            this.moveSelection = true;
-        }
+        // MAKE THIS BUTTON INVISIBLE IF CLICKED OFF OF.
     }
 
     public void setButtonInvisible(){
         this.setVisible(false);
+        this.setEnabled(false);
     }
 
     public void setChipButtonsMoveButton(int strip, int location) {
@@ -105,7 +79,7 @@ public class GraphicsButton extends JButton {
     public int getMoveButtonStrip() {
         return moveButtonStrip;
     }
-
+  
     public int getMoveButtonLocation() {
         return moveButtonLocation;
     }
@@ -133,7 +107,7 @@ public class GraphicsButton extends JButton {
 
     public void resetButton() {
         setButtonInvisible();
+        this.updateSelection(false);
         this.chipSelection = false;
-        this.moveSelection = false;
     }
 }
