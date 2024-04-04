@@ -7,7 +7,7 @@ import javax.swing.*;
 // render this on a new thread 
 public class StartMenuGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
-    private static final int WINDOWHEIGHT = 500;
+    private static final int WINDOWHEIGHT = 800;
     public static void main(String[] args) {
         new StartMenuGUI();
     }
@@ -22,9 +22,13 @@ public class StartMenuGUI extends JFrame {
         setVisible(true);
     }
 
-    public void initiliseGameStart(boolean muliplayer, boolean network) {
+    public void initialiseGameStart(boolean muliplayer, boolean network) {
         closeFrame();
-        new GameStartGUI(muliplayer, network);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new GameStartGUI(muliplayer, network);
+            }
+        });
         // pass some params somewhere if muliplayers (would also change UI)
     }
 
@@ -34,7 +38,7 @@ public class StartMenuGUI extends JFrame {
         JButton startNetwkButton = new JButton("Multiplayer (Network)");
         startSingleButton.setBounds((WINDOWWIDTH/2)-100,WINDOWHEIGHT/2-200,200,100);
         startMultiButton.setBounds((WINDOWWIDTH/2)-100, WINDOWHEIGHT/2, 200, 100);
-        startNetwkButton.setBounds((WINDOWWIDTH/2)-100, WINDOWHEIGHT/2, 200, 100);
+        startNetwkButton.setBounds((WINDOWWIDTH/2)-100, WINDOWHEIGHT/2+200, 200, 100);
         addStartButtonAction(startSingleButton, false, false);
         addStartButtonAction(startMultiButton, true, false);
         addStartButtonAction(startNetwkButton, false, true);
@@ -47,7 +51,7 @@ public class StartMenuGUI extends JFrame {
         button.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                initiliseGameStart(muliplayer, network);
+                initialiseGameStart(muliplayer, network);
             }
         });
     }

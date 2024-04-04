@@ -36,8 +36,6 @@ public class Server {
 
                     try (PrintWriter player1Out = new PrintWriter(player1.getOutputStream(), true);
                          BufferedReader player1In = new BufferedReader(new InputStreamReader(player1.getInputStream()));) {
-                         
-                         player1Out.println("Searching for opponent...");
 
                          Socket player2 = serverSocket.accept();
                          System.out.println("Server: " + player2.getInetAddress().getHostAddress() + " has connected.");
@@ -45,8 +43,11 @@ public class Server {
                          try (PrintWriter player2Out = new PrintWriter(player2.getOutputStream(), true);
                               BufferedReader player2In = new BufferedReader(new InputStreamReader(player2.getInputStream()));) {
 
-                              player1Out.println("Match found!");
-                              player2Out.println("Match found!");
+                              System.out.println("Server: Matchmaking completed.");
+                              player1Out.println("matchfound");
+                              player2Out.println("matchfound");
+
+                              Thread.sleep(1000); // Ensure that clients receive the matchfound message
 
                               GameSession gameSession = new GameSession(player1, player2);
                               gameSession.connectionInit();

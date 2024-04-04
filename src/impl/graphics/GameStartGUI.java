@@ -9,6 +9,9 @@ public class GameStartGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
     private static final int WINDOWHEIGHT = 500;
     private boolean muliplayer, network;
+    private static Counter counter;
+    private static Board currentBoard;
+    private static Dice dice;
 
     public GameStartGUI(boolean muliplayer, boolean network) {
         this.muliplayer = muliplayer;
@@ -23,8 +26,31 @@ public class GameStartGUI extends JFrame {
     }
 
     public void startGame() {
-        closeFrame();
-        //new GameGUI();
+        if (network) {
+            Counter counter = new Counter();
+            Board currentBoard = new Board(counter);
+            Dice dice = new Dice();
+            Client client = new Client(counter, currentBoard, dice);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    GameGUI gameGUI = new GameGUI(client);
+                    client.setGUI(gameGUI);
+                }
+            });
+            client.initiateMatch();
+        } else {
+            counter = new Counter();
+            currentBoard = new Board(counter);
+            dice = new Dice();
+            Game game = new Game(currentBoard, counter, dice, muliplayer);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    GameGUI gui = new GameGUI(game);
+                    game.setGameGUI(gui);
+                }
+            });
+            game.start();
+        }
     }
 
     public void addComponents() {
@@ -34,19 +60,27 @@ public class GameStartGUI extends JFrame {
             option.setText("Multiplayer (Local) Selected");
         } else if (network) {
             option.setText("Multiplayer (Network) Selected");
-            Client client = new Client();
-            GameGUI gameGUI = new GameGUI(client);
-            client.setGUI(gameGUI);
-            client.initiateMatch(gameGUI);
         } else {
             option.setText("Singleplayer Selected");;
         }
         option.setBounds((WINDOWWIDTH/2)-100, WINDOWHEIGHT/2-100, 200, 100);
         startButton.setBounds((WINDOWWIDTH/2)-100,WINDOWHEIGHT/2,200,100);
-        startButton.addActionListener(new ActionListener(){
+        startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                startGame();
+                new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        startGame();
+                        return null;
+                    }
+        
+                    @Override
+                    protected void done() {
+                        // Close the start frame after the background task completes
+                        closeFrame();
+                    }
+                }.execute();
             }
         });
         this.add(startButton);

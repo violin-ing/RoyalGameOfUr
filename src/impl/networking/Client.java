@@ -29,13 +29,12 @@ public class Client {
 
      private boolean selfWin = false;
      private boolean opponentWin = false;
+     private boolean myTurn;
+     private boolean opponentAlive = true, selfAlive = true;
 
      public String[] info = new String[5];
 
-     public Client() {
-          Counter counter = new Counter();
-          Board currentBoard = new Board(counter);
-          Dice dice = new Dice();
+     public Client(Counter counter, Board currentBoard, Dice dice) {
           this.currentBoard = currentBoard;
           this.counter = counter;
           this.dice = dice;
@@ -55,7 +54,7 @@ public class Client {
      * messages to the server to indicate that the client is still connected.
      * The method also listens for user input to send game actions to the server.
      */
-     public void initiateMatch(GameGUI gui) {
+     public void initiateMatch() {
           try {
                // Connecting to server display
                ServerConnectionGUI frame = ServerConnectionGUI.display();
@@ -73,19 +72,13 @@ public class Client {
 
                // Extract the server IP address from the broadcast message
                String serverIP = new String(packet.getData(), 0, packet.getLength()).trim();
-               // System.out.println("Connected to server at " + serverIP);
 
                // Connect to the server using the discovered IP address
                int serverPort = DEFAULT_PORT;
                try (Socket socket = new Socket(serverIP, serverPort);
                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in)); ) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
 
-                    AtomicBoolean myTurn = new AtomicBoolean(false); // Tracks player's turn
-                    AtomicBoolean opponentAlive = new AtomicBoolean(true); // Tracks if opponent is connected
-                    AtomicBoolean selfAlive = new AtomicBoolean(true); // Tracks if self is connected
-         
                     // Send periodic heartbeats to server in case of connection loss
                     Thread heartbeatSender = new Thread(() -> {
                          String host = serverIP; 
@@ -113,58 +106,55 @@ public class Client {
                          String fromServer;
                          try {
                               while ((fromServer = in.readLine()) != null) {
-                                   // System.out.println("Server: " + fromServer);
-                                   if ("Match found!".equals(fromServer)) {
-                                        frame.closeWindow();
-                                        matchFound = true;
-                                        String turnMsg = in.readLine();
-                                        if (turnMsg.equals("startfirst")) {
-                                             myTurn.set(true);
-                                        } else if (turnMsg.equals("waitfirst")) {
-                                             myTurn.set(false);
-                                        }
+                                   Thread.sleep(1000);
+                                   if ("selfdc".equals(fromServer)) {
+                                        selfAlive = false;
+                                        gui.closeFrame();
+                                        ClientLoseGUI.display("You have disconnected and forfeited the match!");
+                                   } else if ("opponentdc".equals(fromServer)) {
+                                        opponentAlive = false;
+                                        gui.closeFrame();
+                                        ClientWinGUI.display("Opponent has disconnected. You have won by default!");
                                    }
-
-                                   if ("You have disconnected.".equals(fromServer.trim())) {
-                                        selfAlive.set(false);
-                                        System.out.println("You have disconnected and forfeited the match!");
-                                        // TODO: Display losing screen here
-                                   } else if ("Opponent has disconnected.".equals(fromServer.trim())) {
-                                        opponentAlive.set(false);
-                                        System.out.println("You have won by default!");
-                                        // TODO: Display winning screen
-                                   } 
                               }
                          } catch (IOException e) {
                               // IGNORE
+                         } catch (InterruptedException e) {
+                              gui.closeFrame();
+                              ErrorWindowGUI.display();
                          }
                     });
 
                     heartbeatSender.start();
                     serverListener.start();
 
-                    if (matchFound) {
-                         // Close server connection display window after connecting to the server with another player
-                         SwingUtilities.invokeLater(new Runnable() {
-                              @Override
-                              public void run() {
-                                   if (frame != null) {
-                                        frame.closeWindow();
-                                   }
+                    String startPacket;
+                    do {
+                         startPacket = in.readLine();
+                         if (startPacket == null) {continue;}
+                         if ("matchfound".equals(startPacket)) {
+                              matchFound = true;
+                              String turnMsg = in.readLine();
+                              if (turnMsg.equals("startfirst")) {
+                                   myTurn = true;
+                              } else if (turnMsg.equals("waitfirst")) {
+                                   myTurn = false;
                               }
-                         });
-
-                         gui.disableP2();
-                    }
+                              SwingUtilities.invokeLater(new Runnable() {
+                                   public void run() {
+                                       frame.closeWindow();
+                                   }
+                               });
+                         }
+                    } while (startPacket == null);
 
                     // Main thread deals with sending messages to server
-                    while (opponentAlive.get() && selfAlive.get()) {
-                         if (myTurn.get()) {
+                    while (opponentAlive && selfAlive) {
+                         if (myTurn) {
                               // 1. Read for dice roll and send user input to server
                               // 2. Read for move (ONLY if dice roll > 0)
                               // 3. Read for move again if the player ends up on a rosetta tile
 
-                              // PSEUDO-CODE:
                               gui.switchP1RollButton(true);
                               boolean rosetta = false;
                               
@@ -221,7 +211,7 @@ public class Client {
                                    } while (rosetta);
                               } 
                               
-                              myTurn.set(false); // Reset turn after sending message
+                              myTurn = false; // Reset turn after sending message
                               gui.switchP1RollButton(false);
                               if (counter.getP1Score() == 7) {
                                    gui.closeFrame();
@@ -230,6 +220,8 @@ public class Client {
                               boolean opponentTurn = true;
                               String dieRollStr = in.readLine(); // Read opponent's die roll
                               int dieRoll = Integer.parseInt(dieRollStr);
+                              
+                              gui.updateRollLabel("P2", dieRoll);
 
                               if (dieRoll > 0) {
                                    do {
@@ -272,12 +264,14 @@ public class Client {
           }
      }    
 
-    
     // TODO: Temporary main method for debugging
-     public static void main(String[] args) {
-          Client client = new Client();
-          GameGUI gameGUI = new GameGUI(client);
-          client.setGUI(gameGUI);
-          client.initiateMatch(gameGUI);
-     }
+     // public static void main(String[] args) {
+     //      Counter counter = new Counter();
+     //      Board currentBoard = new Board(counter);
+     //      Dice dice = new Dice();
+     //      Client client = new Client(counter, currentBoard, dice);
+     //      GameGUI gameGUI = new GameGUI(client);
+     //      client.setGUI(gameGUI);
+     //      client.initiateMatch();
+     // }
 }

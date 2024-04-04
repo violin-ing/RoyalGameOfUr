@@ -122,6 +122,12 @@ public class GameSession {
           p1Out.println("startfirst");
           p2Out.println("waitfirst");
 
+          try {
+               Thread.sleep(1000);
+          } catch (InterruptedException e) {
+               e.printStackTrace();
+          }
+
           // Schedule a task to check for timeouts
           ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
           executorService.scheduleAtFixedRate(() -> {
@@ -131,8 +137,8 @@ public class GameSession {
                          if (ipAddr.equals(p1Address)) {
                               System.out.println("Server: Player 1 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   p1Out.println("You have disconnected.");
-                                   p2Out.println("Opponent has disconnected.");
+                                   p1Out.println("selfdc");
+                                   p2Out.println("opponentdc");
                                    player1.close();
                               } catch (Exception e) {
                                    e.printStackTrace();
@@ -140,8 +146,8 @@ public class GameSession {
                          } else {
                               System.out.println("Server: Player 2 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   p2Out.println("You have disconnected.");
-                                   p1Out.println("Opponent has disconnected.");
+                                   p2Out.println("selfdc");
+                                   p1Out.println("opponentdc");
                                    player2.close();
                               } catch (Exception e) {
                                    e.printStackTrace();
@@ -174,7 +180,10 @@ public class GameSession {
                     // At the end of the player's turn check if the game is over (ie. player has won)
 
                     boolean rosetta = false;
-                    String diceRoll = p1In.readLine(); // Read dice roll
+                    String diceRoll;
+                    do {
+                         diceRoll = p1In.readLine(); // Read dice roll
+                    } while (diceRoll == null);
                     p2Out.println(diceRoll); // Send opponent dice roll
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {

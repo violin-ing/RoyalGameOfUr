@@ -47,7 +47,7 @@ public class Board {
             this.p2Strip[i].getChip().setOwnership("none");
             this.p2Strip[i].getChip().setAmn(0);
             if (i==3 || i==5) {
-                this.p1Strip[i].setRosetta();
+                this.p2Strip[i].setRosetta();
             }
         }
     

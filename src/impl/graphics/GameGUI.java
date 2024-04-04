@@ -287,17 +287,17 @@ public class GameGUI extends JFrame {
     public int[] getButtonArrayPosition(int[] stripPlace) {
         int[] positionInArray = new int[2];
         positionInArray[0] = stripPlace[0];
-        int[] playerStringPos = {3,2,1,0};
-        int[] playerStringBottonPos = {7,6};
+        int[] playerStripPos = {3,2,1,0};
+        int[] playerStripBottonPos = {7,6};
         if (stripPlace[0]==0 || stripPlace[0] ==2) {
             if (stripPlace[1]==-1) {
                 positionInArray[1] = 4;
             } else if(stripPlace[1]==6) {
                 positionInArray[1] = 5;
-            } else if(stripPlace[1] >= 0 || stripPlace[1] <= 3) {
-                positionInArray[1] = playerStringPos[stripPlace[1]];
+            } else if(stripPlace[1] >= 0 && stripPlace[1] <= 3) {
+                positionInArray[1] = playerStripPos[stripPlace[1]];
             } else {
-                positionInArray[1] = playerStringBottonPos[stripPlace[1]-4];
+                positionInArray[1] = playerStripBottonPos[stripPlace[1]-4];
             }
         } else {
             positionInArray[1] = stripPlace[1];
