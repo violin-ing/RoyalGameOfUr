@@ -191,16 +191,23 @@ public class GameSession {
                     final String diceRoll[] = new String[1];
 
                     new Thread(() -> {
-                         try {
-                              System.out.println(p1In.readLine());
-                         } catch (IOException e) {
-                              e.printStackTrace();
-                         } // "sending_dice_roll"
+                         String fromPlayer = null;
+                         do {
+                              try {
+                                   fromPlayer = p1In.readLine();
+                              } catch (IOException e) {
+                                   e.printStackTrace();
+                                   return;
+                              } // "sending_dice_roll"
+                         } while (fromPlayer == null);
+                         System.out.println(fromPlayer);
                          try {
                               diceRoll[0] = p1In.readLine();
                          } catch (IOException e) {
                               e.printStackTrace();
+                              return;
                          } // Read dice roll
+
                          p2Out.println(diceRoll[0]); // Send opponent dice roll
                     }).start();
 
