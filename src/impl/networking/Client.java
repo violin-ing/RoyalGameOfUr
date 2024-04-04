@@ -183,58 +183,13 @@ public class Client {
 
                                    // System.out.println("diceNum String = " + diceRoll);
 
-                                   if (diceNum != 0) {
+                                   if (diceNum == 0) {
+                                        out.println("0,nil");
+                                        myTurn = false;
+                                        continue;
+                                   } else {
                                         // System.out.println("diceNum = " + diceRoll);
-                                        if (availableMoves("P1", diceNum)) {
-                                             // System.out.println("WAITING FOR MOVE");
-                                             while (!moveSelected) {
-                                                  System.out.println("WAITING FOR INPUT");
-                                             }
-
-                                             int[] move = Arrays.stream(info)
-                                                  .limit(4)
-                                                  .mapToInt(Integer::parseInt)
-                                                  .toArray();
-
-                                             currentBoard.move(move, "P1");
-                                             System.out.println("update the board");
-                                             gui.updateBoard(currentBoard);
-                                             gui.updateScore(counter);
-
-                                             moveSelected = false;
-     
-                                             int newStrip = move[2];
-                                             int newIndex = move[3];
-     
-                                             // INFORMATION TO SEND:
-                                             // 1. Chip's old position (strip + index)
-                                             // 2. Chip's new position (strip + index)
-                                             // 3. Rosetta boolean (of chip's new position)
-                                             Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
-                                             if (newTile.isRosetta()) {
-                                                  info[4] = "true";
-                                                  rosetta = true;
-                                             } else {
-                                                  info[4] = "false";
-                                                  rosetta = false;
-                                             }
-                                             
-                                             for (int i = 0; i < info.length; i++) {
-                                                  packetBuilder.append("," + info[i]);
-                                             }
-
-                                             new Thread(() -> {
-                                                  out.println(packetBuilder.toString());
-                                                  // packetBuilder = {
-                                                  //      diceRoll, 
-                                                  //      oldStrip, 
-                                                  //      oldIndex, 
-                                                  //      newStrip, 
-                                                  //      newIndex, 
-                                                  //      "true"/"false"
-                                                  // }
-                                             }).start();
-                                        } else {
+                                        if (!availableMoves("P1", diceNum)) {
                                              System.out.println("no moves avail");
                                              packetBuilder.append(",nil");
                                              new Thread(() -> {
@@ -242,7 +197,57 @@ public class Client {
                                                   // packetBuilder = {diceRoll, "nil"}
                                              }).start();
                                              rosetta = false;
+                                             myTurn = false;
+                                             continue;
                                         }
+                                        // System.out.println("WAITING FOR MOVE");
+                                        while (!moveSelected) {
+                                             System.out.println("WAITING FOR INPUT");
+                                        }
+
+                                        int[] move = Arrays.stream(info)
+                                             .limit(4)
+                                             .mapToInt(Integer::parseInt)
+                                             .toArray();
+
+                                        currentBoard.move(move, "P1");
+                                        System.out.println("update the board");
+                                        gui.updateBoard(currentBoard);
+                                        gui.updateScore(counter);
+
+                                        moveSelected = false;
+
+                                        int newStrip = move[2];
+                                        int newIndex = move[3];
+
+                                        // INFORMATION TO SEND:
+                                        // 1. Chip's old position (strip + index)
+                                        // 2. Chip's new position (strip + index)
+                                        // 3. Rosetta boolean (of chip's new position)
+                                        Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
+                                        if (newTile.isRosetta()) {
+                                             info[4] = "true";
+                                             rosetta = true;
+                                        } else {
+                                             info[4] = "false";
+                                             rosetta = false;
+                                        }
+                                        
+                                        for (int i = 0; i < info.length; i++) {
+                                             packetBuilder.append("," + info[i]);
+                                        }
+
+                                        new Thread(() -> {
+                                             out.println(packetBuilder.toString());
+                                             // packetBuilder = {
+                                             //      diceRoll, 
+                                             //      oldStrip, 
+                                             //      oldIndex, 
+                                             //      newStrip, 
+                                             //      newIndex, 
+                                             //      "true"/"false"
+                                             // }
+                                        }).start();
                                    }
                               } while (rosetta);
                               
@@ -260,9 +265,6 @@ public class Client {
                                    heartbeatSender.interrupt();
                                    return;
                               }
-                         } else {
-                              System.out.println("here?");
-                              out.println("0,nil");
                          }
                     }
                } catch (Exception e) {
@@ -293,7 +295,11 @@ public class Client {
                possibleMoves = true;
           }
           System.out.println("updating tiles");
-          gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+          SwingUtilities.invokeLater(new Runnable() {
+               public void run() {
+                    gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+               }
+           });
   
           return possibleMoves;
       }

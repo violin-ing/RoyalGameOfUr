@@ -264,18 +264,14 @@ public class GameGUI extends JFrame {
                 componentsArray[currentMovable.get(i)[0]][4].updateImage(1, player,true);
             }
             
-            System.out.println("test1");
             int[] currentMovePos = getButtonArrayPosition(currentMovable.get(i));
             int[] futureMovePos = getButtonArrayPosition(futureMovable.get(i));
-
-            System.out.println("test2");
 
             buttonArray[currentMovePos[0]][currentMovePos[1]].setButtonSelectable();
             // make sure the future position and position of the future path are stored correctly.
             buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveFromLocation(currentMovable.get(i)[0], currentMovable.get(i)[1]);
             buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveToLocation(futureMovable.get(i)[0], futureMovable.get(i)[1]);
             buttonArray[currentMovePos[0]][currentMovePos[1]].setChipButtonsMoveButton(futureMovePos[0], futureMovePos[1]);
-            System.out.println("updated selectable tiles");
         }
     }
     // converts position of tile in strips to a position in the graphicbutton array.
