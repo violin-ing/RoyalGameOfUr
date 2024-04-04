@@ -184,7 +184,10 @@ public class Client {
                                    String diceRoll = Integer.toString(diceNum);
                                    packetBuilder.append(diceRoll);
 
+                                   System.out.println("diceNum String = " + diceRoll);
+
                                    if (diceNum != 0) {
+                                        System.out.println("diceNum = " + diceRoll);
                                         if (Game.availableMoves("P1", diceNum)) {
                                              System.out.println("WAITING FOR MOVE");
                                              while (!moveSelected) {
