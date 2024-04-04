@@ -250,6 +250,7 @@ public class Client {
                               }
                               // check if opponent has won (should get losing message if so)
                          }
+                         myTurn = true;
                     }
 
                     // Cleanup resources
