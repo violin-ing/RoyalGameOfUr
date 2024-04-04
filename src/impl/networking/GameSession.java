@@ -181,6 +181,7 @@ public class GameSession {
 
           boolean p1Turn = true;
 
+          // TODO: Main game loop
           while (true) {
                if (executorService.isShutdown()) {
                     throw new IOException();
@@ -188,7 +189,7 @@ public class GameSession {
 
                if (p1Turn) {
                     boolean rosetta = false;
-                    final String diceRoll[] = new String[1];
+                    final int diceRoll[] = new int[1];
 
                     new Thread(() -> {
                          String fromPlayer = null;
@@ -202,7 +203,7 @@ public class GameSession {
                          } while (fromPlayer == null);
                          System.out.println(fromPlayer);
                          try {
-                              diceRoll[0] = p1In.readLine();
+                              diceRoll[0] = p1In.read();
                          } catch (IOException e) {
                               e.printStackTrace();
                               return;

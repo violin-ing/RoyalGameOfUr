@@ -165,7 +165,6 @@ public class Client {
 
                               // Send dice number to the server to send to opponent
                               new Thread(() -> {
-                                   out.println("sending_dice_roll");
                                    out.println(diceRoll); // Sends die roll to server
                               }).start();
                               
@@ -247,9 +246,16 @@ public class Client {
                               }
                          } else {
                               boolean opponentTurn = true;
-                              String dieRollStr = in.readLine(); // Read opponent's die roll
+                              final int dieRollStr[] = new int[1];
+                              new Thread(() -> {
+                                   try {
+                                        dieRollStr[0] = in.readInt();
+                                   } catch (IOException e) {
+                                        e.printStackTrace();
+                                   } // Read opponent's die roll
+                              }).start();
                               
-                              int dieRoll = Integer.parseInt(dieRollStr);
+                              int dieRoll = Integer.parseInt(dieRollStr[0]);
                               
                               SwingUtilities.invokeLater(() -> {
                                    gui.updateRollLabel("P2", dieRoll);
