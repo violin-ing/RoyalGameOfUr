@@ -97,6 +97,7 @@ public class Client {
                     });
 
                     Thread serverListener = new Thread(() -> {
+                         System.out.println("Listening for server msgs");
                          while (true) {
                               try {
                                    String opponentPkt = in.readLine();
@@ -195,10 +196,8 @@ public class Client {
                                         if (!availableMoves("P1", diceNum)) {
                                              System.out.println("no moves avail");
                                              packetBuilder.append(",nil");
-                                             new Thread(() -> {
-                                                  out.println(packetBuilder.toString());
-                                                  System.out.println("sent nil packet");
-                                             }).start();
+                                             out.println(packetBuilder.toString());
+                                             System.out.println("sent nil packet");
                                              rosetta = false;
                                              myTurn = false;
                                              continue;
@@ -242,19 +241,17 @@ public class Client {
                                         for (int i = 0; i < info.length; i++) {
                                              packetBuilder.append("," + info[i]);
                                         }
-
-                                        new Thread(() -> {
-                                             out.println(packetBuilder.toString());
-                                             System.out.println("sent move packet");
-                                             // packetBuilder = {
-                                             //      diceRoll, 
-                                             //      oldStrip, 
-                                             //      oldIndex, 
-                                             //      newStrip, 
-                                             //      newIndex, 
-                                             //      "true"/"false"
-                                             // }
-                                        }).start();
+                                        out.println(packetBuilder.toString());
+                                        System.out.println("sent move packet");
+                                        System.out.println(packetBuilder.toString());
+                                        // packetBuilder = {
+                                        //      diceRoll, 
+                                        //      oldStrip, 
+                                        //      oldIndex, 
+                                        //      newStrip, 
+                                        //      newIndex, 
+                                        //      "true"/"false"
+                                        // }
                                    }
                               } while (rosetta);
                               
