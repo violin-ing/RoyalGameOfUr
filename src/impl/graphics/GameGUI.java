@@ -1,6 +1,8 @@
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.*;
@@ -161,74 +163,68 @@ public class GameGUI extends JFrame {
     }
 
     public void addButtonActionListener(GraphicsButton button) {
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // depending on the status of that button (waiting to select a move) / already selected move.
-                // some method will then need to be called which will change which other buttons are visible.
-                System.out.println("CLICKED");
-                // pass tile which was selected and move position to game.
+        button.addMouseListener(new MouseListener() {
 
-                // if button is both chip and move then do the extend check, then do the checks below
-                // extended check: 
-                // 
-                if (button.checkIsBothSelection()) {
-                    // check to see if the player is trying to move a chip here first:
-                    // if moveFromTile is selected, then this is true.
-                    if (buttonArray[button.getMoveFromStrip()][button.getMoveFromLocation()].isSelected()) {
-                        if (networkPlay) {
-                            sendClientMoveInfo(button);
-                        } else { 
+            @Override
+            public void mousePressed(MouseEvent e) {}
+
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+
+            @Override
+            public void mouseExited(MouseEvent e) {}
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // if left mouse button is clicked, they are selecting a chip
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    System.out.println("CLICEKD1");
+                    if (button.checkIsChipSelection()) {
+                        System.out.println(button.getSelection());
+                        if (button.getSelection()) {
                             sendMoveInformation(button);
-                        }
-                    } else {
-                        // button was clicked to select chip
-                        if (GraphicsButton.tileSelected) {
-                            // clear all moveselection tiles, make sure they are no selectable.
-                            resetChipSelection();
-                        }
-                        // make this chip button selected
-                        button.setSelected(true);
-                        GraphicsButton.tileSelected = true;
-                        if (!buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].checkIsBothSelection()) {
-                            buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].setButtonSelectable();
+                        } else {
+                            // button is getting selected.
+                            button.updateSelection(true);
+                            // show the move position, and make all the other buttons invisible.
+                            buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].setButtonAsFutureMove();
+                            setButtonsInvisible(button.getX(), button.getY(), button.getMoveButtonStrip(), button.getMoveButtonLocation());
                         }
                     }
-                } else if (button.checkIsChipSelection()) {
-                    if (GraphicsButton.tileSelected) {
-                        // make sure all moveselections are not selectable and all chip ones are selectable.
-                        // revert to orignal selecetion.
-                        resetChipSelection();
-                    }
-                    button.setSelected(true);
-                    button.setButtonFutureSelectable();
-                    GraphicsButton.tileSelected = true;
-                    // turn the next non selectable button to selectable.
-                    if(!buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].checkIsBothSelection()) {
-                        buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].setButtonSelectable();
-                    }
-                } else if (button.checkIsMoveSelection()) {
-                    // send game the previous tile to be moved, and the position its moving to.
-                    System.out.println("MOVED A PIECE!");
-                    sendMoveInformation(button);
+                }
+                if (e.getButton()==MouseEvent.BUTTON3) {
+                    System.out.println("CLICEKD2");
+                    button.updateSelection(false);
+                    resetChipSelection();
                 }
             }
         });
     }
+
+    public void setButtonsInvisible(int moveFromStrip, int moveFromLocation, int moveToStrip, int moveToLocation) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 8; j++) {
+                if ((i != moveFromStrip && j != moveFromLocation)|| (i != moveToStrip && j != moveToLocation)) {
+                    // this will also disable the buttons.
+                    buttonArray[i][j].setButtonInvisible();
+                }
+            }
+        }
+    }
+
     // this method is called if a button is already selected and the player selected another chip
     // this will reset all the selected and selectable properties of the buttons.
     public void resetChipSelection() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 8; j++) {
-                if (buttonArray[i][j].checkIsBothSelection()) {
-                    buttonArray[i][j].setSelected(false);
-                }
                 if (buttonArray[i][j].checkIsChipSelection()) {
+                    // resets button making them visible and functional
                     buttonArray[i][j].setButtonSelectable();
-                    buttonArray[i][j].setSelected(false);
-                } else if(buttonArray[i][j].checkIsMoveSelection()) {
-                    buttonArray[i][j].setButtonFutureSelectable();
-                    buttonArray[i][j].setSelected(false);
+                } else {
+                    buttonArray[i][j].setButtonInvisible();
                 }
             }
         }
@@ -262,24 +258,15 @@ public class GameGUI extends JFrame {
                 componentsArray[currentMovable.get(i)[0]][4].updateImage(1, player,true);
             }
             
-            System.out.println(currentMovable.get(i)[0] + " " + currentMovable.get(i)[1]);
-            System.out.println(futureMovable.get(i)[0] + " " + futureMovable.get(i)[1]);
             int[] currentMovePos = getButtonArrayPosition(currentMovable.get(i));
             int[] futureMovePos = getButtonArrayPosition(futureMovable.get(i));
-            // checks to correctly set a tile to both a selection and move tile, if a chip can be moved to and from this position.
-            if(buttonArray[currentMovePos[0]][currentMovePos[1]].checkIsMoveSelection()) {
-                buttonArray[currentMovePos[0]][currentMovePos[1]].setBothSelectableAndFutureSelectable();
-            } else {
-                buttonArray[currentMovePos[0]][currentMovePos[1]].setButtonSelectable();
-            }
+
+            buttonArray[currentMovePos[0]][currentMovePos[1]].setButtonSelectable();
+            System.out.println(currentMovePos[0] + " " + currentMovePos[1]);
+            // make sure the future position and position of the future path are stored correctly.
+            buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveFromLocation(currentMovable.get(i)[0], currentMovable.get(i)[1]);
+            buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveToLocation(futureMovable.get(i)[0], futureMovable.get(i)[1]);
             buttonArray[currentMovePos[0]][currentMovePos[1]].setChipButtonsMoveButton(futureMovePos[0], futureMovePos[1]);
-            if(buttonArray[futureMovePos[0]][futureMovePos[1]].checkIsChipSelection()){
-                buttonArray[futureMovePos[0]][futureMovePos[1]].setBothSelectableAndFutureSelectable();;
-            } else {
-                buttonArray[futureMovePos[0]][futureMovePos[1]].setButtonFutureSelectable();
-            }
-            buttonArray[futureMovePos[0]][futureMovePos[1]].setMoveToLocation(futureMovePos[0], futureMovable.get(i)[1]);
-            buttonArray[futureMovePos[0]][futureMovePos[1]].setMoveFromLocation(currentMovePos[0], currentMovable.get(i)[1]);
         }
     }
     // converts position of tile in strips to a position in the graphicbutton array.
