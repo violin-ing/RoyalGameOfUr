@@ -57,7 +57,7 @@ public class Client {
      public void initiateMatch() {
           try {
                matchFound = false;
-               
+
                // Connecting to server display
                // ServerConnectionGUI frame = ServerConnectionGUI.display();
 
@@ -115,6 +115,7 @@ public class Client {
                                         opponentAlive = false;
                                         gui.closeFrame();
                                         ClientWinGUI.display("Opponent has disconnected. You have won by default!");
+                                        heartbeatSender.interrupt();
                                    }
                               }
                          } catch (IOException e) {

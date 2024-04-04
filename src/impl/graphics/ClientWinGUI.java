@@ -11,7 +11,7 @@ public class ClientWinGUI extends JFrame {
           setTitle("Game Over");
 
           setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-          setSize(300, 100);
+          setSize(450, 100);
           setLocationRelativeTo(null); 
 
           JTextField textField = new JTextField(msg);
