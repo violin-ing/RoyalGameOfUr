@@ -257,30 +257,45 @@ public class Client {
                               
                               if (dieRoll > 0) {
                                    do {
-                                        String data = in.readLine(); // Read opponent's move
+                                        final String[] dataContainer = new String[1];
+                                        new Thread(() -> {
+                                             while (dataContainer[0] == null) {
+                                                  try {
+                                                       dataContainer[0] = in.readLine();
+                                                  } catch (IOException e) {
+                                                       e.printStackTrace();
+                                                  } // Read opponent's move
+                                             }
+                                        }).start();
+                                        String data = dataContainer[0];
+                                        if (!data.equals("nil")) {
+                                             String[] info = data.split(",");
+                                             String rosetta = info[4];
 
-                                        String[] info = data.split(",");
-                                        String rosetta = info[4];
+                                             if ("true".equals(rosetta)) {
+                                                  opponentTurn = true;
+                                             } else {
+                                                  opponentTurn = false;
+                                             }
 
-                                        if ("true".equals(rosetta)) {
-                                             opponentTurn = true;
+                                             // Stream packet array into a usable int[] array
+                                             int[] move = Arrays.stream(info)
+                                                  .limit(4)
+                                                  .mapToInt(Integer::parseInt)
+                                                  .toArray();
+                                             currentBoard.move(move, "P2");
+                                             SwingUtilities.invokeLater(() -> {
+                                                  gui.updateBoard(currentBoard);
+                                             });
+                                             if (counter.getP2Score() == 7) {
+                                                  SwingUtilities.invokeLater(() -> {
+                                                       gui.closeFrame();
+                                                  });
+                                                  ClientLoseGUI.display("You have lost the game!");
+                                                  return;
+                                             }
                                         } else {
                                              opponentTurn = false;
-                                        }
-
-                                        // Stream packet array into a usable int[] array
-                                        int[] move = Arrays.stream(info)
-                                             .limit(4)
-                                             .mapToInt(Integer::parseInt)
-                                             .toArray();
-                                        currentBoard.move(move, "P2");
-                                        gui.updateBoard(currentBoard);
-                                        if (counter.getP2Score() == 7) {
-                                             SwingUtilities.invokeLater(() -> {
-                                                  gui.closeFrame();
-                                             });
-                                             ClientLoseGUI.display("You have lost the game!");
-                                             return;
                                         }
                                    } while (opponentTurn);
                               }

@@ -217,8 +217,8 @@ public class GameSession {
                                    } else {
                                         rosetta = false;
                                    }
-                                   p2Out.println(gamePacket);
-                              }
+                              } 
+                              p2Out.println(gamePacket);
                          } while (rosetta);
                     } 
 
@@ -241,8 +241,8 @@ public class GameSession {
                                    } else {
                                         rosetta = false;
                                    }
-                                   p1Out.println(gamePacket);
                               }
+                              p1Out.println(gamePacket);
                          } while (rosetta);
                     } 
                }
