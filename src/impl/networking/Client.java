@@ -16,16 +16,16 @@ public class Client {
      public static final int DEFAULT_PORT = 6969; // Server game port
      private final static int HEARTBEAT_PORT = 42069; // Heartbeat port
 
-     private Board currentBoard;
-     private Board futureBoard;
-     private Counter counter;
-     private Dice dice;
+     public static Board currentBoard;
+     public static Board futureBoard;
+     public static Counter counter;
+     public static Dice dice;
      public static GameGUI gui;
 
      public static int rollAmount;
      public static boolean rollPressed = false;
      public static boolean matchFound = false;
-     public boolean moveSelected = false;
+     public static boolean moveSelected = false;
 
      private boolean selfWin = false;
      private boolean opponentWin = false;
@@ -34,10 +34,10 @@ public class Client {
 
      public String[] info = new String[5];
 
-     public Client(Counter counter, Board currentBoard, Dice dice) {
-          this.currentBoard = currentBoard;
-          this.counter = counter;
-          this.dice = dice;
+     public Client(Counter counterIn, Board currentBoardIn, Dice diceIn) {
+          currentBoard = currentBoardIn;
+          counter = counterIn;
+          dice = diceIn;
           Game.networkPlay = true;
       }
 
@@ -103,26 +103,25 @@ public class Client {
 
                     // Start a thread to listen for messages from the server
                     Thread serverListener = new Thread(() -> {
-                         String fromServer;
-                         try {
-                              while ((fromServer = in.readLine()) != null) {
-                                   Thread.sleep(1000);
-                                   if ("selfdc".equals(fromServer)) {
-                                        selfAlive = false;
+                         try (DatagramSocket dcSocket = new DatagramSocket(4445)) {
+                              byte[] dcMsgBuffer = new byte[256];
+                  
+                              while (true) {
+                                   DatagramPacket dcPacket = new DatagramPacket(dcMsgBuffer, dcMsgBuffer.length);
+                                   dcSocket.receive(dcPacket);
+                                   String received = new String(dcPacket.getData(), 0, dcPacket.getLength());
+                                   if (received.equals("opponentdc")) {
                                         gui.closeFrame();
-                                        ClientLoseGUI.display("You have disconnected and forfeited the match!");
-                                   } else if ("opponentdc".equals(fromServer)) {
-                                        opponentAlive = false;
-                                        gui.closeFrame();
-                                        ClientWinGUI.display("Opponent has disconnected. You have won by default!");
+                                        ClientWinGUI.display("Opponent disconnected. You have won the game by default.");
                                         heartbeatSender.interrupt();
-                                   }
+                                        return;
+                                   } 
                               }
-                         } catch (IOException e) {
-                              // IGNORE
-                         } catch (InterruptedException e) {
+                         } catch (Exception e) {
                               gui.closeFrame();
                               ErrorWindowGUI.display();
+                         } finally {
+                              
                          }
                     });
 
@@ -130,19 +129,16 @@ public class Client {
                     serverListener.start();
 
                     String startPacket;
-                    do {
-                         startPacket = in.readLine();
-                         if (startPacket == null) {continue;}
-                         if ("startfirst".equals(startPacket)) {
-                              matchFound = true;
-                              myTurn = true;
-                              // frame.closeWindow();
-                         } else if (startPacket.equals("waitfirst")) {
-                              matchFound = true;
-                              myTurn = false;
-                              // frame.closeWindow();
-                         }
-                    } while (startPacket == null);
+                    startPacket = in.readLine();
+                    if ("startfirst".equals(startPacket)) {
+                         matchFound = true;
+                         myTurn = true;
+                         // frame.closeWindow();
+                    } else if (startPacket.equals("waitfirst")) {
+                         matchFound = true;
+                         myTurn = false;
+                         // frame.closeWindow();
+                    }
 
                     // Main thread deals with sending messages to server
                     while (opponentAlive && selfAlive) {
@@ -151,100 +147,146 @@ public class Client {
                               // 2. Read for move (ONLY if dice roll > 0)
                               // 3. Read for move again if the player ends up on a rosetta tile
 
-                              gui.switchP1RollButton(true);
+                              SwingUtilities.invokeLater(() -> {
+                                   gui.switchP1RollButton(true);
+                              });
+                              
                               boolean rosetta = false;
                               
                               while (!rollPressed) {
-                                   // Wait until the player rolls the dice
+                                   System.out.println("rolling...");
                               }
                               rollPressed = false;
 
-                              // Send dice number to the server to send to opponent
+                              System.out.println("TEST: Testing rolling functionality");
+                              System.out.println(rollAmount);
+
                               String diceRoll = Integer.toString(rollAmount);
-                              out.println(diceRoll); // Sends die roll to server
+
+                              // Send dice number to the server to send to opponent
+                              new Thread(() -> {
+                                   out.print(diceRoll + "\r\n"); // Sends die roll to server
+                              }).start();
                               
-                              int diceNum = Integer.parseInt(diceRoll);
-                              
-                              if (diceNum > 0) {
+                              if (rollAmount > 0) {
                                    do {
-                                        Game.availableMoves("P1", diceNum);
-                                        while (!moveSelected) {
-                                             // Wait for player to make their move on the GUI
-                                        }
-                                        // Stream "info" array into a usable int[] array 
-                                        int[] move = Arrays.stream(info)
-                                             .limit(4)
-                                             .mapToInt(Integer::parseInt)
-                                             .toArray();
-                                        currentBoard.move(move, "P1");
-                                        gui.updateBoard(currentBoard);
-                                        moveSelected = false;
+                                        // go to next iteration if there are no available moves
+                                        if (Game.availableMoves("P1", rollAmount)) {
+                                             System.out.println("WAITING FOR MOVE");
+                                             while (!moveSelected) {
+                                                  try { 
+                                                       Thread.sleep(3000); // Wait for 10 seconds 
+                                                       System.out.println("WAITING FOR INPUT");
+                                                  } catch (InterruptedException e) { 
+                                                       // Handle the exception 
+                                                  }
+                                             }
 
-                                        int newStrip = move[2];
-                                        int newIndex = move[3];
+                                             System.out.println("update the board");
 
-                                        // INFORMATION TO SEND:
-                                        // 1. Chip's old position (strip + index)
-                                        // 2. Chip's new position (strip + index)
-                                        // 3. Rosetta boolean (of chip's new position)
-                                        Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
-                                        if (newTile.isRosetta()) {
-                                             info[4] = "true";
-                                             rosetta = true;
+                                             // Stream "info" array into a usable int[] array 
+                                             int[] move = Arrays.stream(info)
+                                                  .limit(4)
+                                                  .mapToInt(Integer::parseInt)
+                                                  .toArray();
+                                             
+                                             currentBoard.move(move, "P1");
+                                             SwingUtilities.invokeLater(() -> {
+                                                  gui.updateBoard(currentBoard);
+                                                  gui.updateScore(counter);
+                                             });
+                                             moveSelected = false;
+     
+                                             int newStrip = move[2];
+                                             int newIndex = move[3];
+     
+                                             // INFORMATION TO SEND:
+                                             // 1. Chip's old position (strip + index)
+                                             // 2. Chip's new position (strip + index)
+                                             // 3. Rosetta boolean (of chip's new position)
+                                             Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
+                                             if (newTile.isRosetta()) {
+                                                  info[4] = "true";
+                                                  rosetta = true;
+                                             } else {
+                                                  info[4] = "false";
+                                                  rosetta = false;
+                                             }
+                                             StringBuffer gamePacket = new StringBuffer();
+                                             for (int i = 0; i < info.length; i++) {
+                                                  if (i == info.length - 1) {
+                                                       gamePacket.append(info[i]);
+                                                  } else {
+                                                       gamePacket.append(info[i] + ",");
+                                                  }
+                                             }
+                                             new Thread(() -> {
+                                                  out.print(gamePacket + "\r\n");
+                                             }).start();
                                         } else {
-                                             info[4] = "false";
+                                             new Thread(() -> {
+                                                  out.print("nil\r\n");
+                                             }).start();
                                              rosetta = false;
                                         }
-                                        StringBuffer gamePacket = new StringBuffer();
-                                        for (int i = 0; i < info.length; i++) {
-                                             if (i == info.length - 1) {
-                                                  gamePacket.append(info[i]);
-                                             } else {
-                                                  gamePacket.append(info[i] + ",");
-                                             }
-                                        }
-                                        out.println(gamePacket);
                                    } while (rosetta);
                               } 
                               
                               myTurn = false; // Reset turn after sending message
-                              gui.switchP1RollButton(false);
-                              if (counter.getP1Score() == 7) {
-                                   gui.closeFrame();
+                              SwingUtilities.invokeLater(() -> {
+                                   gui.switchP1RollButton(false);
+                              });
+                              
+                              if (counter.getP1Score() >= 7) {
+                                   SwingUtilities.invokeLater(() -> {
+                                        gui.closeFrame();
+                                   });
+                                   ClientWinGUI.display("You have won the game!");
+                                   return;
                               }
                          } else {
                               boolean opponentTurn = true;
-                              String dieRollStr = in.readLine(); // Read opponent's die roll
+                              String dieRollStr = in.readLine();
                               int dieRoll = Integer.parseInt(dieRollStr);
                               
-                              gui.updateRollLabel("P2", dieRoll);
-
+                              SwingUtilities.invokeLater(() -> {
+                                   gui.updateRollLabel("P2", dieRoll);
+                              });
+                              
                               if (dieRoll > 0) {
                                    do {
-                                        String data = in.readLine(); // Read opponent's move
-                                        String[] info = data.split(",");
-                                        String rosetta = info[4];
+                                        String data = in.readLine();
+                                        if (!data.equals("nil")) {
+                                             String[] info = data.split(",");
+                                             String rosetta = info[4];
 
-                                        if ("true".equals(rosetta)) {
-                                             opponentTurn = true;
+                                             if ("true".equals(rosetta)) {
+                                                  opponentTurn = true;
+                                             } else {
+                                                  opponentTurn = false;
+                                             }
+
+                                             // Stream packet array into a usable int[] array
+                                             int[] move = Arrays.stream(info)
+                                                  .limit(4)
+                                                  .mapToInt(Integer::parseInt)
+                                                  .toArray();
+                                             currentBoard.move(move, "P2");
+                                             SwingUtilities.invokeLater(() -> {
+                                                  gui.updateBoard(currentBoard);
+                                             });
+                                             if (counter.getP2Score() == 7) {
+                                                  SwingUtilities.invokeLater(() -> {
+                                                       gui.closeFrame();
+                                                  });
+                                                  ClientLoseGUI.display("You have lost the game!");
+                                                  return;
+                                             }
                                         } else {
                                              opponentTurn = false;
                                         }
-
-                                        // Stream packet array into a usable int[] array
-                                        int[] move = Arrays.stream(info)
-                                             .limit(4)
-                                             .mapToInt(Integer::parseInt)
-                                             .toArray();
-                                        currentBoard.move(move, "P2");
-                                        gui.updateBoard(currentBoard);
-                                        if (counter.getP2Score() == 7) {
-                                             gui.closeFrame();
-                                             break;
-                                        }
                                    } while (opponentTurn);
                               }
-                              // check if opponent has won (should get losing message if so)
                          }
                          myTurn = true;
                     }
@@ -252,12 +294,12 @@ public class Client {
                     // Cleanup resources
                     heartbeatSender.interrupt();
                     serverListener.interrupt();
-                    System.exit(0);
+                    return;
                } catch (Exception e) {
-                    System.out.println("Error connecting to server!" + e);
+                    e.printStackTrace();
                } 
           } catch (Exception e) {
-               System.out.println("Client exception!" + e);
+               e.printStackTrace();
           }
      }    
 

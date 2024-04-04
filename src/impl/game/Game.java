@@ -73,18 +73,20 @@ public class Game {
                 rollAmount = dice.roll();
                 gui.editP2Roll(rollAmount);
                 if (rollAmount!=0) {
-                    Node root = ai.createTree(rollAmount, counter.getP2Counter());
-                    double expectimax = ai.expectiminimax(root, "max");
-                    root.setScore(expectimax);
+                    ai.createTree(rollAmount, counter.getP2Counter());
+                    double expectimax = ai.expectiminimax(ai.getRoot(), "max");
+                    ai.printTree(ai.getRoot(), 1);
+                    ai.getRoot().setScore(expectimax);
                     Node bestChild = ai.filterChildren(expectimax);
                     move = bestChild.getPos();
+                    System.out.println(Arrays.toString(move));
                 }
                 // ai turn
             } else {
                 // players turn
                 System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
-                    System.out.println("WAITING FOR INPUT");
+                    //System.out.println("WAITING FOR INPUT");
                 }
                 // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
                 if (rollAmount == 0) {
@@ -96,7 +98,12 @@ public class Game {
                     }
                     System.out.println("WAITING FOR MOVE");
                     while (!moveSelected) {
-                        System.out.println("WAITING FOR INPUT");
+                        try { 
+                            Thread.sleep(3000); // Wait for 10 seconds 
+                            System.out.println("WAITING FOR INPUT");
+                        } catch (InterruptedException e) { 
+                            // Handle the exception 
+                        }
                     }
                     // update the board.
                     // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
@@ -138,26 +145,41 @@ public class Game {
     public static boolean availableMoves(String player, int roll) {
         boolean possibleMoves;
         int currentPlayerCounter;
-        if (player.equals("P1")) {
-            currentPlayerCounter = counter.getP1Counter();
+        
+        if (networkPlay) {
+            if (player.equals("P1")) {
+                currentPlayerCounter = Client.counter.getP1Counter();
+            } else {
+                currentPlayerCounter = Client.counter.getP2Counter();
+            }
         } else {
-            currentPlayerCounter = counter.getP2Counter();
-        }
-
-        List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
-        List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
-
-        if (futurePositions.size()==0) {
-            possibleMoves = false;
-        } else {
-            possibleMoves = true;
+            if (player.equals("P1")) {
+                currentPlayerCounter = counter.getP1Counter();
+            } else {
+                currentPlayerCounter = counter.getP2Counter();
+            }
         }
 
         if (networkPlay) {
+            List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, Client.currentBoard.identifyPieces(player), currentPlayerCounter);
+            List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
+            if (futurePositions.size()==0) {
+                possibleMoves = false;
+            } else {
+                possibleMoves = true;
+            }
             Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
         } else {
+            List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
+            List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
+            if (futurePositions.size()==0) {
+                possibleMoves = false;
+            } else {
+                possibleMoves = true;
+            }
             gui.updateSelectableTiles(currentMovablePositions, futurePositions);
         }
+
         return possibleMoves;
     }
 
@@ -279,12 +301,23 @@ public class Game {
         }
 
         if (strip != 1 && checkTileAfter == 6) {
-            if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
-                String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
-                if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
-                    return true;
-                } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
-                    return false;
+            if (networkPlay) {
+                if (Client.currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
+                    String enemyPlayer = "P2";
+                    if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
+                        return true;
+                    } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
+                        return false;
+                    }
+                }
+            } else {
+                if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
+                    String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
+                    if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
+                        return true;
+                    } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
+                        return false;
+                    }
                 }
             }
         }
