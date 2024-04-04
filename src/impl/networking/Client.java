@@ -175,7 +175,7 @@ public class Client {
                               
                               if (diceNum > 0) {
                                    do {
-                                        Game.availableMoves("P1", diceNum);
+                                        Game.availableMoves("P1", diceNum, false);
                                         while (!moveSelected) {
                                              // Wait for player to make their move on the GUI
                                         }
