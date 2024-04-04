@@ -18,7 +18,7 @@ public class Game {
     public boolean moveSelected = false;
     public int[] move = new int[4];
 
-    public boolean multiplayer;
+    public boolean multiplayer = false;
 
     public Game(Board currentBoard, Counter counter, Dice dice) {
         this.currentBoard = currentBoard;
@@ -42,9 +42,9 @@ public class Game {
          *      The ability to check if a player has won
     */
 
-    public Board getCurrentBoard() {return this.currentBoard;}
+    public static Board getCurrentBoard() {return currentBoard;}
 
-    public Counter getCounter() {return this.counter;}
+    public static Counter getCounter() {return counter;}
         
     public void start() {
         String currentPlayer = "";

@@ -106,7 +106,7 @@ public class Ai {
         root = new Node("max", 0);
 
         int roll = dice.roll(); // check if roll == 0
-        int counter = game.getCounter().getP2Counter();
+        int counter = Game.getCounter().getP2Counter();
         List<Board> maxBoards = new ArrayList<>();
         List<Board> minBoards = new ArrayList<>();
         List<Integer> branches = new ArrayList<>();
@@ -274,7 +274,7 @@ public class Ai {
                     System.out.println(m);
                     System.out.println(filteredChildren.stream().anyMatch(child -> child.getMoves().equals(m)));
                     filteredChildren = filteredChildren.stream()
-                        .filter(child -> child.getMoves().equals(m)) // Use .equals() for string comparison
+                        .filter(child -> child.moveExists(m)) 
                         .toList();
                 }
             }

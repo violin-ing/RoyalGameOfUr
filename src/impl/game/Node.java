@@ -37,6 +37,10 @@ public class Node {
         return this.moves;
     }
 
+    public boolean moveExists(String move) {
+        return Arrays.stream(moves).anyMatch(move::equals);
+    }
+
     public List<Node> getChildren() {
         return this.children;
     }
