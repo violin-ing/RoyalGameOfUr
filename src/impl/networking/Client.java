@@ -187,27 +187,23 @@ public class Client {
                                    String diceRoll = Integer.toString(rollAmount);
                                    packetBuilder.append(diceRoll);
 
-                                   if (rollAmount > 0) {
-                                        // go to next iteration if there are no available moves
+                                   if (rollAmount != 0) {
                                         if (Game.availableMoves("P1", rollAmount)) {
                                              System.out.println("WAITING FOR MOVE");
                                              while (!moveSelected) {
                                                   System.out.println("WAITING FOR INPUT");
                                              }
 
-                                             System.out.println("update the board");
-
-                                             // Stream "info" array into a usable int[] array 
                                              int[] move = Arrays.stream(info)
                                                   .limit(4)
                                                   .mapToInt(Integer::parseInt)
                                                   .toArray();
-                                             
+
                                              currentBoard.move(move, "P1");
-                                             SwingUtilities.invokeLater(() -> {
-                                                  gui.updateBoard(currentBoard);
-                                                  gui.updateScore(counter);
-                                             });
+                                             System.out.println("update the board");
+                                             gui.updateBoard(currentBoard);
+                                             gui.updateScore(counter);
+                                             
                                              moveSelected = false;
      
                                              int newStrip = move[2];
