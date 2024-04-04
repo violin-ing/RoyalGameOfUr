@@ -167,6 +167,7 @@ public class Client {
                                    gui.switchP1RollButton(true);
                               });
                               
+                              rollPressed = false;
                               boolean rosetta = false;
                               do {
                                    StringBuffer packetBuilder = new StringBuffer();
@@ -174,7 +175,7 @@ public class Client {
                                    while (!rollPressed) {
                                         System.out.println("rolling...");
                                    }
-                                   rollPressed = false;
+                                   // rollPressed = false;
      
                                    System.out.println("TEST: Testing rolling functionality");
                                    int diceNum = rollAmount;
