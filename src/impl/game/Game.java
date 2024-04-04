@@ -77,6 +77,7 @@ public class Game {
                     double expectimax = ai.expectiminimax(root, "max");
                     root.setScore(expectimax);
                     Node bestChild = ai.filterChildren(expectimax);
+                    move = bestChild.getPos();
                 }
                 // ai turn
             } else {
