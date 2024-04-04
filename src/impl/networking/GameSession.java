@@ -22,6 +22,9 @@ public class GameSession {
      private String p1Address;
      private String p2Address;
 
+     PrintWriter p1Out, p2Out;
+     BufferedReader p1In, p2In;
+
      private volatile ConcurrentHashMap<String, Long> lastHeartbeatTime = new ConcurrentHashMap<>();
 
      /**
@@ -41,6 +44,15 @@ public class GameSession {
           lastHeartbeatTime.put(p1Address, System.currentTimeMillis());
           lastHeartbeatTime.put(p2Address, System.currentTimeMillis());
 
+          try {
+               this.p1Out = new PrintWriter(player1.getOutputStream(), true);
+               this.p1In = new BufferedReader(new InputStreamReader(player1.getInputStream()));
+               this.p2Out = new PrintWriter(player2.getOutputStream(), true);
+               this.p2In = new BufferedReader(new InputStreamReader(player2.getInputStream()));
+          } catch (IOException e) {
+               e.printStackTrace();
+          }
+
           Thread heartbeatListener = new Thread(() -> {
                try (DatagramSocket socket = new DatagramSocket(null)) {
                     socket.setReuseAddress(true);
@@ -56,7 +68,7 @@ public class GameSession {
                          lastHeartbeatTime.put(senderIP, System.currentTimeMillis());
                     }
                } catch (Exception e) {
-                    System.err.println("Error receiving heartbeat: " + e.getMessage());
+                    // System.err.println("Error receiving heartbeat: " + e.getMessage());
                     e.printStackTrace();
                }
           });
@@ -67,7 +79,7 @@ public class GameSession {
      /**
       * Initializes the game session by starting the game logic and handling for each player.
       */
-     public void connectionInit() {
+     public void connectionInit() throws IOException, InterruptedException {
           handlePlayers(player1, player2);
      }
 
@@ -78,19 +90,8 @@ public class GameSession {
       * @param playerSocket The socket of the player to handle.
       * @param playerLabel A label identifying the player (e.g., "Player 1").
       */
-     private void handlePlayers(Socket p1Socket, Socket p2Socket) {
-          try { 
-               PrintWriter p1Out = new PrintWriter(p1Socket.getOutputStream(), true);
-               BufferedReader p1In = new BufferedReader(new InputStreamReader(p1Socket.getInputStream()));
-               PrintWriter p2Out = new PrintWriter(p2Socket.getOutputStream(), true);
-               BufferedReader p2In = new BufferedReader(new InputStreamReader(p2Socket.getInputStream()));
-               // Run game   
-               playGame(p1Out, p1In, p2Out, p2In);
-          } catch (IOException e) {
-               System.out.println("An IOException occurred with a player: " + e.getMessage());
-          } catch (InterruptedException e) {
-               return;
-          }
+     private void handlePlayers(Socket p1Socket, Socket p2Socket) throws IOException, InterruptedException {
+          playGame(p1Out, p1In, p2Out, p2In);
      }
 
      /**
