@@ -42,9 +42,7 @@ public class Client {
       }
 
      public void setGUI(GameGUI gameGUI) {
-          gui = gameGUI;
-          gui.disableP2();
-          gui.switchP1RollButton(false);
+          Client.gui = gameGUI;
      }
 
      /**
@@ -56,6 +54,9 @@ public class Client {
      */
      public void initiateMatch() {
           try {
+               Client.gui.disableP2();
+               Client.gui.switchP1RollButton(false);
+
                // Connecting to server display
                // ServerConnectionGUI frame = ServerConnectionGUI.display();
 
@@ -188,7 +189,7 @@ public class Client {
 
                                    if (diceNum != 0) {
                                         // System.out.println("diceNum = " + diceRoll);
-                                        if (Game.availableMoves("P1", diceNum)) {
+                                        if (availableMoves("P1", diceNum)) {
                                              // System.out.println("WAITING FOR MOVE");
                                              while (!moveSelected) {
                                                   System.out.println("WAITING FOR INPUT");
@@ -275,6 +276,35 @@ public class Client {
                e.printStackTrace();
           }
      }
+
+     public static boolean availableMoves(String player, int roll) {
+          boolean possibleMoves;
+          int currentPlayerCounter;
+          
+          System.out.println("Moving for network play");
+          if (player.equals("P1")) {
+               currentPlayerCounter = Client.counter.getP1Counter();
+          } else {
+               currentPlayerCounter = Client.counter.getP2Counter();
+          }
+  
+          System.out.println("getting positions");
+          List<int[]> currentMovablePositions = Game.getCurrentMovablePositions(player, roll, Client.currentBoard.identifyPieces(player), currentPlayerCounter);
+          List<int[]> futurePositions = Game.getFuturePositions(player, roll, currentMovablePositions);
+          if (futurePositions.size()==0) {
+               possibleMoves = false;
+          } else {
+               possibleMoves = true;
+          }
+          System.out.println("updating tiles");
+          SwingUtilities.invokeLater(new Runnable() {
+               public void run() {
+                    Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+               }
+          });
+  
+          return possibleMoves;
+      }
 
 
     // TODO: Temporary main method for debugging
