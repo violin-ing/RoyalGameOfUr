@@ -208,15 +208,17 @@ public class GameSession {
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p1In.readLine();
-                              System.out.println("Player 1: " + gamePacket);
-                              String data[] = gamePacket.split(",");
-                              // Check if the player stepped onto a rosetta
-                              if (data[4].equals("true")) {
-                                   rosetta = true;
-                              } else {
-                                   rosetta = false;
+                              if (!gamePacket.equals("nil")) {
+                                   System.out.println("Player 1: " + gamePacket);
+                                   String data[] = gamePacket.split(",");
+                                   // Check if the player stepped onto a rosetta
+                                   if (data[4].equals("true")) {
+                                        rosetta = true;
+                                   } else {
+                                        rosetta = false;
+                                   }
+                                   p2Out.println(gamePacket);
                               }
-                              p2Out.println(gamePacket);
                          } while (rosetta);
                     } 
 
@@ -230,15 +232,17 @@ public class GameSession {
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p2In.readLine();
-                              System.out.println("Player 2: " + gamePacket);
-                              String data[] = gamePacket.split(",");
-                              // Check if the player stepped onto a rosetta
-                              if (data[4].equals("true")) {
-                                   rosetta = true;
-                              } else {
-                                   rosetta = false;
+                              if (!gamePacket.equals("nil")) {
+                                   System.out.println("Player 2: " + gamePacket);
+                                   String data[] = gamePacket.split(",");
+                                   // Check if the player stepped onto a rosetta
+                                   if (data[4].equals("true")) {
+                                        rosetta = true;
+                                   } else {
+                                        rosetta = false;
+                                   }
+                                   p1Out.println(gamePacket);
                               }
-                              p1Out.println(gamePacket);
                          } while (rosetta);
                     } 
                }

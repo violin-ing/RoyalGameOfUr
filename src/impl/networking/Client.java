@@ -169,12 +169,10 @@ public class Client {
                                    out.println(diceRoll); // Sends die roll to server
                               }).start();
                               
-                              int diceNum = Integer.parseInt(diceRoll);
-                              
-                              if (diceNum > 0) {
+                              if (rollAmount > 0) {
                                    do {
                                         // go to next iteration if there are no available moves
-                                        if (Game.availableMoves("P1", diceNum)) {
+                                        if (Game.availableMoves("P1", rollAmount)) {
                                              System.out.println("WAITING FOR MOVE");
                                              while (!moveSelected) {
                                                   try { 
@@ -227,6 +225,9 @@ public class Client {
                                                   out.println(gamePacket);
                                              }).start();
                                         } else {
+                                             new Thread(() -> {
+                                                  out.println("nil");
+                                             }).start();
                                              rosetta = false;
                                         }
                                    } while (rosetta);
@@ -237,7 +238,7 @@ public class Client {
                                    gui.switchP1RollButton(false);
                               });
                               
-                              if (counter.getP1Score() == 7) {
+                              if (counter.getP1Score() >= 7) {
                                    SwingUtilities.invokeLater(() -> {
                                         gui.closeFrame();
                                    });
