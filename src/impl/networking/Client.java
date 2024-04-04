@@ -192,12 +192,7 @@ public class Client {
                                         if (Game.availableMoves("P1", rollAmount)) {
                                              System.out.println("WAITING FOR MOVE");
                                              while (!moveSelected) {
-                                                  try { 
-                                                       Thread.sleep(3000); // Wait for 10 seconds 
-                                                       System.out.println("WAITING FOR INPUT");
-                                                  } catch (InterruptedException e) { 
-                                                       // Handle the exception 
-                                                  }
+                                                  System.out.println("WAITING FOR INPUT");
                                              }
 
                                              System.out.println("update the board");

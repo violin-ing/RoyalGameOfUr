@@ -142,6 +142,7 @@ public class Game {
         int currentPlayerCounter;
         
         if (networkPlay) {
+            System.out.println("Moving for network play");
             if (player.equals("P1")) {
                 currentPlayerCounter = Client.counter.getP1Counter();
             } else {
