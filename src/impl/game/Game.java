@@ -1,7 +1,5 @@
 import java.util.*;
 
-import javax.swing.SwingUtilities;
-
 // General notes:
 // anywhere with a "system.out.println" message should be replaced with a call to the GUI to display the message, use general intuition to determine 
 
@@ -157,7 +155,7 @@ public class Game {
             possibleMoves = true;
         }
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
-        
+
         return possibleMoves;
     }
 
