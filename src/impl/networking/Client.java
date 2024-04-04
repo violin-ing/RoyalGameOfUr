@@ -122,7 +122,12 @@ public class Client {
                                                   .toArray();
 
                                              currentBoard.move(move, "P2");
-                                             gui.updateBoard(currentBoard);
+
+                                             SwingUtilities.invokeLater(new Runnable() {
+                                                  public void run() {
+                                                       gui.updateBoard(currentBoard);
+                                                  }
+                                              });
                                              
                                              if (counter.getP2Score() == 7) {
                                                   gui.closeFrame();
