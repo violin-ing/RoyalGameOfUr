@@ -187,24 +187,25 @@ public class GameSession {
                }
 
                if (p1Turn) {
-                    // TODO: 
-                    // Roll dice, save the number, then send it to the server -> send to the opponent
-                    // Opponent's local GUI will update the die number info
-                    // If the number rolled > 0, then read for the next input (player's move)
-                    // If the player steps onto a rosetta tile, read again for the next input 
-                    // Use a do-while loop for the logic above
-                    // Note: At the end of each do-while loop, the server should send the opponent the info
-                    // At the end of the player's turn check if the game is over (ie. player has won)
-
                     boolean rosetta = false;
-                    String diceRoll;
+                    final String diceRoll[] = new String[1];
 
-                    System.out.println(p1In.readLine()); // "sending_dice_roll"
-                    diceRoll = p1In.readLine(); // Read dice roll
+                    new Thread(() -> {
+                         try {
+                              System.out.println(p1In.readLine());
+                         } catch (IOException e) {
+                              e.printStackTrace();
+                         } // "sending_dice_roll"
+                         try {
+                              diceRoll[0] = p1In.readLine();
+                         } catch (IOException e) {
+                              e.printStackTrace();
+                         } // Read dice roll
+                         p2Out.println(diceRoll[0]); // Send opponent dice roll
+                    }).start();
 
-                    p2Out.println(diceRoll); // Send opponent dice roll
-                    System.out.println("Player 1: " + diceRoll);
-                    int diceNum = Integer.parseInt(diceRoll);
+                    System.out.println("Player 1: " + diceRoll[0]);
+                    int diceNum = Integer.parseInt(diceRoll[0]);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p1In.readLine();
@@ -218,17 +219,32 @@ public class GameSession {
                                         rosetta = false;
                                    }
                               } 
-                              p2Out.println(gamePacket);
+                              new Thread(() -> {
+                                   p2Out.println(gamePacket);
+                              }).start();
                          } while (rosetta);
                     } 
-
                } else {
                     // Same as above, but just swap players (ie. p1 <-> p2)
                     boolean rosetta = false;
-                    String diceRoll = p2In.readLine(); // Read dice roll
-                    p1Out.println(diceRoll); // Send opponent dice roll
-                    System.out.println("Player 2: " + diceRoll);
-                    int diceNum = Integer.parseInt(diceRoll);
+                    final String diceRoll[] = new String[1];
+
+                    new Thread(() -> {
+                         try {
+                              System.out.println(p2In.readLine());
+                         } catch (IOException e) {
+                              e.printStackTrace();
+                         } // "sending_dice_roll"
+                         try {
+                              diceRoll[0] = p2In.readLine();
+                         } catch (IOException e) {
+                              e.printStackTrace();
+                         } // Read dice roll
+                         p2Out.println(diceRoll[0]); // Send opponent dice roll
+                    }).start();
+
+                    System.out.println("Player 2: " + diceRoll[0]);
+                    int diceNum = Integer.parseInt(diceRoll[0]);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p2In.readLine();
@@ -241,8 +257,10 @@ public class GameSession {
                                    } else {
                                         rosetta = false;
                                    }
-                              }
-                              p1Out.println(gamePacket);
+                              } 
+                              new Thread(() -> {
+                                   p1Out.println(gamePacket);
+                              }).start();
                          } while (rosetta);
                     } 
                }
