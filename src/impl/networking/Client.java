@@ -234,6 +234,7 @@ public class Client {
                                                   // }
                                              }).start();
                                         } else {
+                                             System.out.println("no moves avail");
                                              packetBuilder.append(",nil");
                                              new Thread(() -> {
                                                   out.println(packetBuilder.toString());
@@ -259,6 +260,7 @@ public class Client {
                                    return;
                               }
                          } else {
+                              System.out.println("here?");
                               out.println("0,nil");
                          }
                     }
