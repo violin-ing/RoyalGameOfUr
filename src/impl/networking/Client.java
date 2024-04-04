@@ -16,16 +16,16 @@ public class Client {
      public static final int DEFAULT_PORT = 6969; // Server game port
      private final static int HEARTBEAT_PORT = 42069; // Heartbeat port
 
-     private Board currentBoard;
-     private Board futureBoard;
-     private Counter counter;
-     private Dice dice;
+     private static Board currentBoard;
+     private static Board futureBoard;
+     private static Counter counter;
+     private static Dice dice;
      public static GameGUI gui;
 
      public static int rollAmount;
      public static boolean rollPressed = false;
      public static boolean matchFound = false;
-     public boolean moveSelected = false;
+     public static boolean moveSelected = false;
 
      private boolean selfWin = false;
      private boolean opponentWin = false;
@@ -34,10 +34,10 @@ public class Client {
 
      public String[] info = new String[5];
 
-     public Client(Counter counter, Board currentBoard, Dice dice) {
-          this.currentBoard = currentBoard;
-          this.counter = counter;
-          this.dice = dice;
+     public Client(Counter counterIn, Board currentBoardIn, Dice diceIn) {
+          currentBoard = currentBoardIn;
+          counter = counterIn;
+          dice = diceIn;
           Game.networkPlay = true;
       }
 
