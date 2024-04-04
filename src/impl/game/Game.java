@@ -73,7 +73,7 @@ public class Game {
                 rollAmount = dice.roll();
                 gui.editP2Roll(rollAmount);
                 if (rollAmount!=0) {
-                    ai.createTree(rollAmount, counter.getP2Counter());
+                    ai.createTree(rollAmount);
                     double expectimax = ai.expectiminimax(ai.getRoot(), "max");
                     ai.printTree(ai.getRoot(), 1);
                     ai.getRoot().setScore(expectimax);
@@ -81,7 +81,6 @@ public class Game {
                     move = bestChild.getPos();
                     System.out.println(Arrays.toString(move));
                 }
-                // ai turn
             } else {
                 // players turn
                 System.out.println("WAITING FOR ROLL");
@@ -143,6 +142,7 @@ public class Game {
         int currentPlayerCounter;
         
         if (networkPlay) {
+            System.out.println("Moving for network play");
             if (player.equals("P1")) {
                 currentPlayerCounter = Client.counter.getP1Counter();
             } else {

@@ -99,12 +99,12 @@ public class GameGUI extends JFrame {
     public void changePlayerTurn(String player) {
         this.player = player;
         if (player.equals("P1")) {
-            rollButtonP1.setVisible(true);
-            rollButtonP2.setVisible(false);
+            rollButtonP1.setEnabled(true);
+            rollButtonP2.setEnabled(false);
         } else {
-            rollButtonP1.setVisible(false);
+            rollButtonP1.setEnabled(false);
            // rollAmountP1.setVisible(false);
-            rollButtonP2.setVisible(true);
+            rollButtonP2.setEnabled(true);
            // rollAmountP2.setVisible(true);
         }
     }
@@ -138,9 +138,8 @@ public class GameGUI extends JFrame {
                 // depending on the status of that button (waiting to select a move) / already selected move.
                 // some method will then need to be called which will change which other buttons are visible.
                 int roll = dice.roll();
-                SwingUtilities.invokeLater(() -> {
-                    rollAmountText.setText("" + roll);
-                });
+                rollAmountText.setText("" + roll);
+            
                 if (networkPlay) {
                     Client.rollAmount = roll;
                     Client.rollPressed = true;
@@ -153,9 +152,7 @@ public class GameGUI extends JFrame {
                 System.out.println("ROLLED");
 
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
-                SwingUtilities.invokeLater(() -> {
-                    rollbutton.setVisible(false);
-                });
+                rollbutton.setEnabled(false);
             }
         });
     }
@@ -185,7 +182,11 @@ public class GameGUI extends JFrame {
                     if (button.checkIsChipSelection()) {
                         System.out.println(button.getSelection());
                         if (button.getSelection()) {
-                            sendMoveInformation(button);
+                            if (networkPlay) {
+                                sendClientMoveInfo(button);
+                            } else {
+                                sendMoveInformation(button);
+                            }
                         } else {
                             // button is getting selected.
                             button.updateSelection(true);
@@ -247,7 +248,7 @@ public class GameGUI extends JFrame {
         client.info[1] = String.valueOf(button.getMoveFromLocation());
         client.info[2] = String.valueOf(button.getMoveStrip());
         client.info[3] = String.valueOf(button.getMoveLocation());
-        client.moveSelected = true;
+        Client.moveSelected = true;
     } 
 
     public void closeFrame() {
