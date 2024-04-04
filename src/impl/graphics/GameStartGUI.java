@@ -44,13 +44,12 @@ public class GameStartGUI extends JFrame {
             currentBoard = new Board(counter);
             dice = new Dice();
             Game game = new Game(currentBoard, counter, dice, muliplayer);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    GameGUI gui = new GameGUI(game);
-                    game.setGameGUI(gui);
-                }
+            GameGUI gui = new GameGUI(game);
+            game.setGameGUI(gui);
+            Thread gamThread = new Thread(() -> {
+                game.start();
             });
-            game.start();
+            gamThread.start();
         }
     }
 

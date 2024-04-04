@@ -66,9 +66,10 @@ public class Game {
             currentPlayer = counter.getPlayerTurn();
             gui.changePlayerTurn(currentPlayer);
             // method to change the P1/P2 value for GUI
-
+            System.out.println("PICKING TURN");
             // ai player turn 
             if (!multiplayer && currentPlayer.equals("P2")) {
+                System.out.println("AI/NETWORK PLAYER PICKING MOVE");
                 // ai turn
             } else {
                 System.out.println("WAITING FOR ROLL");
@@ -274,17 +275,16 @@ public class Game {
             }
         }
 
-
-        if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
-            String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
-            if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
-                return true;
-            } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
-                return false;
+        if (strip != 1 && checkTileAfter == 6) {
+            if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
+                String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
+                if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
+                    return true;
+                } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
+                    return false;
+                }
             }
         }
-
-
         return true;
     }
 }
