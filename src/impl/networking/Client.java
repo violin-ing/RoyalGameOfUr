@@ -100,6 +100,7 @@ public class Client {
                          while (true) {
                               try {
                                    String opponentPkt = in.readLine();
+                                   System.out.println("from opponent: " + opponentPkt);
                                    if (opponentPkt != null) {
                                         String[] info = opponentPkt.split(",");
                                         if (info.length == 2) {
