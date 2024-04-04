@@ -25,6 +25,7 @@ public class Game {
         this.counter = counter;
         this.dice = dice;
         this.multiplayer = muliplayer;
+        this.ai = new Ai();
     }
 
     public void setGameGUI(GameGUI gameGui) {
@@ -69,6 +70,12 @@ public class Game {
             // ai player turn 
             if (!multiplayer && currentPlayer.equals("P2")) {
                 System.out.println("AI/NETWORK PLAYER PICKING MOVE");
+                rollAmount = dice.roll();
+                gui.editP2Roll(rollAmount);
+                Node root = ai.createTree(rollAmount, counter.getP2Counter());
+                double expectimax = ai.expectiminimax(root, "max");
+                root.setScore(expectimax);
+                Node bestChild = ai.filterChildren(expectimax);
 
                 // ai turn
             } else {
@@ -82,7 +89,7 @@ public class Game {
                     continue;
                 } else {
                     // go to next iteration if there are no available moves
-                    if (!availableMoves(currentPlayer, rollAmount, multiplayer)) {
+                    if (!availableMoves(currentPlayer, rollAmount)) {
                         continue;
                     }
                     System.out.println("WAITING FOR MOVE");
@@ -126,7 +133,7 @@ public class Game {
      *
      * @see Board#identifyPieces(String) runs through each tile of each strip of the board and "puts" the strip and position in it into a map as <strip, position>, then returns it
      */
-    public static boolean availableMoves(String player, int roll, boolean muliplayer) {
+    public static boolean availableMoves(String player, int roll) {
         boolean possibleMoves;
         int currentPlayerCounter;
         if (player.equals("P1")) {
@@ -147,7 +154,7 @@ public class Game {
 
         if (networkPlay) {
             Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
-        } else if (muliplayer || player.equals("P1")){
+        } else {
             gui.updateSelectableTiles(currentMovablePositions, futurePositions);
         }
         return possibleMoves;
