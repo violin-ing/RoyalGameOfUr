@@ -164,10 +164,12 @@ public class GameSession {
                          diceRoll = p1In.readLine(); // Read dice roll
                     } while (diceRoll == null);
                     p2Out.println(diceRoll); // Send opponent dice roll
+                    System.out.println("Player 1: " + diceRoll);
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p1In.readLine();
+                              System.out.println("Player 1: " + gamePacket);
                               String data[] = gamePacket.split(",");
                               // Check if the player stepped onto a rosetta
                               if (data[4].equals("true")) {
@@ -184,10 +186,12 @@ public class GameSession {
                     boolean rosetta = false;
                     String diceRoll = p2In.readLine(); // Read dice roll
                     p1Out.println(diceRoll); // Send opponent dice roll
+                    System.out.println("Player 2: " + diceRoll);
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p2In.readLine();
+                              System.out.println("Player 2: " + gamePacket);
                               String data[] = gamePacket.split(",");
                               // Check if the player stepped onto a rosetta
                               if (data[4].equals("true")) {
