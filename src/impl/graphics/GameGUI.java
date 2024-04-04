@@ -154,7 +154,7 @@ public class GameGUI extends JFrame {
 
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
                 SwingUtilities.invokeLater(() -> {
-                    rollbutton.setVisible(false);
+                    rollbutton.setEnabled(false);
                 });
             }
         });
@@ -182,7 +182,11 @@ public class GameGUI extends JFrame {
                     if (button.checkIsChipSelection()) {
                         System.out.println(button.getSelection());
                         if (button.getSelection()) {
-                            sendMoveInformation(button);
+                            if (networkPlay) {
+                                sendClientMoveInfo(button);
+                            } else {
+                                sendMoveInformation(button);
+                            }
                         } else {
                             // button is getting selected.
                             button.updateSelection(true);
