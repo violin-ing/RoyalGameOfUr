@@ -1,7 +1,10 @@
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 // this class will handle drawing tiles as buttons.
 public class GraphicsButton extends JButton {
@@ -27,6 +30,7 @@ public class GraphicsButton extends JButton {
         this.xPosition = x;
         this.yPosition = y;
         this.chipSelection = false;
+        // addActionListenerToButton();
         this.setBorder(BorderFactory.createLineBorder(Color.GREEN,5));
         this.setBounds((WINDOWWIDTH/2)+(xPosition*BLOCKDIMENSION)-150,yPosition*BLOCKDIMENSION+75,BLOCKDIMENSION,BLOCKDIMENSION);
         this.setOpaque(false);
@@ -34,9 +38,6 @@ public class GraphicsButton extends JButton {
         this.setBorderPainted(true);
         this.setVisible(false);
     }
-
-    public int getX(){return xPosition;}
-    public int getY(){return yPosition;}
 
     public void updateSelection(boolean selection) {
         this.isSelected = selection;
@@ -56,9 +57,7 @@ public class GraphicsButton extends JButton {
     public void setButtonAsFutureMove() {
         this.setBorder(BorderFactory.createLineBorder(Color.ORANGE,5));
         this.setEnabled(false);
-        // still not visible, only when other button is selected.
         this.setVisible(true);
-        // MAKE THIS BUTTON INVISIBLE IF CLICKED OFF OF.
     }
 
     public void setButtonInvisible(){
@@ -79,7 +78,7 @@ public class GraphicsButton extends JButton {
     public int getMoveButtonStrip() {
         return moveButtonStrip;
     }
-  
+
     public int getMoveButtonLocation() {
         return moveButtonLocation;
     }
@@ -107,7 +106,15 @@ public class GraphicsButton extends JButton {
 
     public void resetButton() {
         setButtonInvisible();
-        this.updateSelection(false);
         this.chipSelection = false;
+        this.isSelected = false;
+    }
+
+    public int getXPos() {
+        return xPosition;
+    }
+
+    public int getYPos() {
+        return yPosition;
     }
 }

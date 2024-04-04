@@ -86,8 +86,8 @@ public class Game {
                 // players turn
                 System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
-                    ai.printTree(ai.getRoot(), 1);
-                    System.out.println("WAITING FOR INPUT");
+                    // ai.printTree(ai.getRoot(), 1);
+                    System.out.println("WAITING FOR ROLL");
                 }
                 // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
                 if (rollAmount == 0) {

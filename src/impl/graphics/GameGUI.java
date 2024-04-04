@@ -179,6 +179,9 @@ public class GameGUI extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 // if left mouse button is clicked, they are selecting a chip
                 if (e.getButton() == MouseEvent.BUTTON1) {
+                    for (int i = 0; i < 1000; i++) {
+                        System.out.println("CLICKED1");
+                    }
                     if (button.checkIsChipSelection()) {
                         System.out.println(button.getSelection());
                         if (button.getSelection()) {
@@ -188,11 +191,13 @@ public class GameGUI extends JFrame {
                             button.updateSelection(true);
                             // show the move position, and make all the other buttons invisible.
                             buttonArray[button.getMoveButtonStrip()][button.getMoveButtonLocation()].setButtonAsFutureMove();
-                            setButtonsInvisible(button.getX(), button.getY(), button.getMoveButtonStrip(), button.getMoveButtonLocation());
+                            System.out.println(button.getXPos() +"" + button.getYPos());
+                            setButtonsInvisible(button.getXPos(), button.getYPos(), button.getMoveButtonStrip(), button.getMoveButtonLocation());
                         }
                     }
                 }
                 if (e.getButton()==MouseEvent.BUTTON3) {
+                    System.out.println("CLICKED3");
                     button.updateSelection(false);
                     resetChipSelection();
                 }
@@ -203,8 +208,11 @@ public class GameGUI extends JFrame {
     public void setButtonsInvisible(int moveFromStrip, int moveFromLocation, int moveToStrip, int moveToLocation) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 8; j++) {
-                if ((i != moveFromStrip && j != moveFromLocation)|| (i != moveToStrip && j != moveToLocation)) {
-                    // this will also disable the buttons.
+                if (moveFromStrip == i && moveFromLocation == j) {
+                    continue;
+                } else if(moveToStrip == i && moveToLocation ==j) {
+                    continue;
+                } else {
                     buttonArray[i][j].setButtonInvisible();
                 }
             }
@@ -258,7 +266,6 @@ public class GameGUI extends JFrame {
             int[] futureMovePos = getButtonArrayPosition(futureMovable.get(i));
 
             buttonArray[currentMovePos[0]][currentMovePos[1]].setButtonSelectable();
-            System.out.println(currentMovePos[0] + " " + currentMovePos[1]);
             // make sure the future position and position of the future path are stored correctly.
             buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveFromLocation(currentMovable.get(i)[0], currentMovable.get(i)[1]);
             buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveToLocation(futureMovable.get(i)[0], futureMovable.get(i)[1]);
