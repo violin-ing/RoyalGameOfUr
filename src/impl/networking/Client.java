@@ -165,7 +165,7 @@ public class Client {
 
                               // Send dice number to the server to send to opponent
                               new Thread(() -> {
-                                   out.println(diceRoll); // Sends die roll to server
+                                   out.print(diceRoll + "\r\n"); // Sends die roll to server
                               }).start();
                               
                               if (rollAmount > 0) {
@@ -221,11 +221,11 @@ public class Client {
                                                   }
                                              }
                                              new Thread(() -> {
-                                                  out.println(gamePacket);
+                                                  out.print(gamePacket + "\r\n");
                                              }).start();
                                         } else {
                                              new Thread(() -> {
-                                                  out.println("nil");
+                                                  out.print("nil\r\n");
                                              }).start();
                                              rosetta = false;
                                         }
@@ -246,16 +246,8 @@ public class Client {
                               }
                          } else {
                               boolean opponentTurn = true;
-                              final int dieRollStr[] = new int[1];
-                              new Thread(() -> {
-                                   try {
-                                        dieRollStr[0] = in.readInt();
-                                   } catch (IOException e) {
-                                        e.printStackTrace();
-                                   } // Read opponent's die roll
-                              }).start();
-                              
-                              int dieRoll = Integer.parseInt(dieRollStr[0]);
+                              String dieRollStr = in.readLine();
+                              int dieRoll = Integer.parseInt(dieRollStr);
                               
                               SwingUtilities.invokeLater(() -> {
                                    gui.updateRollLabel("P2", dieRoll);
@@ -263,17 +255,7 @@ public class Client {
                               
                               if (dieRoll > 0) {
                                    do {
-                                        final String[] dataContainer = new String[1];
-                                        new Thread(() -> {
-                                             while (dataContainer[0] == null) {
-                                                  try {
-                                                       dataContainer[0] = in.readLine();
-                                                  } catch (IOException e) {
-                                                       e.printStackTrace();
-                                                  } // Read opponent's move
-                                             }
-                                        }).start();
-                                        String data = dataContainer[0];
+                                        String data = in.readLine();
                                         if (!data.equals("nil")) {
                                              String[] info = data.split(",");
                                              String rosetta = info[4];

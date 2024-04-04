@@ -104,8 +104,8 @@ public class GameSession {
       */
      private void playGame(PrintWriter p1Out, BufferedReader p1In, PrintWriter p2Out, BufferedReader p2In) throws IOException, InterruptedException {
           // Send signal for client to know if they start first or wait for their turn first
-          p1Out.println("startfirst");
-          p2Out.println("waitfirst");
+          p1Out.print("startfirst\r\n");
+          p2Out.print("waitfirst\r\n");
 
           System.out.println("Server: Player turns assigned.");
 
@@ -189,31 +189,12 @@ public class GameSession {
 
                if (p1Turn) {
                     boolean rosetta = false;
-                    final int diceRoll[] = new int[1];
+                    String diceRoll = p1In.readLine();
 
-                    new Thread(() -> {
-                         String fromPlayer = null;
-                         do {
-                              try {
-                                   fromPlayer = p1In.readLine();
-                              } catch (IOException e) {
-                                   e.printStackTrace();
-                                   return;
-                              } // "sending_dice_roll"
-                         } while (fromPlayer == null);
-                         System.out.println(fromPlayer);
-                         try {
-                              diceRoll[0] = p1In.read();
-                         } catch (IOException e) {
-                              e.printStackTrace();
-                              return;
-                         } // Read dice roll
+                    p2Out.print(diceRoll + "\r\n"); // Send opponent dice roll
 
-                         p2Out.println(diceRoll[0]); // Send opponent dice roll
-                    }).start();
-
-                    System.out.println("Player 1: " + diceRoll[0]);
-                    int diceNum = Integer.parseInt(diceRoll[0]);
+                    System.out.println("Player 1: " + diceRoll);
+                    int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p1In.readLine();
@@ -228,31 +209,19 @@ public class GameSession {
                                    }
                               } 
                               new Thread(() -> {
-                                   p2Out.println(gamePacket);
+                                   p2Out.print(gamePacket + "\r\n");
                               }).start();
                          } while (rosetta);
                     } 
                } else {
                     // Same as above, but just swap players (ie. p1 <-> p2)
                     boolean rosetta = false;
-                    final String diceRoll[] = new String[1];
+                    String diceRoll = p2In.readLine();
 
-                    new Thread(() -> {
-                         try {
-                              System.out.println(p2In.readLine());
-                         } catch (IOException e) {
-                              e.printStackTrace();
-                         } // "sending_dice_roll"
-                         try {
-                              diceRoll[0] = p2In.readLine();
-                         } catch (IOException e) {
-                              e.printStackTrace();
-                         } // Read dice roll
-                         p2Out.println(diceRoll[0]); // Send opponent dice roll
-                    }).start();
+                    p2Out.print(diceRoll + "\r\n"); // Send opponent dice roll
 
-                    System.out.println("Player 2: " + diceRoll[0]);
-                    int diceNum = Integer.parseInt(diceRoll[0]);
+                    System.out.println("Player 2: " + diceRoll);
+                    int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p2In.readLine();
@@ -267,7 +236,7 @@ public class GameSession {
                                    }
                               } 
                               new Thread(() -> {
-                                   p1Out.println(gamePacket);
+                                   p1Out.print(gamePacket + "\r\n");
                               }).start();
                          } while (rosetta);
                     } 
