@@ -132,19 +132,17 @@ public class Client {
                     do {
                          startPacket = in.readLine();
                          if (startPacket == null) {continue;}
-                         if ("matchfound".equals(startPacket)) {
+                         if ("startfirst".equals(startPacket)) {
                               matchFound = true;
-                              String turnMsg = in.readLine();
-                              if (turnMsg.equals("startfirst")) {
-                                   myTurn = true;
-                              } else if (turnMsg.equals("waitfirst")) {
-                                   myTurn = false;
-                              }
+                              myTurn = true;
+                         } else if (startPacket.equals("waitfirst")) {
+                              matchFound = true;
+                              myTurn = false;
                               SwingUtilities.invokeLater(new Runnable() {
                                    public void run() {
                                        frame.closeWindow();
                                    }
-                               });
+                              });
                          }
                     } while (startPacket == null);
 
