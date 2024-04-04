@@ -27,6 +27,10 @@ public class Game {
         this.multiplayer = muliplayer;
     }
 
+    public void setGameGUI(GameGUI gameGui) {
+        this.gui = gameGui;
+    }
+
     Scanner scanner = new Scanner(System.in);
     Random random = new Random();
     String rollInput = "";  //Placeholder value for gui, this checks if the necessary input was provided
@@ -48,6 +52,7 @@ public class Game {
     public static Counter getCounter() {return counter;}
         
     public void start() {
+        System.out.println("GAME STARTED");
         String currentPlayer = "";
 
         while (true) {
@@ -56,13 +61,15 @@ public class Game {
             currentPlayer = counter.getPlayerTurn();
             gui.changePlayerTurn(currentPlayer);
             // method to change the P1/P2 value for GUI
-
+            System.out.println("PICKING TURN");
             // ai player turn 
             if (!multiplayer && currentPlayer.equals("P2")) {
+                System.out.println("AI/NETWORK PLAYER PICKING MOVE");
                 // ai turn
             } else {
+                System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
-                    System.out.println("Waiting for roll input");
+                    System.out.println("WAITING FOR INPUT");
                 }
             }
 
@@ -80,8 +87,9 @@ public class Game {
                 if (!availableMoves(currentPlayer, rollAmount)) {
                     continue;
                 }
+                System.out.println("WAITING FOR MOVE");
                 while (!moveSelected) {
-                    System.out.println("Waiting for move input");
+                    System.out.println("WAITING FOR INPUT");
                 }
                 // update the board.
                 // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
@@ -89,6 +97,7 @@ public class Game {
                 currentBoard.move(move, currentPlayer);
                 System.out.println("update the board");
                 gui.updateBoard(currentBoard);
+                gui.updateScore(counter);
                 // if (currentBoard.getBoard()[move[2]][move[3]].isRosetta()) {
                 //     for (int i = 0; i < 10000; i++) {
                 //         System.out.println(currentPlayer + " gets another turn");  
@@ -261,22 +270,16 @@ public class Game {
             }
         }
 
-
-        if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
-            String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
-            if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
-                return true;
-            } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
-                return false;
+        if (strip != 1 && checkTileAfter == 6) {
+            if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
+                String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
+                if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
+                    return true;
+                } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
+                    return false;
+                }
             }
         }
-
-
         return true;
-    }
-
-
-    public void setGameGUI(GameGUI gameGui) {
-        gui = gameGui;
     }
 }

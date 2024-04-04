@@ -9,9 +9,10 @@ public class GameStartGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
     private static final int WINDOWHEIGHT = 500;
     private boolean muliplayer, network;
-    private static Counter counter;
-    private static Board currentBoard;
-    private static Dice dice;
+    private static Counter counter = new Counter();
+    private static Board currentBoard = new Board(counter);
+    private static Dice dice = new Dice();
+    public static GameGUI gameGUI;
 
     public GameStartGUI(boolean muliplayer, boolean network) {
         this.muliplayer = muliplayer;
@@ -43,13 +44,12 @@ public class GameStartGUI extends JFrame {
             currentBoard = new Board(counter);
             dice = new Dice();
             Game game = new Game(currentBoard, counter, dice, muliplayer);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    GameGUI gui = new GameGUI(game);
-                    game.setGameGUI(gui);
-                }
+            GameGUI gui = new GameGUI(game);
+            game.setGameGUI(gui);
+            Thread gamThread = new Thread(() -> {
+                game.start();
             });
-            game.start();
+            gamThread.start();
         }
     }
 

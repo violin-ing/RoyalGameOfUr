@@ -1,12 +1,6 @@
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 // This will be a class to draw all the basic tiles on the board.
 /**
@@ -36,7 +30,7 @@ public class GraphicsTile extends JPanel {
         this.empty = empty;
         this.ownership = "none";
         this.stackAmount = 0;
-        drawTileImage(ownership, 0);
+        drawTileImage(ownership, 0,false);
         this.setBounds((WINDOWWIDTH/2)+(xPosition*BLOCKDIMENSION)-150,yPosition*BLOCKDIMENSION+75,BLOCKDIMENSION,BLOCKDIMENSION);
     }
     // PATH WILL HAVE TO BE CHANGED SOON
@@ -46,7 +40,7 @@ public class GraphicsTile extends JPanel {
         this.image = result;
     }
     // updates the image of the tile.
-    private void drawTileImage(String ownership, int stackAmount) {
+    private void drawTileImage(String ownership, int stackAmount, boolean addingChip) {
         switch (ownership) {
             case "none":
                 if (rosette) {
@@ -58,10 +52,18 @@ public class GraphicsTile extends JPanel {
                 }
                 break;
             case "P1":
-                loadImage("w" + stackAmount + "chip.png");
+                if (addingChip) {
+                    loadImage("w-1chip.png");
+                } else {
+                    loadImage("w" + stackAmount + "chip.png");
+                }
                 break;
             case "P2":
-                loadImage("b" + stackAmount + "chip.png");
+                if (addingChip) {
+                    loadImage("b-1chip.png");
+                } else {
+                    loadImage("b" + stackAmount + "chip.png");
+                }
                 break;
             default:
                 break;
@@ -76,10 +78,10 @@ public class GraphicsTile extends JPanel {
     }
     // changes graphic tile ownership
 
-    public void updateImage(int amount, String ownership) {
+    public void updateImage(int amount, String ownership, boolean addingChip) {
         this.stackAmount = amount;
         this.ownership = ownership;
         // make sure image is updated after each change.
-        drawTileImage(this.ownership, this.stackAmount);
+        drawTileImage(this.ownership, this.stackAmount, addingChip);
     }
 }

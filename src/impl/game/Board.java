@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -59,12 +60,12 @@ public class Board {
     public Tile[] getBoardStrip(int index) {return this.board[index];}
     public Tile[][] getBoard() {return this.board;}
 
-    public List<String> move(int[] moveChoice, String player) {
+    public HashSet<String> move(int[] moveChoice, String player) {
         Tile movingFromTile;
         Tile movingToTile;
         boolean addedChip  = false;
         boolean removedChip = false;
-        List<String> moveType = new ArrayList<>();
+        HashSet<String> moveType = new HashSet<>();
         
         // if statment sets up tile we are moving from and to.
         // this will also check if we are adding a chip to the board / or removing one (scoring).
