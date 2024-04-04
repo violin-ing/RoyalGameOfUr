@@ -43,8 +43,11 @@ public class Server {
                          try (PrintWriter player2Out = new PrintWriter(player2.getOutputStream(), true);
                               BufferedReader player2In = new BufferedReader(new InputStreamReader(player2.getInputStream()));) {
 
+                              System.out.println("Server: Matchmaking completed.");
                               player1Out.println("matchfound");
                               player2Out.println("matchfound");
+
+                              Thread.sleep(1000); // Ensure that clients receive the matchfound message
 
                               GameSession gameSession = new GameSession(player1, player2);
                               gameSession.connectionInit();

@@ -122,6 +122,12 @@ public class GameSession {
           p1Out.println("startfirst");
           p2Out.println("waitfirst");
 
+          try {
+               Thread.sleep(1000);
+          } catch (InterruptedException e) {
+               e.printStackTrace();
+          }
+
           // Schedule a task to check for timeouts
           ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
           executorService.scheduleAtFixedRate(() -> {
@@ -174,7 +180,10 @@ public class GameSession {
                     // At the end of the player's turn check if the game is over (ie. player has won)
 
                     boolean rosetta = false;
-                    String diceRoll = p1In.readLine(); // Read dice roll
+                    String diceRoll;
+                    do {
+                         diceRoll = p1In.readLine(); // Read dice roll
+                    } while (diceRoll == null);
                     p2Out.println(diceRoll); // Send opponent dice roll
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
