@@ -38,7 +38,10 @@ public class GameStartGUI extends JFrame {
                     client.setGUI(gameGUI);
                 }
             });
-            client.initiateMatch();
+            Thread cliThread = new Thread(() -> {
+                client.initiateMatch();
+            });
+            cliThread.start();
         } else {
             counter = new Counter();
             currentBoard = new Board(counter);
