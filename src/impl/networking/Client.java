@@ -163,6 +163,8 @@ public class Client {
                               gui.changePlayerTurn("P1");
                               
                               rollPressed = false;
+                              moveSelected = false;
+
                               boolean rosetta = false;
                               do {
                                    StringBuffer packetBuilder = new StringBuffer();
@@ -183,7 +185,9 @@ public class Client {
 
                                    if (diceNum == 0) {
                                         out.println("0,nil");
+                                        System.out.println("sent nil packet");
                                         myTurn = false;
+                                        rosetta = false;
                                         continue;
                                    } else {
                                         // System.out.println("diceNum = " + diceRoll);
@@ -192,7 +196,7 @@ public class Client {
                                              packetBuilder.append(",nil");
                                              new Thread(() -> {
                                                   out.println(packetBuilder.toString());
-                                                  // packetBuilder = {diceRoll, "nil"}
+                                                  System.out.println("sent nil packet");
                                              }).start();
                                              rosetta = false;
                                              myTurn = false;
@@ -210,10 +214,13 @@ public class Client {
 
                                         currentBoard.move(move, "P1");
                                         System.out.println("update the board");
-                                        gui.updateBoard(currentBoard);
-                                        gui.updateScore(counter);
 
-                                        moveSelected = false;
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                             public void run() {
+                                                  gui.updateBoard(currentBoard);
+                                                  gui.updateScore(counter);
+                                             }
+                                         });
 
                                         int newStrip = move[2];
                                         int newIndex = move[3];
@@ -237,6 +244,7 @@ public class Client {
 
                                         new Thread(() -> {
                                              out.println(packetBuilder.toString());
+                                             System.out.println("sent move packet");
                                              // packetBuilder = {
                                              //      diceRoll, 
                                              //      oldStrip, 
@@ -250,9 +258,13 @@ public class Client {
                               } while (rosetta);
                               
                               myTurn = false; // Reset turn after sending message
-                              SwingUtilities.invokeLater(() -> {
-                                   gui.switchP1RollButton(false);
-                              });
+
+                              SwingUtilities.invokeLater(new Runnable() {
+                                   public void run() {
+                                        gui.changePlayerTurn("P2");
+                                        gui.disableP2();
+                                   }
+                               });
                               
                               if (counter.getP1Score() >= 7) {
                                    SwingUtilities.invokeLater(() -> {
