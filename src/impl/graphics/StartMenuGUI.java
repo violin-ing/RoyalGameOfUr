@@ -24,6 +24,7 @@ public class StartMenuGUI extends JFrame {
 
     public void initialiseGameStart(boolean muliplayer, boolean network) {
         closeFrame();
+        System.out.println(muliplayer + " SELECTED");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new GameStartGUI(muliplayer, network);
