@@ -104,8 +104,8 @@ public class GameSession {
       */
      private void playGame(PrintWriter p1Out, BufferedReader p1In, PrintWriter p2Out, BufferedReader p2In) throws IOException, InterruptedException {
           // Send signal for client to know if they start first or wait for their turn first
-          p1Out.println("startfirst");
-          p2Out.println("waitfirst");
+          p1Out.print("startfirst\r\n");
+          p2Out.print("waitfirst\r\n");
 
           System.out.println("Server: Player turns assigned.");
 
@@ -181,64 +181,63 @@ public class GameSession {
 
           boolean p1Turn = true;
 
+          // TODO: Main game loop
           while (true) {
                if (executorService.isShutdown()) {
                     throw new IOException();
                }
 
                if (p1Turn) {
-                    // TODO: 
-                    // Roll dice, save the number, then send it to the server -> send to the opponent
-                    // Opponent's local GUI will update the die number info
-                    // If the number rolled > 0, then read for the next input (player's move)
-                    // If the player steps onto a rosetta tile, read again for the next input 
-                    // Use a do-while loop for the logic above
-                    // Note: At the end of each do-while loop, the server should send the opponent the info
-                    // At the end of the player's turn check if the game is over (ie. player has won)
-
                     boolean rosetta = false;
-                    String diceRoll;
+                    String diceRoll = p1In.readLine();
 
-                    System.out.println(p1In.readLine()); // "sending_dice_roll"
-                    diceRoll = p1In.readLine(); // Read dice roll
+                    p2Out.print(diceRoll + "\r\n"); // Send opponent dice roll
 
-                    p2Out.println(diceRoll); // Send opponent dice roll
                     System.out.println("Player 1: " + diceRoll);
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p1In.readLine();
-                              System.out.println("Player 1: " + gamePacket);
-                              String data[] = gamePacket.split(",");
-                              // Check if the player stepped onto a rosetta
-                              if (data[4].equals("true")) {
-                                   rosetta = true;
-                              } else {
-                                   rosetta = false;
-                              }
-                              p2Out.println(gamePacket);
+                              if (!gamePacket.equals("nil")) {
+                                   System.out.println("Player 1: " + gamePacket);
+                                   String data[] = gamePacket.split(",");
+                                   // Check if the player stepped onto a rosetta
+                                   if (data[4].equals("true")) {
+                                        rosetta = true;
+                                   } else {
+                                        rosetta = false;
+                                   }
+                              } 
+                              new Thread(() -> {
+                                   p2Out.print(gamePacket + "\r\n");
+                              }).start();
                          } while (rosetta);
                     } 
-
                } else {
                     // Same as above, but just swap players (ie. p1 <-> p2)
                     boolean rosetta = false;
-                    String diceRoll = p2In.readLine(); // Read dice roll
-                    p1Out.println(diceRoll); // Send opponent dice roll
+                    String diceRoll = p2In.readLine();
+
+                    p2Out.print(diceRoll + "\r\n"); // Send opponent dice roll
+
                     System.out.println("Player 2: " + diceRoll);
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p2In.readLine();
-                              System.out.println("Player 2: " + gamePacket);
-                              String data[] = gamePacket.split(",");
-                              // Check if the player stepped onto a rosetta
-                              if (data[4].equals("true")) {
-                                   rosetta = true;
-                              } else {
-                                   rosetta = false;
-                              }
-                              p1Out.println(gamePacket);
+                              if (!gamePacket.equals("nil")) {
+                                   System.out.println("Player 2: " + gamePacket);
+                                   String data[] = gamePacket.split(",");
+                                   // Check if the player stepped onto a rosetta
+                                   if (data[4].equals("true")) {
+                                        rosetta = true;
+                                   } else {
+                                        rosetta = false;
+                                   }
+                              } 
+                              new Thread(() -> {
+                                   p1Out.print(gamePacket + "\r\n");
+                              }).start();
                          } while (rosetta);
                     } 
                }
