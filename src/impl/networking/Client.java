@@ -107,9 +107,9 @@ public class Client {
                               byte[] dcMsgBuffer = new byte[256];
                   
                               while (true) {
-                                   DatagramPacket dcPacket = new DatagramPacket(buffer, buffer.length);
-                                   dcSocket.receive(packet);
-                                   String received = new String(packet.getData(), 0, packet.getLength());
+                                   DatagramPacket dcPacket = new DatagramPacket(dcMsgBuffer, dcMsgBuffer.length);
+                                   dcSocket.receive(dcPacket);
+                                   String received = new String(dcPacket.getData(), 0, dcPacket.getLength());
                                    if (received.equals("opponentdc")) {
                                         gui.closeFrame();
                                         ClientWinGUI.display("Opponent disconnected. You have won the game by default.");
