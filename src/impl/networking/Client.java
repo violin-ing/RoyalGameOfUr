@@ -215,6 +215,18 @@ public class Client {
                          } else {
                               boolean opponentTurn = true;
                               String dieRollStr = in.readLine(); // Read opponent's die roll
+
+                              if ("selfdc".equals(dieRollStr)) {
+                                   selfAlive = false;
+                                   gui.closeFrame();
+                                   ClientLoseGUI.display("You have disconnected and forfeited the match!");
+                              } else if ("opponentdc".equals(dieRollStr)) {
+                                   opponentAlive = false;
+                                   gui.closeFrame();
+                                   ClientWinGUI.display("Opponent has disconnected. You have won by default!");
+                                   heartbeatSender.interrupt();
+                              }
+
                               int dieRoll = Integer.parseInt(dieRollStr);
                               
                               gui.updateRollLabel("P2", dieRoll);
@@ -222,6 +234,18 @@ public class Client {
                               if (dieRoll > 0) {
                                    do {
                                         String data = in.readLine(); // Read opponent's move
+
+                                        if ("selfdc".equals(data)) {
+                                             selfAlive = false;
+                                             gui.closeFrame();
+                                             ClientLoseGUI.display("You have disconnected and forfeited the match!");
+                                        } else if ("opponentdc".equals(data)) {
+                                             opponentAlive = false;
+                                             gui.closeFrame();
+                                             ClientWinGUI.display("Opponent has disconnected. You have won by default!");
+                                             heartbeatSender.interrupt();
+                                        }
+                                        
                                         String[] info = data.split(",");
                                         String rosetta = info[4];
 
