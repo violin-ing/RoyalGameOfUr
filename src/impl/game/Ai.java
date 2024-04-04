@@ -3,7 +3,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Ai {
-    private static Node root;
+    private Node root;
     public static double[] ROLL_PERCENTAGES = {0.0625, 0.25, 0.375, 0.25, 0.0625};
     public static int LEVELS = 4;
 
@@ -31,8 +31,16 @@ public class Ai {
 
     public Game game;
 
+    public void setRoot(Node root) {
+        this.root = root;
+    }
 
-    public static Map<String, String> mapScores() {
+    public Node getRoot() {
+        return this.root;
+    }
+
+
+    public Map<String, String> mapScores() {
         //behaviour = new HashMap<>();
 
         for (int i = 0; i < tactics.length; i++) {
@@ -59,7 +67,7 @@ public class Ai {
         return board.move(move, player);
     }
 
-    public Node createTree(int roll, int counter) {
+    public void createTree(int roll, int counter) {
         root = new Node("max", 0);
 
         List<Board> maxBoards = new ArrayList<>();
@@ -139,7 +147,6 @@ public class Ai {
             }
         }
 
-        return root;
     }
 
     public int[] getPos(int[] currentPos, int[] futurePos) { 
@@ -148,7 +155,7 @@ public class Ai {
         .toArray();
     }
 
-    public static int getScore(HashSet<String> moves) {
+    public int getScore(HashSet<String> moves) {
         int score = 0;
         
         for (String move : moves) {
@@ -164,7 +171,7 @@ public class Ai {
         return score;
     }
 
-    public static void printTree(Node node, int level) {
+    public void printTree(Node node, int level) {
         if (node == null) return;
         for (int i = 0; i < level; i++) {
             System.out.print("\t");
@@ -176,7 +183,7 @@ public class Ai {
         }
     }
 
-    public static double expectiminimax(Node node, String type) {
+    public double expectiminimax(Node node, String type) {
         if (node.getChildren().isEmpty()) {
             return node.getScore();
         }
@@ -201,7 +208,7 @@ public class Ai {
         }
     }
 
-    public static List<Double> iterateChildren(Node node, String type) {
+    public List<Double> iterateChildren(Node node, String type) {
         List<Double> scores = new ArrayList<>();
         
         for (Node child : node.getChildren()) {
@@ -213,8 +220,8 @@ public class Ai {
         return scores;
     }
 
-    public static Node filterChildren(double expectimax) {
-        List<Node> children = root.getChildren();
+    public Node filterChildren(double expectimax) {
+        List<Node> children = this.root.getChildren();
 
         List<Node> filteredChildren = children.stream()
         .filter(child -> child.getScore() == expectimax)
@@ -279,7 +286,7 @@ public class Ai {
         
     }
 
-    public static void speedy(List<Node> filteredChildren) {
+    public void speedy(List<Node> filteredChildren) {
         
     }
 }
