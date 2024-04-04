@@ -75,15 +75,18 @@ public class Game {
                 if (rollAmount!=0) {
                     Node root = ai.createTree(rollAmount, counter.getP2Counter());
                     double expectimax = ai.expectiminimax(root, "max");
+                    ai.printTree(root, 1);
                     root.setScore(expectimax);
                     Node bestChild = ai.filterChildren(expectimax);
+                    move = bestChild.getPos();
+                    System.out.println(Arrays.toString(move));
                 }
                 // ai turn
             } else {
                 // players turn
                 System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
-                    System.out.println("WAITING FOR INPUT");
+                    //System.out.println("WAITING FOR INPUT");
                 }
                 // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
                 if (rollAmount == 0) {
@@ -95,7 +98,12 @@ public class Game {
                     }
                     System.out.println("WAITING FOR MOVE");
                     while (!moveSelected) {
-                        System.out.println("WAITING FOR INPUT");
+                        try { 
+                            Thread.sleep(3000); // Wait for 10 seconds 
+                            System.out.println("WAITING FOR INPUT");
+                        } catch (InterruptedException e) { 
+                            // Handle the exception 
+                        }
                     }
                     // update the board.
                     // move is updated in the GUI class, it is an int[] array, with 4 values in this order:

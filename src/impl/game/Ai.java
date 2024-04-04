@@ -42,50 +42,6 @@ public class Ai {
         return behaviour;
     }
 
-    public List<Integer> create() {
-        int roll = dice.roll();
-        int counter = game.getCounter().getP2Counter();
-        List<Board> maxBoards = new ArrayList<>();
-        List<Board> minBoards = new ArrayList<>();
-        List<Integer> branches = new ArrayList<>();
-        List<Integer> scores = new ArrayList<>();
-            
-        if (roll != 0) {
-            List<int[]> maxCurrentMovablePositions = Game.getCurrentMovablePositions(p2, roll, game.getCurrentBoard().identifyPieces(p2), counter);
-
-            // checks that there is current movable positions 
-            if (maxCurrentMovablePositions.isEmpty()) {
-                List<int[]> maxFuturePositions = Game.getFuturePositions(p2, roll, maxCurrentMovablePositions);
-    
-                 // calculates all possible boards after ai makes a move
-                for (int i = 0; i < maxFuturePositions.size(); i++) { 
-                    maxBoards.add(createTempBoard(Game.getCurrentBoard(), p2, maxCurrentMovablePositions.get(i), maxFuturePositions.get(i)));
-                }
-    
-                // calculates all the possible player boards, for each roll combination
-                for (int playerRoll = 1; playerRoll < 5; playerRoll++) {
-                    int numBranches = 0;
-                    for (int j = 0; j < maxBoards.size(); j++) { 
-                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(j).identifyPieces(p1), counter);
-                        List<int[]> minFuturePositions = Game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
-    
-                        minBoards.add(createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j)));
-
-                        // create array of possible moves for each branch
-                        HashSet<String> movesList = getMoveTypes(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
-                        //moveTypes.add(movesArr);
-                        numBranches++;
-                        scores.add(getScore(movesList));
-                    }
-
-                    branches.add(numBranches);
-                }
-            }
-        }
-
-        return scores;
-    }
-
     public Board createTempBoard(Board board, String player, int[] currentPos, int[] futurePos) {
         Board tempBoard = board;
 
@@ -164,7 +120,7 @@ public class Ai {
 
                             Board minBoard = createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
 
-                            HashSet<String> movesList = getMoveTypes(minBoard, p2, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+                            HashSet<String> movesList = getMoveTypes(minBoard, p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
                             int[] pos = getPos(minCurrentMovablePositions.get(j), minFuturePositions.get(j));
 
                             Node childNode = new Node(currentNode.getNextType(), getScore(movesList), minBoard, movesList, pos);
@@ -199,7 +155,7 @@ public class Ai {
             switch(move) {
                 case "TAKE CHIP":
                 case "STACK":
-                case "ROSETTE":
+                case "ROSETTA":
                 case "WIN":
                     score--;
             }
@@ -260,10 +216,6 @@ public class Ai {
     public static Node filterChildren(double expectimax) {
         List<Node> children = root.getChildren();
 
-        for (Node c : children) { //
-            System.out.println(c.getScore());
-        }
-
         List<Node> filteredChildren = children.stream()
         .filter(child -> child.getScore() == expectimax)
         .toList(); // Collect the filtered objects into a new ArrayList
@@ -272,20 +224,26 @@ public class Ai {
             System.out.println(c.getScore());
         }
 
-        while (filteredChildren.size() > 1) {
-            for (String m : moves) {
-                if (filteredChildren.stream().anyMatch(child -> child.getMoves().contains(m))) {
-                    System.out.println(m);
-                    System.out.println(filteredChildren.stream().anyMatch(child -> child.getMoves().contains(m)));
-                    filteredChildren = filteredChildren.stream()
-                        .filter(child -> child.getMoves().contains(m)) 
-                        .toList();
-                }
+        List<Node> tempFilteredChildren = new ArrayList<>(filteredChildren);
 
+        for (String m : moves) {
+            for (Node child : tempFilteredChildren) {
+                if (child.getMoves().contains(m)) {
+                    System.out.println(m);
+                    System.out.println(child.getMoves().contains(m));
+                    filteredChildren = filteredChildren.stream()
+                            .filter(c -> c.getMoves().contains(m))
+                            .toList();
+                    break; // Break the inner loop after finding the first matching move
+                }
             }
+        }
+    
+        return filteredChildren.size() > 0 ? filteredChildren.get(0) : null; // Return the first child, or null if none found
         
             
 
+        /* 
             switch (aiMode) {
                 // ALL
                 // check if chip can move to rosette
@@ -296,7 +254,7 @@ public class Ai {
                     Node furthestChild = filteredChildren.get(0);
                     for (Node child : filteredChildren) {
                         if (child.getMove())
-                    }  */
+                    }  
 
 
 
@@ -317,14 +275,8 @@ public class Ai {
                     // STACK --> furthest
                     // MOVE --> closest
                     // TAKE CHIP --> closest
-            }
-        }
-
-        if (!filteredChildren.isEmpty()) {
-            return filteredChildren.get(0); // Return the first element if not empty
-        } else {
-            return null; // Return null if filteredChildren is empty
-        }
+            } */
+        
     }
 
     public static void speedy(List<Node> filteredChildren) {
