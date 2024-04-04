@@ -160,9 +160,7 @@ public class Client {
                     // Main thread deals with sending messages to server
                     while (true) {
                          if (myTurn) {
-                              SwingUtilities.invokeLater(() -> {
-                                   gui.switchP1RollButton(true);
-                              });
+                              gui.changePlayerTurn("P1");
                               
                               rollPressed = false;
                               boolean rosetta = false;
