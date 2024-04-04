@@ -72,11 +72,12 @@ public class Game {
                 System.out.println("AI/NETWORK PLAYER PICKING MOVE");
                 rollAmount = dice.roll();
                 gui.editP2Roll(rollAmount);
-                Node root = ai.createTree(rollAmount, counter.getP2Counter());
-                double expectimax = ai.expectiminimax(root, "max");
-                root.setScore(expectimax);
-                Node bestChild = ai.filterChildren(expectimax);
-
+                if (rollAmount!=0) {
+                    Node root = ai.createTree(rollAmount, counter.getP2Counter());
+                    double expectimax = ai.expectiminimax(root, "max");
+                    root.setScore(expectimax);
+                    Node bestChild = ai.filterChildren(expectimax);
+                }
                 // ai turn
             } else {
                 // players turn
@@ -143,7 +144,6 @@ public class Game {
         }
 
         List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
-    
         List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
 
         if (futurePositions.size()==0) {
