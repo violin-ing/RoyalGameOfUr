@@ -44,8 +44,6 @@ public class Server {
                               BufferedReader player2In = new BufferedReader(new InputStreamReader(player2.getInputStream()));) {
 
                               System.out.println("Server: Matchmaking completed.");
-                              player1Out.println("matchfound");
-                              player2Out.println("matchfound");
 
                               Thread.sleep(1000); // Ensure that clients receive the matchfound message
 

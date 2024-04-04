@@ -54,6 +54,10 @@ public class Game {
     public void start() {
         System.out.println("GAME STARTED");
         String currentPlayer = "";
+        
+        if (!multiplayer) {
+            gui.disableP2();
+        }
 
         while (true) {
             rollPressed = false;
@@ -65,45 +69,41 @@ public class Game {
             // ai player turn 
             if (!multiplayer && currentPlayer.equals("P2")) {
                 System.out.println("AI/NETWORK PLAYER PICKING MOVE");
+
                 // ai turn
             } else {
+                // players turn
                 System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
                     System.out.println("WAITING FOR INPUT");
                 }
-            }
-
-            //pass current roll amount and player to available moves
-            // available moves should also calculate if the player can add a token to the board:
-            //  - this can be done if the roll amount does not == 0 
-            //  - and the player has at least 1 token in reserve
-            //System.out.println("ROLL: " + rollAmount);
-
-            // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
-            if (rollAmount == 0) {
-                continue;
-            } else {
-                // go to next iteration if there are no available moves
-                if (!availableMoves(currentPlayer, rollAmount)) {
+                // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
+                if (rollAmount == 0) {
                     continue;
+                } else {
+                    // go to next iteration if there are no available moves
+                    if (!availableMoves(currentPlayer, rollAmount, multiplayer)) {
+                        continue;
+                    }
+                    System.out.println("WAITING FOR MOVE");
+                    while (!moveSelected) {
+                        System.out.println("WAITING FOR INPUT");
+                    }
+                    // update the board.
+                    // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
+                    // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
+                    // if (currentBoard.getBoard()[move[2]][move[3]].isRosetta()) {
+                    //     for (int i = 0; i < 10000; i++) {
+                    //         System.out.println(currentPlayer + " gets another turn");  
+                    //     } 
+                    // }
                 }
-                System.out.println("WAITING FOR MOVE");
-                while (!moveSelected) {
-                    System.out.println("WAITING FOR INPUT");
-                }
-                // update the board.
-                // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
-                // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
                 currentBoard.move(move, currentPlayer);
                 System.out.println("update the board");
                 gui.updateBoard(currentBoard);
                 gui.updateScore(counter);
-                // if (currentBoard.getBoard()[move[2]][move[3]].isRosetta()) {
-                //     for (int i = 0; i < 10000; i++) {
-                //         System.out.println(currentPlayer + " gets another turn");  
-                //     } 
-                // }
             }
+
             //CHECK WIN CONDITION
             if (currentPlayer.equals("P1")) {
                 if (counter.getP1Score()==7) {
@@ -126,7 +126,7 @@ public class Game {
      *
      * @see Board#identifyPieces(String) runs through each tile of each strip of the board and "puts" the strip and position in it into a map as <strip, position>, then returns it
      */
-    public static boolean availableMoves(String player, int roll) {
+    public static boolean availableMoves(String player, int roll, boolean muliplayer) {
         boolean possibleMoves;
         int currentPlayerCounter;
         if (player.equals("P1")) {
@@ -147,7 +147,7 @@ public class Game {
 
         if (networkPlay) {
             Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
-        } else {
+        } else if (muliplayer || player.equals("P1")){
             gui.updateSelectableTiles(currentMovablePositions, futurePositions);
         }
         return possibleMoves;
