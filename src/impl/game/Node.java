@@ -5,13 +5,15 @@ public class Node {
     private double score;
     private Board board;
     private HashSet<String> moves;
+    private int[] pos;
     private List<Node> children;
 
-    public Node(String type, double score, Board board, HashSet<String> moves) {
+    public Node(String type, double score, Board board, HashSet<String> moves, int[] pos) {
         this.type = type;
         this.score = score;
         this.board = board;
         this.moves = moves;
+        this.pos = pos;
         this.children = new ArrayList<>();
     }
 
@@ -35,6 +37,10 @@ public class Node {
 
     public HashSet<String> getMoves() {
         return this.moves;
+    }
+
+    public int[] getPos() {
+        return this.pos;
     }
 
     public List<Node> getChildren() {
