@@ -151,7 +151,7 @@ public class GameGUI extends JFrame {
                 System.out.println("ROLLED");
 
                 // make attribute in game call roll amount, then make a method to update it, this is called here to update the roll amonut.
-                rollbutton.setVisible(false);
+                rollbutton.setEnabled(false);
             }
         });
     }

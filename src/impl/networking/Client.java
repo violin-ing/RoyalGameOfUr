@@ -114,11 +114,14 @@ public class Client {
                                         gui.closeFrame();
                                         ClientWinGUI.display("Opponent disconnected. You have won the game by default.");
                                         heartbeatSender.interrupt();
+                                        return;
                                    } 
                               }
                          } catch (Exception e) {
                               gui.closeFrame();
                               ErrorWindowGUI.display();
+                         } finally {
+                              
                          }
                     });
 
@@ -158,7 +161,9 @@ public class Client {
                               // Send dice number to the server to send to opponent
                               String diceRoll = Integer.toString(rollAmount);
                               out.println("sending_dice_roll");
+                              out.flush();
                               out.println(diceRoll); // Sends die roll to server
+                              out.flush();
                               
                               int diceNum = Integer.parseInt(diceRoll);
                               
