@@ -279,10 +279,10 @@ public class Client {
                     serverListener.interrupt();
                     return;
                } catch (Exception e) {
-                    System.out.println("Error connecting to server! " + e);
+                    e.printStackTrace();
                } 
           } catch (Exception e) {
-               System.out.println("Client exception!" + e);
+               e.printStackTrace();
           }
      }    
 
