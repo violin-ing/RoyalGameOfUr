@@ -1,5 +1,7 @@
 import java.util.*;
 
+import javax.swing.SwingUtilities;
+
 // General notes:
 // anywhere with a "system.out.println" message should be replaced with a call to the GUI to display the message, use general intuition to determine 
 
@@ -157,6 +159,7 @@ public class Game {
         }
 
         if (networkPlay) {
+            System.out.println("getting positions");
             List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, Client.currentBoard.identifyPieces(player), currentPlayerCounter);
             List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
             if (futurePositions.size()==0) {
@@ -164,7 +167,12 @@ public class Game {
             } else {
                 possibleMoves = true;
             }
-            Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+            System.out.println("updating tiles");
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+                }
+            });
         } else {
             List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
             List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
