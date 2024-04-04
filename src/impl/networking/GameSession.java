@@ -178,71 +178,37 @@ public class GameSession {
           // In this method, we need to pass in the array(s) that correspond to the game GUI
           // On the client side, this will directly update the GUI displayed on their screen
           // Server updates the GUI on both clients' machines after every move (roll + chip movement)
-
-          boolean p1Turn = true;
-
+          
           // TODO: Main game loop
           while (true) {
                if (executorService.isShutdown()) {
                     throw new IOException();
                }
 
-               if (p1Turn) {
-                    boolean rosetta = false;
-                    String diceRoll = p1In.readLine();
+               Thread p1Listener = new Thread(() -> {
+                    while (true) {
+                         try {
+                              String p1info = p1In.readLine();
+                              p2Out.print(p1info + "\r\n");
+                         } catch (Exception e) {
+                              e.printStackTrace();
+                         }
+                    }
+               });
 
-                    p2Out.print(diceRoll + "\r\n"); // Send opponent dice roll
+               Thread p2Listener = new Thread(() -> {
+                    while (true) {
+                         try {
+                              String p2info = p2In.readLine();
+                              p1Out.print(p2info + "\r\n");
+                         } catch (Exception e) {
+                              e.printStackTrace();
+                         }
+                    }
+               });
 
-                    System.out.println("Player 1: " + diceRoll);
-                    int diceNum = Integer.parseInt(diceRoll);
-                    if (diceNum > 0) {
-                         do {
-                              String gamePacket = p1In.readLine();
-                              if (!gamePacket.equals("nil")) {
-                                   System.out.println("Player 1: " + gamePacket);
-                                   String data[] = gamePacket.split(",");
-                                   // Check if the player stepped onto a rosetta
-                                   if (data[4].equals("true")) {
-                                        rosetta = true;
-                                   } else {
-                                        rosetta = false;
-                                   }
-                              } 
-                              new Thread(() -> {
-                                   p2Out.print(gamePacket + "\r\n");
-                              }).start();
-                         } while (rosetta);
-                    } 
-               } else {
-                    // Same as above, but just swap players (ie. p1 <-> p2)
-                    boolean rosetta = false;
-                    String diceRoll = p2In.readLine();
-
-                    p2Out.print(diceRoll + "\r\n"); // Send opponent dice roll
-
-                    System.out.println("Player 2: " + diceRoll);
-                    int diceNum = Integer.parseInt(diceRoll);
-                    if (diceNum > 0) {
-                         do {
-                              String gamePacket = p2In.readLine();
-                              if (!gamePacket.equals("nil")) {
-                                   System.out.println("Player 2: " + gamePacket);
-                                   String data[] = gamePacket.split(",");
-                                   // Check if the player stepped onto a rosetta
-                                   if (data[4].equals("true")) {
-                                        rosetta = true;
-                                   } else {
-                                        rosetta = false;
-                                   }
-                              } 
-                              new Thread(() -> {
-                                   p1Out.print(gamePacket + "\r\n");
-                              }).start();
-                         } while (rosetta);
-                    } 
-               }
-               // Swap turns
-               p1Turn = !p1Turn;
+               p1Listener.start();
+               p2Listener.start();
           }
      }
 }
