@@ -67,7 +67,7 @@ public class Ai {
         return board.move(move, player);
     }
 
-    public void createTree(int roll, int counter) {
+    public void createTree(int roll) {
         root = new Node("max", 0);
 
         List<Board> maxBoards = new ArrayList<>();
@@ -75,7 +75,7 @@ public class Ai {
         List<Integer> branches = new ArrayList<>();
         List<Integer> scores = new ArrayList<>();
     
-        List<int[]> maxCurrentMovablePositions = Game.getCurrentMovablePositions(p2, roll, Game.getCurrentBoard().identifyPieces(p2), counter);
+        List<int[]> maxCurrentMovablePositions = Game.getCurrentMovablePositions(p2, roll, Game.getCurrentBoard().identifyPieces(p2), Game.getCounter().getP2Counter());
 
         List<int[]> maxFuturePositions = Game.getFuturePositions(p2, roll, maxCurrentMovablePositions);
 
@@ -116,35 +116,34 @@ public class Ai {
     
                     }
                 } else if (LEVELS == 2) {
-                    System.out.println(maxBoards.size());
+                    int maxBoardsSize = maxBoards.size();
+                    int count = 0;
 
-                    for (int playerRoll = 1; playerRoll < 5; playerRoll++) {
-                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(i).identifyPieces(p1), counter);
-                        List<int[]> minFuturePositions = Game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
+                    while (count < maxBoardsSize) {
+                        for (int playerRoll = 1; playerRoll < 5; playerRoll++) {
+                            List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(count).identifyPieces(p1), Game.getCounter().getP1Counter());
+                            List<int[]> minFuturePositions = Game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
 
-                        int numBranches = 0;
+                            for (int j = 0; j < maxBoards.size(); j++) { 
 
-                        for (int j = 0; j < maxBoards.size(); j++) { 
+                                Board minBoard = createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
 
-                            Board minBoard = createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+                                HashSet<String> movesList = getMoveTypes(minBoard, p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+                                int[] pos = getPos(minCurrentMovablePositions.get(j), minFuturePositions.get(j));
 
-                            HashSet<String> movesList = getMoveTypes(minBoard, p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
-                            int[] pos = getPos(minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+                                Node childNode = new Node(currentNode.getNextType(), getScore(movesList), minBoard, movesList, pos);
 
-                            Node childNode = new Node(currentNode.getNextType(), getScore(movesList), minBoard, movesList, pos);
+                                currentNode.addChild(childNode); // Add the child node to the current node
+                                queue.add(childNode); // Add the child node to the queue for further processing
 
-                            currentNode.addChild(childNode); // Add the child node to the current node
-                            queue.add(childNode); // Add the child node to the queue for further processing
-    
-                            numBranches++;
+                            }
                         }
-    
-                        branches.add(numBranches);
+                        count++;
                     }
                 }
-
-            LEVELS--; // Decrement the number of levels
             }
+            
+            LEVELS--; // Decrement the number of levels
         }
 
     }
