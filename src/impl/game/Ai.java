@@ -90,6 +90,7 @@ public class Ai {
         Board tempBoard = board;
 
         int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
+        System.out.println(move);
 
         tempBoard.move(move, player);
 
@@ -151,10 +152,10 @@ public class Ai {
     
                     }
                 } else if (LEVELS == 2) {
-                    int count = 0;
+                    System.out.println(maxBoards.size());
 
                     for (int playerRoll = 1; playerRoll < 5; playerRoll++) {
-                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(count).identifyPieces(p1), counter);
+                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(i).identifyPieces(p1), counter);
                         List<int[]> minFuturePositions = Game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
 
                         int numBranches = 0;
@@ -175,7 +176,6 @@ public class Ai {
                         }
     
                         branches.add(numBranches);
-                        count++;
                     }
                 }
 
