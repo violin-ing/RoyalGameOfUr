@@ -86,7 +86,8 @@ public class Game {
                 // players turn
                 System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
-                    //System.out.println("WAITING FOR INPUT");
+                    ai.printTree(ai.getRoot(), 1);
+                    System.out.println("WAITING FOR INPUT");
                 }
                 // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
                 if (rollAmount == 0) {
@@ -98,12 +99,7 @@ public class Game {
                     }
                     System.out.println("WAITING FOR MOVE");
                     while (!moveSelected) {
-                        try { 
-                            Thread.sleep(3000); // Wait for 10 seconds 
-                            System.out.println("WAITING FOR INPUT");
-                        } catch (InterruptedException e) { 
-                            // Handle the exception 
-                        }
+                        System.out.println("WAITING FOR INPUT");
                     }
                     // update the board.
                     // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
