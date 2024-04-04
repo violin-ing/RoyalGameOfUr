@@ -85,8 +85,10 @@ public class GameSession {
                BufferedReader p2In = new BufferedReader(new InputStreamReader(p2Socket.getInputStream()));) { 
                // Run game   
                playGame(p1Out, p1In, p2Out, p2In);
-          } catch (Exception e) {
-               System.out.println("An exception occurred with a player: " + e.getMessage());
+          } catch (IOException e) {
+               System.out.println("An IOException occurred with a player: " + e.getMessage());
+          } catch (InterruptedException e) {
+               return;
           }
      }
 
@@ -100,7 +102,7 @@ public class GameSession {
       * @param p2In BufferedReader for player 2 input.
       * @throws IOException If an I/O error occurs during communication with the players.
       */
-     private void playGame(PrintWriter p1Out, BufferedReader p1In, PrintWriter p2Out, BufferedReader p2In) throws IOException {
+     private void playGame(PrintWriter p1Out, BufferedReader p1In, PrintWriter p2Out, BufferedReader p2In) throws IOException, InterruptedException {
           // Send signal for client to know if they start first or wait for their turn first
           p1Out.println("startfirst");
           p2Out.println("waitfirst");
@@ -116,21 +118,57 @@ public class GameSession {
                          if (ipAddr.equals(p1Address)) {
                               System.out.println("Server: Player 1 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   p1Out.println("selfdc");
-                                   p2Out.println("opponentdc");
-                                   player1.close();
-                              } catch (Exception e) {
+                                   // Start the timer
+                                   final long durationMillis = 10000; // 10 seconds
+                                   long startTime = System.currentTimeMillis();
+                               
+                                   // Create the socket outside the loop to reuse for all packets
+                                   try (DatagramSocket socket = new DatagramSocket()) {
+                                       while (System.currentTimeMillis() - startTime < durationMillis) {
+                                           byte[] buffer = "opponentdc".getBytes();
+                                           InetAddress address = player2.getInetAddress();
+                                           DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 4445);
+                                           socket.send(packet);
+                               
+                                           // Sleep for a short period to avoid flooding
+                                           Thread.sleep(500); // Sleep for 500 milliseconds
+                                       }
+                                   } catch (Exception e) {
+                                       e.printStackTrace();
+                                   }
+                                   System.out.println("Server: Player 2 (" + p2Address + ") socket closed.");
+                                   player2.close();
+                                   throw new InterruptedException();
+                               } catch (Exception e) {
                                    e.printStackTrace();
-                              }
+                               }                          
                          } else {
                               System.out.println("Server: Player 2 (" + ipAddr + ") has disconnected due to timeout.");
                               try {
-                                   p2Out.println("selfdc");
-                                   p1Out.println("opponentdc");
-                                   player2.close();
-                              } catch (Exception e) {
+                                   // Start the timer
+                                   final long durationMillis = 10000; // 10 seconds
+                                   long startTime = System.currentTimeMillis();
+                               
+                                   // Create the socket outside the loop to reuse for all packets
+                                   try (DatagramSocket socket = new DatagramSocket()) {
+                                       while (System.currentTimeMillis() - startTime < durationMillis) {
+                                           byte[] buffer = "opponentdc".getBytes();
+                                           InetAddress address = player1.getInetAddress();
+                                           DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, 4445);
+                                           socket.send(packet);
+                               
+                                           // Sleep for a short period to avoid flooding
+                                           Thread.sleep(500); // Sleep for 500 milliseconds
+                                       }
+                                   } catch (Exception e) {
+                                       e.printStackTrace();
+                                   }
+                                   System.out.println("Server: Player 1 (" + p1Address + ") socket closed.");
+                                   player1.close();
+                                   throw new InterruptedException();
+                               } catch (Exception e) {
                                    e.printStackTrace();
-                              }
+                               }     
                          }
                          executorService.shutdown();
                     }
@@ -149,7 +187,7 @@ public class GameSession {
                }
 
                if (p1Turn) {
-                    // TO EDIT: THIS WILL BE THE MAIN GAME THING
+                    // TODO: 
                     // Roll dice, save the number, then send it to the server -> send to the opponent
                     // Opponent's local GUI will update the die number info
                     // If the number rolled > 0, then read for the next input (player's move)
@@ -160,14 +198,17 @@ public class GameSession {
 
                     boolean rosetta = false;
                     String diceRoll;
-                    do {
-                         diceRoll = p1In.readLine(); // Read dice roll
-                    } while (diceRoll == null);
+
+                    System.out.println(p1In.readLine()); // "sending_dice_roll"
+                    diceRoll = p1In.readLine(); // Read dice roll
+
                     p2Out.println(diceRoll); // Send opponent dice roll
+                    System.out.println("Player 1: " + diceRoll);
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p1In.readLine();
+                              System.out.println("Player 1: " + gamePacket);
                               String data[] = gamePacket.split(",");
                               // Check if the player stepped onto a rosetta
                               if (data[4].equals("true")) {
@@ -184,10 +225,12 @@ public class GameSession {
                     boolean rosetta = false;
                     String diceRoll = p2In.readLine(); // Read dice roll
                     p1Out.println(diceRoll); // Send opponent dice roll
+                    System.out.println("Player 2: " + diceRoll);
                     int diceNum = Integer.parseInt(diceRoll);
                     if (diceNum > 0) {
                          do {
                               String gamePacket = p2In.readLine();
+                              System.out.println("Player 2: " + gamePacket);
                               String data[] = gamePacket.split(",");
                               // Check if the player stepped onto a rosetta
                               if (data[4].equals("true")) {
