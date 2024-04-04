@@ -32,13 +32,12 @@ public class GameStartGUI extends JFrame {
             Board currentBoard = new Board(counter);
             Dice dice = new Dice();
             Client client = new Client(counter, currentBoard, dice);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    GameGUI gameGUI = new GameGUI(client);
-                    client.setGUI(gameGUI);
-                }
+            GameGUI gameGUI = new GameGUI(client);
+            client.setGUI(gameGUI);
+            Thread cliThread = new Thread(() -> {
+                client.initiateMatch();
             });
-            client.initiateMatch();
+            cliThread.start();
         } else {
             counter = new Counter();
             currentBoard = new Board(counter);
