@@ -130,19 +130,16 @@ public class Client {
                     serverListener.start();
 
                     String startPacket;
-                    do {
-                         startPacket = in.readLine();
-                         if (startPacket == null) {continue;}
-                         if ("startfirst".equals(startPacket)) {
-                              matchFound = true;
-                              myTurn = true;
-                              // frame.closeWindow();
-                         } else if (startPacket.equals("waitfirst")) {
-                              matchFound = true;
-                              myTurn = false;
-                              // frame.closeWindow();
-                         }
-                    } while (startPacket == null);
+                    startPacket = in.readLine();
+                    if ("startfirst".equals(startPacket)) {
+                         matchFound = true;
+                         myTurn = true;
+                         // frame.closeWindow();
+                    } else if (startPacket.equals("waitfirst")) {
+                         matchFound = true;
+                         myTurn = false;
+                         // frame.closeWindow();
+                    }
 
                     // Main thread deals with sending messages to server
                     while (opponentAlive && selfAlive) {
@@ -155,7 +152,7 @@ public class Client {
                               boolean rosetta = false;
                               
                               while (!rollPressed) {
-                                   // Wait until the player rolls the dice
+                                   System.out.println("rolling...");
                               }
                               rollPressed = false;
 
@@ -210,6 +207,7 @@ public class Client {
                               myTurn = false; // Reset turn after sending message
                               gui.switchP1RollButton(false);
                               if (counter.getP1Score() == 7) {
+                                   ClientWinGUI.display("You have won the game!");
                                    gui.closeFrame();
                               }
                          } else {
@@ -245,7 +243,7 @@ public class Client {
                                              ClientWinGUI.display("Opponent has disconnected. You have won by default!");
                                              heartbeatSender.interrupt();
                                         }
-                                        
+
                                         String[] info = data.split(",");
                                         String rosetta = info[4];
 
@@ -263,12 +261,12 @@ public class Client {
                                         currentBoard.move(move, "P2");
                                         gui.updateBoard(currentBoard);
                                         if (counter.getP2Score() == 7) {
+                                             ClientLoseGUI.display("You have lost the game!");
                                              gui.closeFrame();
                                              break;
                                         }
                                    } while (opponentTurn);
                               }
-                              // check if opponent has won (should get losing message if so)
                          }
                          myTurn = true;
                     }
