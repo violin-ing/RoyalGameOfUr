@@ -56,10 +56,10 @@ public class Client {
      */
      public void initiateMatch() {
           try {
-               // Connecting to server display
-               ServerConnectionGUI frame = ServerConnectionGUI.display();
-
                matchFound = false;
+               
+               // Connecting to server display
+               // ServerConnectionGUI frame = ServerConnectionGUI.display();
 
                // Listen for server broadcast to discover the server
                DatagramSocket broadcastSocket = new DatagramSocket(DEFAULT_PORT);
@@ -135,20 +135,11 @@ public class Client {
                          if ("startfirst".equals(startPacket)) {
                               matchFound = true;
                               myTurn = true;
-                              frame.closeWindow();
-                              // SwingUtilities.invokeLater(new Runnable() {
-                              //      public void run() {
-                              //          frame.closeWindow();
-                              //      }
-                              // });
+                              // frame.closeWindow();
                          } else if (startPacket.equals("waitfirst")) {
                               matchFound = true;
                               myTurn = false;
-                              SwingUtilities.invokeLater(new Runnable() {
-                                   public void run() {
-                                       frame.closeWindow();
-                                   }
-                              });
+                              // frame.closeWindow();
                          }
                     } while (startPacket == null);
 
