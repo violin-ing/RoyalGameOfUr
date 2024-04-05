@@ -40,7 +40,7 @@ public class Ai {
     }
 
     public Board createTempBoard(Board board, String player, int[] currentPos, int[] futurePos) {
-        Board tempBoard = board;
+        Board tempBoard = new Board(board);
 
         int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
         System.out.println(move);
@@ -53,7 +53,12 @@ public class Ai {
     public HashSet<String> getMoveTypes(Board board, String player, int[] currentPos, int[] futurePos) {
         int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
         
-        Board tempBoard = board;
+        Board tempBoard = new Board(board);
+
+
+        System.out.println("board");
+        System.out.println(board);
+        System.out.println(tempBoard);
 
         return tempBoard.move(move, player, false);
     }
@@ -100,10 +105,22 @@ public class Ai {
                         break;
 
                     case 2: // player rolls --> player moves
-                        Board parentMaxBoard = currentNode.getParent().getBoard();
+                        Board parentMaxBoard = new Board(currentNode.getParent().getBoard());
+                        List<int[]> pieces = parentMaxBoard.identifyPieces(p1);
+                        int numPieces = pieces.size();
 
-                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, currentNode.getRoll(), parentMaxBoard.identifyPieces(p1), Game.getCounter().getP1Counter());
+                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, currentNode.getRoll(), pieces, numPieces);
                         List<int[]> minFuturePositions = Game.getFuturePositions(p1, currentNode.getRoll(), minCurrentMovablePositions);
+
+                        System.out.println("minpos");
+                        for (int[] pos : minCurrentMovablePositions) {
+                            System.out.println(Arrays.toString(pos));
+                        }
+            
+                        System.out.println("minfuturepos");
+                        for (int[] pos : minFuturePositions) {
+                            System.out.println(Arrays.toString(pos));
+                        }
 
                         List<Board> minBoards = new ArrayList<>();
 
