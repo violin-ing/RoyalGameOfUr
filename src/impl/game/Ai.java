@@ -2,7 +2,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class Ai {
+public class Ai implements Cloneable{
     private Node root;
     public static double[] ROLL_PERCENTAGES = {0.0625, 0.25, 0.375, 0.25, 0.0625};
    //public static int LEVELS = 4;
@@ -307,4 +307,5 @@ public class Ai {
     public void speedy(List<Node> filteredChildren) {
         
     }
+      
 }

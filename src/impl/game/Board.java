@@ -15,7 +15,7 @@ public class Board {
     // Constructor for the board, initializes each strip with a tile in each positon (which itself contains a chip)
     // The chip is initialized with ownership "none" and amount 0, and the position is set to the index of the tile
     // We then form a board 2D array with the initialised strips
-
+    
     public Board(Counter counter) {
         this.counter = counter;
         for (int i = 0; i < p1Strip.length; i++) 
