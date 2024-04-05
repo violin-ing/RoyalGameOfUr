@@ -103,9 +103,9 @@ public class GameSession {
                                         System.out.println("Server: Player 2 (" + p2Address + ") socket closed.");
                                         player2.close();
                                         throw new InterruptedException();
-                                        } catch (Exception e) {
-                                        e.printStackTrace();
-                                        }                          
+                                   } catch (Exception e) {
+                                        System.out.println("Server: Error closing Player 2 socket.");
+                                   }                          
                               } else {
                                    System.out.println("Server: Player 2 (" + ipAddr + ") has disconnected due to timeout.");
                                    try {
@@ -113,9 +113,9 @@ public class GameSession {
                                         System.out.println("Server: Player 1 (" + p1Address + ") socket closed.");
                                         player1.close();
                                         throw new InterruptedException();
-                                        } catch (Exception e) {
-                                        e.printStackTrace();
-                                        }     
+                                   } catch (Exception e) {
+                                        System.out.println("Server: Error closing Player 1 socket.");
+                                   }     
                               }
                               executorService.shutdown();
                          }
@@ -131,7 +131,7 @@ public class GameSession {
                                    p2Out.println(p1info);
                               }
                          } catch (Exception e) {
-                              e.printStackTrace();
+                              System.out.println("Server: Error reading from Player 1.");
                               break;
                          }
                     }
@@ -146,7 +146,7 @@ public class GameSession {
                                    p1Out.println(p2info);
                               }
                          } catch (Exception e) {
-                              e.printStackTrace();
+                              System.out.println("Server: Error reading from Player 2.");
                               break;
                          }
                     }
