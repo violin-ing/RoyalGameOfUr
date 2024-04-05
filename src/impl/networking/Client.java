@@ -105,11 +105,12 @@ public class Client {
                                         if (opponentPkt != null) {
                                              System.out.println("from opponent: " + opponentPkt);
                                              String[] info = opponentPkt.split(",");
-                                             for (String x : info) System.out.println(x);
+                                             for (String x : info) System.out.print("info array: " + x + " ");
                                              if (info.length == 2) {
+                                                  System.out.println("\ninfo length = 2");
                                                   myTurn = true;
                                              } else if (info.length == 6) {
-                                                  System.out.println("info length = 6");
+                                                  System.out.println("\ninfo length = 6");
                                                   String rosetta = info[5];
 
                                                   if ("true".equals(rosetta)) {
@@ -156,6 +157,8 @@ public class Client {
                                                        heartbeatSender.interrupt();
                                                        return;
                                                   }
+
+                                                  continue;
                                              } else if (opponentPkt.equals("opponentdc")) {
                                                   gui.closeFrame();
                                                   ClientWinGUI.display("Opponent disconnected. You win!");
