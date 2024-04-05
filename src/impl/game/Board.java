@@ -60,7 +60,7 @@ public class Board {
     public Tile[] getBoardStrip(int index) {return this.board[index];}
     public Tile[][] getBoard() {return this.board;}
 
-    public HashSet<String> move(int[] moveChoice, String player, boolean changePlayer) {
+    public HashSet<String> move(int[] moveChoice, String player) {
         Tile movingFromTile;
         Tile movingToTile;
         boolean addedChip  = false;
@@ -95,7 +95,7 @@ public class Board {
             movingToTile.getChip().setOwnership(player);
             moveType.add("ADD CHIP");
 
-            if (movingToTile.isRosetta() && changePlayer) {
+            if (movingToTile.isRosetta()) {
                 // this has the effect of giving the player another turn.
                 counter.getPlayerTurn();
                 moveType.add("ROSETTA");
@@ -115,6 +115,90 @@ public class Board {
                 String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
                 if (movingToTile.getChip().getOwnership().equals(enemyPlayer)) {
                     counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
+                    moveType.add("TAKE CHIP");
+                }
+                // IF MOVING TO EMPTY TILE WE DO THIS ASWELL
+                movingToTile.getChip().setOwnership(player);
+                movingToTile.getChip().setAmn(movingFromTile.getChip().getAmn());
+                moveType.add("MOVE");
+            }
+            // give player another turn if this is a rosetta.
+            if (movingToTile.isRosetta()) {
+                counter.getPlayerTurn();
+                moveType.add("ROSETTA");
+            }
+        }
+        if (!addedChip) {
+            // clear the previous tile.
+            movingFromTile.getChip().setOwnership("none");
+            movingFromTile.getChip().setAmn(0);
+        }
+        return moveType;
+    }
+
+    public HashSet<String> move(int[] moveChoice, String player, boolean changePlayer) {
+        Tile movingFromTile;
+        Tile movingToTile;
+        boolean addedChip  = false;
+        boolean removedChip = false;
+        HashSet<String> moveType = new HashSet<>();
+        
+        // if statment sets up tile we are moving fro m and to.
+        // this will also check if we are adding a chip to the board / or removing one (scoring).
+        if (moveChoice[1]==-1) {
+            movingFromTile = null;
+            movingToTile = board[moveChoice[2]][moveChoice[3]];
+            addedChip = true;
+        } else if((moveChoice[2]==0  || moveChoice[2]==2) && moveChoice[3]==6) {
+            movingToTile = null;
+            movingFromTile = board[moveChoice[0]][moveChoice[1]];
+            removedChip = true;
+        } else {
+            movingFromTile = board[moveChoice[0]][moveChoice[1]];
+            movingToTile = board[moveChoice[2]][moveChoice[3]];
+        }
+
+        if (removedChip) {
+            // clear from tile
+            // add tile amount to score
+            if (changePlayer) {
+                counter.increasePlayerScore(player, movingFromTile.getChip().getAmn());
+            }
+            moveType.add("WIN");
+            // CLEAR TILE AFTER
+        } else if(addedChip){
+            // increase value of tile we are moving to, and check if we are on a rosetta tile
+            // if we are on a rosetta give player another turn
+            movingToTile.getChip().increaseAmn(1);
+            movingToTile.getChip().setOwnership(player);
+            moveType.add("ADD CHIP");
+
+            if (movingToTile.isRosetta() && changePlayer) {
+                // this has the effect of giving the player another turn.
+                if (changePlayer) {
+                    counter.getPlayerTurn();
+                }
+                moveType.add("ROSETTA");
+            }
+            // decrement the counter value for player
+            if (changePlayer) {
+                counter.reduceCounter(player);
+            }
+        } else {
+            // if chip is our own;
+            // increase stack amount
+            // check if this is a rosetta tile
+            // MOVING TO OWN TILE
+            if (movingToTile.getChip().getOwnership().equals(player)) {
+                movingToTile.getChip().increaseAmn(movingFromTile.getChip().getStackAmount());
+                moveType.add("STACK");
+            } else {
+                // MOVING TO ENEMY TILE
+                String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
+                if (movingToTile.getChip().getOwnership().equals(enemyPlayer)) {
+                    if (changePlayer) {
+                        counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
+                    }
                     moveType.add("TAKE CHIP");
                 }
                 // IF MOVING TO EMPTY TILE WE DO THIS ASWELL

@@ -103,9 +103,7 @@ public class GameGUI extends JFrame {
             rollButtonP2.setEnabled(false);
         } else {
             rollButtonP1.setEnabled(false);
-           // rollAmountP1.setVisible(false);
             rollButtonP2.setEnabled(true);
-           // rollAmountP2.setVisible(true);
         }
     }
 
@@ -250,6 +248,7 @@ public class GameGUI extends JFrame {
     } 
 
     public void closeFrame() {
+        this.setVisible(false);
         this.dispose();
     }
 
