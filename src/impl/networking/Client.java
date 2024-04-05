@@ -110,7 +110,7 @@ public class Client {
                                                   myTurn = true;
                                              } else if (info.length == 6) {
                                                   System.out.println("info length = 6");
-                                                  String rosetta = info[4];
+                                                  String rosetta = info[5];
 
                                                   if ("true".equals(rosetta)) {
                                                        myTurn = false;
@@ -120,19 +120,35 @@ public class Client {
 
                                                   // Stream packet array into a usable int[] array
                                                   String[] moveStr = {info[1], info[2], info[3], info[4]};
-                                                  int[] move = Arrays.stream(moveStr).mapToInt(Integer::parseInt).toArray();
+                                                  int[] move = new int[4];
+
+                                                  move[1] = Integer.parseInt(moveStr[1]);
+                                                  move[3] = Integer.parseInt(moveStr[3]);
+
+                                                  if (moveStr[0].equals("0")) {
+                                                       move[0] = 2;
+                                                  } else {
+                                                       move[0] = 1;
+                                                  }
+                                                  
+                                                  if (moveStr[2].equals("0")) {
+                                                       move[2] = 2;
+                                                  } else {
+                                                       move[0] = 1;
+                                                  }
 
                                                   currentBoard.move(move, "P2");
 
-                                                  System.out.println("hello there 1");
+                                                  // System.out.println("hello there 1");
 
                                                   // SwingUtilities.invokeLater(new Runnable() {
                                                   //      public void run() {
                                                             gui.updateBoard(currentBoard);
+                                                            gui.updateScore(counter);
                                                   //      }
                                                   // });
 
-                                                  System.out.println("hello there 1");
+                                                  // System.out.println("hello there 1");
                                                   
                                                   if (counter.getP2Score() == 7) {
                                                        gui.closeFrame();
