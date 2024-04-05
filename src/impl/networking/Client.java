@@ -119,10 +119,8 @@ public class Client {
                                                   }
 
                                                   // Stream packet array into a usable int[] array
-                                                  int[] move = Arrays.stream(info)
-                                                       .limit(4)
-                                                       .mapToInt(Integer::parseInt)
-                                                       .toArray();
+                                                  String[] moveStr = {info[1], info[2], info[3], info[4]};
+                                                  int[] move = Arrays.stream(moveStr).mapToInt(Integer::parseInt).toArray();
 
                                                   currentBoard.move(move, "P2");
 
