@@ -116,11 +116,11 @@ public class Game {
                     //     } 
                     // }
                 }
-                currentBoard.move(move, currentPlayer);
-                System.out.println("update the board");
-                gui.updateBoard(currentBoard);
-                gui.updateScore(counter);
             }
+            currentBoard.move(move, currentPlayer);
+            System.out.println("update the board");
+            gui.updateBoard(currentBoard);
+            gui.updateScore(counter);
 
             //CHECK WIN CONDITION
             if (currentPlayer.equals("P1")) {
