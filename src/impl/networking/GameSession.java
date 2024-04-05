@@ -125,7 +125,7 @@ public class GameSession {
                          try {
                               String p1info = p1In.readLine();
                               if (p1info != null) {
-                                   System.out.println("from P1: " + p1info);
+                                   System.out.println("P1: " + p1info);
                                    p2Out.println(p1info);
                               }
                          } catch (Exception e) {
@@ -140,7 +140,7 @@ public class GameSession {
                          try {
                               String p2info = p2In.readLine();
                               if (p2info != null) {
-                                   System.out.println("from P2: " + p2info);
+                                   System.out.println("P2: " + p2info);
                                    p1Out.println(p2info);
                               }
                          } catch (Exception e) {
