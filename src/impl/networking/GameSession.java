@@ -3,34 +3,30 @@ import java.net.*;
 import java.util.concurrent.*;
 
 /**
- * The {@code GameSession} class manages a game session between two players in a multiplayer game.
- * It tracks the connection status of each player using heartbeat messages and handles the game logic
- * to ensure a smooth and responsive gaming experience.
- * This class is responsible for managing the game state, including player turns, game outcomes,
- * and disconnections due to timeouts or other issues.
+ * The {@code GameSession} class encapsulates the functionality required to manage a game session between two players in a multiplayer game context. It tracks the connection status of each player using heartbeat messages, manages game state transitions such as player turns and game outcomes, and handles player disconnections due to timeouts or other network issues. This class utilizes sockets for network communication between players and a scheduled executor service to monitor heartbeat messages to ensure player connectivity.
  */
 public class GameSession {
      private final static int HEARTBEAT_PORT = 42069; 
      private final static int TIMEOUT = 20000; // Timeout if no heartbeat sent after 20s
 
-     boolean player1Win = false;
-     boolean player2Win = false;
+     boolean player1Win = false; // Flag indicating if player 1 has won the game.
+     boolean player2Win = false; // Flag indicating if player 2 has won the game.
 
-     private Socket player1;
-     private Socket player2;
+     private Socket player1; // Socket connection for player 1.
+     private Socket player2; // Socket connection for player 2.
 
-     private String p1Address;
-     private String p2Address;
+     private String p1Address; // IP address of player 1.
+     private String p2Address; // IP address of player 2.
 
+     // A thread-safe map to track the last heartbeat time from each player.
      private volatile ConcurrentHashMap<String, Long> lastHeartbeatTime = new ConcurrentHashMap<>();
 
      /**
-      * Constructs a new GameSession for the specified player sockets.
-      * Initializes heartbeat listening to track player connectivity and sets up the game environment.
-      * 
-      * @param player1 The socket for player 1.
-      * @param player2 The socket for player 2.
-      */
+     * Constructs a new {@code GameSession} instance for the specified player sockets. It initializes the player addresses, sets up the heartbeat listening mechanism to track player connectivity, and starts the heartbeat listener thread.
+     *
+     * @param player1 The socket connection for player 1.
+     * @param player2 The socket connection for player 2.
+     */
      public GameSession(Socket player1, Socket player2) {
           this.player1 = player1;
           this.player2 = player2;
@@ -56,8 +52,7 @@ public class GameSession {
                          lastHeartbeatTime.put(senderIP, System.currentTimeMillis());
                     }
                } catch (Exception e) {
-                    // System.err.println("Error receiving heartbeat: " + e.getMessage());
-                    e.printStackTrace();
+                    System.err.println("Server Exception: Error receiving heartbeat: " + e.getMessage());
                }
           });
 
@@ -65,19 +60,22 @@ public class GameSession {
      }
 
      /**
-      * Initializes the game session by starting the game logic and handling for each player.
-      */
+     * Initializes the game session by starting the game logic and managing the communication and game state for each player.
+     *
+     * @throws IOException If an I/O error occurs during communication with the players.
+     * @throws InterruptedException If the thread is interrupted while waiting or sleeping.
+     */
      public void connectionInit() throws IOException, InterruptedException {
           handlePlayers(player1, player2);
      }
 
      /**
-      * Handles the game logic for a single player, including communication with the player
-      * and managing game state based on player input and actions.
-      * 
-      * @param playerSocket The socket of the player to handle.
-      * @param playerLabel A label identifying the player (e.g., "Player 1").
-      */
+     * Manages the game logic for both players, including initializing communication channels, sending initial game state information, and setting up a scheduled task to monitor for timeouts based on heartbeat messages. This method also starts threads to listen for messages from each player, facilitating communication between them and ensuring game state is maintained and synchronized.
+     *
+     * @param p1Socket The socket connection for player 1.
+     * @param p2Socket The socket connection for player 2.
+     * @throws IOException If an I/O error occurs during setup or communication.
+     */
      private void handlePlayers(Socket p1Socket, Socket p2Socket) throws IOException {
           // Send signal for client to know if they start first or wait for their turn first
           try (PrintWriter p1Out = new PrintWriter(p1Socket.getOutputStream(), true);
@@ -104,7 +102,7 @@ public class GameSession {
                                         player2.close();
                                         throw new InterruptedException();
                                    } catch (Exception e) {
-                                        System.out.println("Server: Error closing Player 2 socket.");
+                                        System.out.println("Server Exception: Error closing Player 2 socket.");
                                    }                          
                               } else {
                                    System.out.println("Server: Player 2 (" + ipAddr + ") has disconnected due to timeout.");
@@ -114,7 +112,7 @@ public class GameSession {
                                         player1.close();
                                         throw new InterruptedException();
                                    } catch (Exception e) {
-                                        System.out.println("Server: Error closing Player 1 socket.");
+                                        System.out.println("Server Exception: Error closing Player 1 socket.");
                                    }     
                               }
                               executorService.shutdown();
@@ -127,11 +125,11 @@ public class GameSession {
                          try {
                               String p1info = p1In.readLine();
                               if (p1info != null) {
-                                   System.out.println("from P1: " + p1info);
+                                   System.out.println("P1: " + p1info);
                                    p2Out.println(p1info);
                               }
                          } catch (Exception e) {
-                              System.out.println("Server: Error reading from Player 1.");
+                              System.out.println("Server Exception: Error reading from Player 1.");
                               break;
                          }
                     }
@@ -142,11 +140,11 @@ public class GameSession {
                          try {
                               String p2info = p2In.readLine();
                               if (p2info != null) {
-                                   System.out.println("from P2: " + p2info);
+                                   System.out.println("P2: " + p2info);
                                    p1Out.println(p2info);
                               }
                          } catch (Exception e) {
-                              System.out.println("Server: Error reading from Player 2.");
+                              System.out.println("Server Exception: Error reading from Player 2.");
                               break;
                          }
                     }
