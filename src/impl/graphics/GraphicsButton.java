@@ -1,11 +1,7 @@
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
+
 // this class will handle drawing tiles as buttons.
 public class GraphicsButton extends JButton {
     private static final int WINDOWWIDTH = 1200;
