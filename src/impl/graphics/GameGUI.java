@@ -248,6 +248,7 @@ public class GameGUI extends JFrame {
     } 
 
     public void closeFrame() {
+        this.setVisible(false);
         this.dispose();
     }
 

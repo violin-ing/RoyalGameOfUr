@@ -128,15 +128,19 @@ public class Game {
             if (currentPlayer.equals("P1")) {
                 if (counter.getP1Score()==7) {
                     System.out.println("P1 WINS");
-                    new EndGameGUI(currentPlayer);
-                    gui.closeFrame();
+                    if (!networkPlay) {
+                        new EndGameGUI(currentPlayer);
+                        gui.closeFrame(); 
+                    }
                     break;
                 }
             } else {
                 if (counter.getP2Score()==7) {
                     System.out.println("P2 WINS");
-                    new EndGameGUI(currentPlayer);
-                    gui.closeFrame();
+                    if (!networkPlay) {
+                        new EndGameGUI(currentPlayer);
+                        gui.closeFrame();
+                    }
                     break;
                 }
             }
