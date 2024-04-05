@@ -67,6 +67,9 @@ public class Board implements Cloneable {
         this.board = (Tile[][])board.getBoard().clone();
     }
 
+    /**
+     * clones an object, so that it does not reference the same object in memory.
+     */
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
