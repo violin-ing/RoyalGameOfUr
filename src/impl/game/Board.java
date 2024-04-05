@@ -2,13 +2,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.swing.border.Border;
+
 /**
  * Represents the game board of a board game. The board is divided into three strips: one for each player and a middle strip.
  * Each strip contains a series of tiles, and each tile can hold a chip. The board tracks the positions of all chips and manages
  * the movement of chips according to the game rules. It supports operations such as moving chips between tiles, adding new chips
  * to the board, and removing chips as they reach the end of their path.
  */
-public class Board {
+public class Board implements Cloneable {
     private Counter counter; // The counter object associated with this board.
     
     private Tile[] p1Strip = new Tile[6]; // The strip of tiles for player 1.
@@ -65,6 +67,10 @@ public class Board {
         this.board = board.getBoard();
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     /**
      * Returns the specified strip of the board.
