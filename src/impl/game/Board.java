@@ -139,13 +139,14 @@ public class Board {
 
     public List<int[]> identifyPieces(String player) {
         List<int[]> pieces = new ArrayList<>();
-        int[] stripPos = new int[2];
 
         for (int i = 0; i < 3; i++) {
             for (Tile tile : this.board[i]) {
                 if (tile.getChip().getOwnership().equals(player)) {
+                    int[] stripPos = new int[2];
                     stripPos[0] = i;
                     stripPos[1] = tile.getPos();
+                    System.out.println(stripPos[0] + " " + stripPos[1]);
                     pieces.add(stripPos);
                 }    
             }
