@@ -49,6 +49,10 @@ public class Board {
         board = new Tile[][] {p1Strip, midStrip, p2Strip};  //Creates an array of strips, 0 for p1, 1 for mid, 2 for p2
     }
 
+    public Board(Board board) {
+        this.board = board.getBoard();
+    }
+
 
     //Returns a strip of the board specified by the index
     public Tile[] getBoardStrip(int index) {return this.board[index];}
