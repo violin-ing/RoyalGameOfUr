@@ -127,14 +127,14 @@ public class Client {
 
                                                   if (moveStr[0].equals("0")) {
                                                        move[0] = 2;
-                                                  } else {
+                                                  } else if (moveStr[0].equals("1")) {
                                                        move[0] = 1;
                                                   }
                                                   
                                                   if (moveStr[2].equals("0")) {
                                                        move[2] = 2;
-                                                  } else {
-                                                       move[0] = 1;
+                                                  } else if (moveStr[2].equals("1")) {
+                                                       move[2] = 1;
                                                   }
 
                                                   currentBoard.move(move, "P2");
@@ -179,7 +179,7 @@ public class Client {
                                         myTurn = false;
           
                                         boolean rosetta = false;
-                                        do {
+                                        // do {
                                              StringBuffer packetBuilder = new StringBuffer();
           
                                              while (!rollPressed) {
@@ -278,11 +278,12 @@ public class Client {
 
                                              if (rosetta) {
                                                   myTurn = true;
-                                                  rosetta = true;
+                                                  rosetta = false;
                                                   rollPressed = false;
+                                                  moveSelected = false;
                                                   continue;
                                              }
-                                        } while (rosetta);
+                                        // } while (rosetta);
           
                                         SwingUtilities.invokeLater(new Runnable() {
                                              public void run() {
