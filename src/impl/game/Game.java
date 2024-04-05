@@ -75,18 +75,29 @@ public class Game {
                 rollAmount = dice.roll();
                 gui.editP2Roll(rollAmount);
                 if (rollAmount!=0) {
-                    Board saveBoard = new Board(currentBoard);
-                    Node root = ai.createTree(rollAmount);
-                    ai.setRoot(root);
                     
-                    double expectimax = ai.expectiminimax(ai.getRoot(), "max");
-                    ai.getRoot().setScore(expectimax);
-                    ai.printTree(ai.getRoot(), 1);
-                    Node bestChild = ai.filterChildren(expectimax);
-                    move = bestChild.getPos();
-                    System.out.println(Arrays.toString(move));
+                    Board saveBoard = new Board(currentBoard);
+
+                    Ai ai = new Ai();
+
+                    // Create an instance of AiThread and pass the Ai object
+                    AiThread aiThread = new AiThread(ai, rollAmount, currentBoard);
+            
+                    // Create a new Thread with the AiThread instance
+                    Thread thread = new Thread(aiThread);
+            
+                    // Start the thread
+                    thread.start();
+
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    move = aiThread.getMove();
                     currentBoard = new Board(saveBoard);
-                    // currentBoard = saveBoard;
+
                 }
             } else {
                 // players turn
@@ -103,7 +114,7 @@ public class Game {
                     continue;
                 } else {
                     // go to next iteration if there are no available moves
-                    if (!availableMoves(currentPlayer, rollAmount)) {
+                    if (!availableMoves(currentPlayer, rollAmount, getCounter())) {
                         continue;
                     }
                     System.out.println("WAITING FOR MOVE");
@@ -171,7 +182,7 @@ public class Game {
      *
      * @see Board#identifyPieces(String) runs through each tile of each strip of the board and "puts" the strip and position in it into a map as <strip, position>, then returns it
      */
-    public static boolean availableMoves(String player, int roll) {
+    public static boolean availableMoves(String player, int roll, Counter counter) {
         boolean possibleMoves;
         int currentPlayerCounter;
         

@@ -69,6 +69,7 @@ public class Board implements Cloneable {
         this.p1Strip = (Tile[])board.getBoardStrip(0).clone();
         this.midStrip = (Tile[])board.getBoardStrip(1).clone();
         this.p2Strip = (Tile[])board.getBoardStrip(2).clone();
+        this.counter = (Counter)board.getCounter();
     }
 
     /**
@@ -95,6 +96,10 @@ public class Board implements Cloneable {
     public Tile[][] getBoard() {return this.board;}
 
     public Counter getCounter() {return this.counter;}
+
+    public void setCounter(Counter counter) {
+        this.counter = counter;
+    }
 
     /**
      * Moves a chip from one tile to another, based on the provided move choice and the player making the move.
