@@ -128,13 +128,33 @@ public class Game {
             if (currentPlayer.equals("P1")) {
                 if (counter.getP1Score()==7) {
                     System.out.println("P1 WINS");
+                    if (!networkPlay) {
+                        new EndGameGUI(currentPlayer);
+                        gui.closeFrame(); 
+                    }
                     break;
                 }
             } else {
                 if (counter.getP2Score()==7) {
                     System.out.println("P2 WINS");
+                    if (!networkPlay) {
+                        new EndGameGUI(currentPlayer);
+                        gui.closeFrame();
+                    }
                     break;
                 }
+            }
+
+            List<int[]> pieces = currentBoard.identifyPieces("P1");
+            System.out.println("pieces p1");
+            for (int[] pos : pieces) {
+                System.out.println(Arrays.toString(pos));
+            }
+
+            List<int[]> pieces2 = currentBoard.identifyPieces("P2");
+            System.out.println("pieces p2");
+            for (int[] pos : pieces2) {
+                System.out.println(Arrays.toString(pos));
             }
         }
     }
@@ -246,8 +266,6 @@ public class Game {
 
         newPos[0] = strip;
         newPos[1] = checkTileAfter;
-
-        System.out.println("new position found");
 
         return newPos;
     }

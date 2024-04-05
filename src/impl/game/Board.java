@@ -161,7 +161,9 @@ public class Board {
         if (removedChip) {
             // clear from tile
             // add tile amount to score
-            counter.increasePlayerScore(player, movingFromTile.getChip().getAmn());
+            if (changePlayer) {
+                counter.increasePlayerScore(player, movingFromTile.getChip().getAmn());
+            }
             moveType.add("WIN");
             // CLEAR TILE AFTER
         } else if(addedChip){
@@ -173,11 +175,15 @@ public class Board {
 
             if (movingToTile.isRosetta() && changePlayer) {
                 // this has the effect of giving the player another turn.
-                counter.getPlayerTurn();
+                if (changePlayer) {
+                    counter.getPlayerTurn();
+                }
                 moveType.add("ROSETTA");
             }
             // decrement the counter value for player
-            counter.reduceCounter(player);
+            if (changePlayer) {
+                counter.reduceCounter(player);
+            }
         } else {
             // if chip is our own;
             // increase stack amount
@@ -190,7 +196,9 @@ public class Board {
                 // MOVING TO ENEMY TILE
                 String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
                 if (movingToTile.getChip().getOwnership().equals(enemyPlayer)) {
-                    counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
+                    if (changePlayer) {
+                        counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
+                    }
                     moveType.add("TAKE CHIP");
                 }
                 // IF MOVING TO EMPTY TILE WE DO THIS ASWELL

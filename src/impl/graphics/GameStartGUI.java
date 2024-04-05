@@ -86,6 +86,7 @@ public class GameStartGUI extends JFrame {
     }
 
     public void closeFrame() {
+        this.setVisible(false);
         this.dispose();
     }
 }
