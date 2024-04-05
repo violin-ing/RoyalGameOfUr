@@ -55,7 +55,10 @@ public class Game {
      * @return Counter object.
      */
     public static Counter getCounter() {return counter;}
-        
+    
+    /**
+     * method which runs the whole game loop this includes
+     */
     public void start() {
         System.out.println("GAME STARTED");
         String currentPlayer = "";
@@ -94,7 +97,6 @@ public class Game {
                 // players turn
                 System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
-                    // ai.printTree(ai.getRoot(), 1);
                     try {
                         wait();
                     } catch (Exception e) {
@@ -114,16 +116,7 @@ public class Game {
                             wait();
                         } catch (Exception e) {
                         }
-                        // System.out.println("Waiting for move");
                     }
-                    // update the board.
-                    // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
-                    // tile we are moving from strip, tile we are moving from position, tile we are moving to strip, and then position.
-                    // if (currentBoard.getBoard()[move[2]][move[3]].isRosetta()) {
-                    //     for (int i = 0; i < 10000; i++) {
-                    //         System.out.println(currentPlayer + " gets another turn");  
-                    //     } 
-                    // }
                 }
             }
             currentBoard.move(move, currentPlayer, true);
@@ -162,6 +155,12 @@ public class Game {
             System.out.println("pieces p2");
             for (int[] pos : pieces2) {
                 System.out.println(Arrays.toString(pos));
+                System.out.println();
+            }
+            for (Tile[] tiles : currentBoard.getBoard()) {
+                for (Tile tile : tiles) {
+                    System.out.println(tile.getChip().getAmn());
+                }
             }
         }
     }
@@ -170,19 +169,22 @@ public class Game {
      * We will check the current positions of each of the player's pieces through invoking ".identifyPieces()" on the current board instance returning a map of <strip, position> pairs
      * We will then input those pairs into a future board instance for each piece
      * We can then apply identifyPieces() to the future board instance in order to return a map of the moves available. A piece with an invalid move will remain in place (this is either useful or a hinderance)
+     * The method then calls the gui method @see {@link GameGUI#updateSelectableTiles(List, List)} to update the buttons which can be selected by the player.
+     * Thus a player can only make valid moves (all moves except for taking a chip on a rosette).
      *
      * @see Board#identifyPieces(String) runs through each tile of each strip of the board and "puts" the strip and position in it into a map as <strip, position>, then returns it
+     * @param player String, current player 
+     * @param roll int the number the players rolled
+     * @return returns a boolean true if there are available moves, and false if there are none.
      */
     public static boolean availableMoves(String player, int roll) {
         boolean possibleMoves;
         int currentPlayerCounter;
-        
         if (player.equals("P1")) {
             currentPlayerCounter = counter.getP1Counter();
         } else {
             currentPlayerCounter = counter.getP2Counter();
         }
-
         List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
         List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
         if (futurePositions.size()==0) {
@@ -191,11 +193,17 @@ public class Game {
             possibleMoves = true;
         }
         gui.updateSelectableTiles(currentMovablePositions, futurePositions);
-
         return possibleMoves;
     }
 
-    // this will check if a particular chip on the board is movable.
+    /**
+     * returns a list of all the positions of chips that a player can move, all chips can be moved (as long as they are not taking an enemy piece on a rosette), and a new chip can be placed on the board (as long as a player has at least 1 chip in reserve)
+     * @param player String player, current player
+     * @param roll int roll, the amount the current player has rolled
+     * @param currentPositions a List of int[] containing the strip and position of all chips on the board.
+     * @param tileCounter the current amount of tiles the player has in reserve.
+     * @return a List of int[] with two values: {the strip of a chip that can be moved, the position the chip can move to}
+     */
     public static List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {
         List<int[]> currentMovablePositions = new ArrayList<>();
         int[] stringPos = new int[2];
@@ -220,13 +228,18 @@ public class Game {
                 currentMovablePositions.add(stringPos);
             }
         }
-
         return currentMovablePositions;
     }
-
+    /**
+     * returns all the positions that chips are going to move on the board, from all the chips that can be moved.
+     * @param player string, current player.
+     * @param roll int, amount rolled by the player
+     * @param currentMovablePositions List of type int[] from the above method.
+     * @return returns a List of type int[] with each array have two values, the strip that the chip will move to and the location it will move to.
+     */
     public static List<int[]> getFuturePositions(String player, int roll, List<int[]> currentMovablePositions) {
         List<int[]> futurePositions = new ArrayList<>();
-        // position of winning tile, 6 on a player strip
+
         for (int[] piecePos : currentMovablePositions) {
             // futureBoard.pieceMover(player, roll, piecePos);
             futurePositions.add(newPosition(piecePos, player, roll));
@@ -236,7 +249,13 @@ public class Game {
         // List<int[]> futurePositions = futureBoard.identifyPieces(player); 
         return futurePositions;
     }
-    // this method will calculate the strip and index position of where a chip will end up after a particular move.
+    /**
+     * this method actually calculates the position a chip will end up after a move.
+     * @param stripPos int[] of length 2, the strip of the chip to be moved, and the position in strip it ends up.
+     * @param player String player, current player.
+     * @param roll int, the amount rolled by the player.
+     * @return returns an int[] with the strip position and position in the strip the chip ends up.
+     */
     public static int[] newPosition(int[] stripPos, String player, int roll) {
         int[] newPos = new int[2];
         int strip = stripPos[0];
@@ -269,10 +288,16 @@ public class Game {
         return newPos;
     }
 
-    // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
+    /**
+     * checks if a particular chip can be moved for a player.
+     * @param player String player, current player.
+     * @param roll int, roll amount by player.
+     * @param movePosition int, the position the chip is moving from
+     * @param strip int, strip position the chip is moving from
+     * @return returns a boolean, true if a particular chip can be moved, and false if no.
+     */
     private static boolean isMoveable(String player, int roll, int movePosition, int strip) {
         // validiation of moves happens, here, so the above method can be simplified more easily.
-        
         int checkTileAfter;
         if (strip == 1) {
             checkTileAfter = movePosition + roll;
@@ -287,7 +312,6 @@ public class Game {
                     strip=1;
             }
         }
-
         if (strip == 1) {
                 if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
                     String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
