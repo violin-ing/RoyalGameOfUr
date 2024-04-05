@@ -98,7 +98,7 @@ public class Client {
 
                     Thread serverListener = new Thread(() -> {
                          System.out.println("Listening for server msgs");
-                         while (true) {
+                         while (!myTurn) {
                               try {
                                    String opponentPkt = in.readLine();
                                    if (opponentPkt != null) {

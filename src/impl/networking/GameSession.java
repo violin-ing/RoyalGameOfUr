@@ -156,7 +156,7 @@ public class GameSession {
                p2Listener.start();
 
                while (true) {
-                    // Run game
+                    System.out.println("Server: Listening to messages");
                }
           } catch (Exception e) {
                
