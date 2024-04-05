@@ -176,9 +176,7 @@ public class GameGUI extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 // if left mouse button is clicked, they are selecting a chip
                 if (e.getButton() == MouseEvent.BUTTON1) {
-                    for (int i = 0; i < 1000; i++) {
-                        System.out.println("CLICKED1");
-                    }
+                    System.out.println("Clicked M1");
                     if (button.checkIsChipSelection()) {
                         System.out.println(button.getSelection());
                         if (button.getSelection()) {
@@ -198,7 +196,7 @@ public class GameGUI extends JFrame {
                     }
                 }
                 if (e.getButton()==MouseEvent.BUTTON3) {
-                    System.out.println("CLICKED3");
+                    System.out.println("Clicked M3");
                     button.updateSelection(false);
                     resetChipSelection();
                 }
@@ -256,6 +254,8 @@ public class GameGUI extends JFrame {
     }
 
     public void updateSelectableTiles(List<int[]> currentMovable, List<int[]> futureMovable) {
+        System.out.println("Number of moves: " + currentMovable.size());
+        System.out.println("Number of future moves: " + futureMovable.size());
         for (int i = 0; i < currentMovable.size(); i++) {
             // if current movable is -1. make sure to print token there
             // add token image if you can add a token to the screen

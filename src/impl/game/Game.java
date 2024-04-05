@@ -86,7 +86,10 @@ public class Game {
                 System.out.println("WAITING FOR ROLL");
                 while(!rollPressed) {
                     // ai.printTree(ai.getRoot(), 1);
-                    System.out.println("WAITING FOR ROLL");
+                    try {
+                        wait();
+                    } catch (Exception e) {
+                    }
                 }
                 // NO POSSIBLE MOVES IF ROLL = 0, GO TO NEXT PLAYER
                 if (rollAmount == 0) {
@@ -98,7 +101,11 @@ public class Game {
                     }
                     System.out.println("WAITING FOR MOVE");
                     while (!moveSelected) {
-                        System.out.println("WAITING FOR INPUT");
+                        try {
+                            wait();
+                        } catch (Exception e) {
+                        }
+                        // System.out.println("Waiting for move");
                     }
                     // update the board.
                     // move is updated in the GUI class, it is an int[] array, with 4 values in this order:
@@ -167,19 +174,25 @@ public class Game {
         int[] stringPos = new int[2];
 
         for (int[] stripAndPos : currentPositions) {
+            System.out.println("1 chip");
             if (isMoveable(player, roll, stripAndPos[1], stripAndPos[0])) {
+                System.out.println("1 move");
                 currentMovablePositions.add(stripAndPos);
             }
         }
         // this will add a possible move for a player to move a token onto the board.
         if (player.equals("P1")) {
+            System.out.println("1 chip");
             if (tileCounter != 0) {
+                System.out.println("1 move");
                 stringPos[0] = 0;
                 stringPos[1] = -1;
                 currentMovablePositions.add(stringPos);
             }
         } else {
+            System.out.println("1 chip");
             if (tileCounter !=0 ) {
+                System.out.println("1 move");
                 stringPos[0] = 2;
                 stringPos[1] = -1;
                 currentMovablePositions.add(stringPos);
@@ -241,6 +254,8 @@ public class Game {
 
         newPos[0] = strip;
         newPos[1] = checkTileAfter;
+
+        System.out.println("new position found");
 
         return newPos;
     }
