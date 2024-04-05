@@ -98,54 +98,64 @@ public class Client {
 
                     Thread serverListener = new Thread(() -> {
                          System.out.println("Listening for server msgs");
-                         while (!myTurn) {
-                              try {
-                                   String opponentPkt = in.readLine();
-                                   if (opponentPkt != null) {
-                                        System.out.println("from opponent: " + opponentPkt);
-                                        String[] info = opponentPkt.split(",");
-                                        if (info.length == 2) {
-                                             myTurn = true;
-                                        } else if (info.length == 5) {
-                                             String rosetta = info[4];
-
-                                             if ("true".equals(rosetta)) {
-                                                  myTurn = false;
-                                             } else {
+                         while (true) {
+                              if (!myTurn) {
+                                   try {
+                                        String opponentPkt = in.readLine();
+                                        if (opponentPkt != null) {
+                                             System.out.println("from opponent: " + opponentPkt);
+                                             String[] info = opponentPkt.split(",");
+                                             for (String x : info) System.out.println(x);
+                                             if (info.length == 2) {
                                                   myTurn = true;
-                                             }
+                                             } else if (info.length == 6) {
+                                                  System.out.println("info length = 6");
+                                                  String rosetta = info[4];
 
-                                             // Stream packet array into a usable int[] array
-                                             int[] move = Arrays.stream(info)
-                                                  .limit(4)
-                                                  .mapToInt(Integer::parseInt)
-                                                  .toArray();
-
-                                             currentBoard.move(move, "P2");
-
-                                             SwingUtilities.invokeLater(new Runnable() {
-                                                  public void run() {
-                                                       gui.updateBoard(currentBoard);
+                                                  if ("true".equals(rosetta)) {
+                                                       myTurn = false;
+                                                  } else {
+                                                       myTurn = true;
                                                   }
-                                              });
-                                             
-                                             if (counter.getP2Score() == 7) {
+
+                                                  // Stream packet array into a usable int[] array
+                                                  int[] move = Arrays.stream(info)
+                                                       .limit(4)
+                                                       .mapToInt(Integer::parseInt)
+                                                       .toArray();
+
+                                                  currentBoard.move(move, "P2");
+
+                                                  System.out.println("hello there 1");
+
+                                                  // SwingUtilities.invokeLater(new Runnable() {
+                                                  //      public void run() {
+                                                            gui.updateBoard(currentBoard);
+                                                  //      }
+                                                  // });
+
+                                                  System.out.println("hello there 1");
+                                                  
+                                                  if (counter.getP2Score() == 7) {
+                                                       gui.closeFrame();
+                                                       ClientLoseGUI.display("You have lost the game!");
+                                                       heartbeatSender.interrupt();
+                                                       return;
+                                                  }
+                                             } else if (opponentPkt.equals("opponentdc")) {
                                                   gui.closeFrame();
-                                                  ClientLoseGUI.display("You have lost the game!");
+                                                  ClientWinGUI.display("Opponent disconnected. You win!");
                                                   heartbeatSender.interrupt();
                                                   return;
                                              }
-                                        } else if (opponentPkt.equals("opponentdc")) {
-                                             gui.closeFrame();
-                                             ClientWinGUI.display("Opponent disconnected. You win!");
-                                             heartbeatSender.interrupt();
-                                             return;
+                                        } else {
+                                             continue;
                                         }
-                                   } else {
-                                        continue;
+                                   } catch (Exception e) {
+                                        e.printStackTrace();
                                    }
-                              } catch (Exception e) {
-                                   e.printStackTrace();
+                              } else {
+                                   continue;
                               }
                          }
                     });
@@ -171,15 +181,20 @@ public class Client {
                               
                               rollPressed = false;
                               moveSelected = false;
+                              myTurn = false;
 
                               boolean rosetta = false;
                               do {
                                    StringBuffer packetBuilder = new StringBuffer();
 
                                    while (!rollPressed) {
-                                        System.out.println("rolling...");
+                                        try {
+                                             wait();
+                                        } catch (Exception e) {
+                                             // IGNORE
+                                        }  
                                    }
-                                   // rollPressed = false;
+                                   rollPressed = false;
      
                                    System.out.println("TEST: Testing rolling functionality");
                                    int diceNum = rollAmount;
@@ -209,8 +224,13 @@ public class Client {
                                         }
                                         // System.out.println("WAITING FOR MOVE");
                                         while (!moveSelected) {
-                                             System.out.println("WAITING FOR INPUT");
+                                             try {
+                                                  wait();
+                                             } catch (Exception e) {
+                                                  // IGNORE
+                                             }  
                                         }
+                                        moveSelected = false;
 
                                         int[] move = Arrays.stream(info)
                                              .limit(4)
@@ -259,8 +279,6 @@ public class Client {
                                         // }
                                    }
                               } while (rosetta);
-                              
-                              myTurn = false; // Reset turn after sending message
 
                               SwingUtilities.invokeLater(new Runnable() {
                                    public void run() {

@@ -78,7 +78,7 @@ public class GameSession {
       * @param playerSocket The socket of the player to handle.
       * @param playerLabel A label identifying the player (e.g., "Player 1").
       */
-     private void handlePlayers(Socket p1Socket, Socket p2Socket) {
+     private void handlePlayers(Socket p1Socket, Socket p2Socket) throws IOException {
           // Send signal for client to know if they start first or wait for their turn first
           try (PrintWriter p1Out = new PrintWriter(p1Socket.getOutputStream(), true);
                BufferedReader p1In = new BufferedReader(new InputStreamReader(p1Socket.getInputStream()));
@@ -156,10 +156,14 @@ public class GameSession {
                p2Listener.start();
 
                while (true) {
-                    System.out.println("Server: Listening to messages");
+                    try {
+                         wait();
+                    } catch (Exception e) {
+                         // IGNORE
+                    } 
                }
           } catch (Exception e) {
-               
+               throw new IOException();
           } 
      }
 }
