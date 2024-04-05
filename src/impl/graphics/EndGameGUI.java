@@ -7,6 +7,7 @@ public class EndGameGUI extends JFrame{
     
     public EndGameGUI(String winningPlayer) {
         this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.winningPlayer = winningPlayer;
     }
 

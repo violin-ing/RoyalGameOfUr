@@ -128,11 +128,15 @@ public class Game {
             if (currentPlayer.equals("P1")) {
                 if (counter.getP1Score()==7) {
                     System.out.println("P1 WINS");
+                    new EndGameGUI(currentPlayer);
+                    gui.closeFrame();
                     break;
                 }
             } else {
                 if (counter.getP2Score()==7) {
                     System.out.println("P2 WINS");
+                    new EndGameGUI(currentPlayer);
+                    gui.closeFrame();
                     break;
                 }
             }
@@ -246,8 +250,6 @@ public class Game {
 
         newPos[0] = strip;
         newPos[1] = checkTileAfter;
-
-        System.out.println("new position found");
 
         return newPos;
     }
