@@ -1,11 +1,11 @@
 import java.util.*;
-
-import javax.swing.border.Border;
-
-// General notes:
-// anywhere with a "system.out.println" message should be replaced with a call to the GUI to display the message, use general intuition to determine 
-
+/**
+ * Game class which contains all the logic for running the game loop, calculating the available moves, getting
+ * available moves for the roll amount, and then executing gui updates based on the move recieved.
+ * This class also terminates the game loop once the win condition has been reached (a player has moved all their pieces off the board) 
+ */
 public class Game {
+    // initilising all attributes
     private static Board currentBoard;
     private static Counter counter;
     private Dice dice;
@@ -13,8 +13,6 @@ public class Game {
     private static GameGUI gui;
 
     public static boolean networkPlay = false;
-
-    //TEMP
     public int rollAmount;
     public boolean rollPressed = false;
     public boolean moveSelected = false;
@@ -22,36 +20,40 @@ public class Game {
 
     public boolean multiplayer = false;
 
+
+    /**
+     * Game constructor, this is called in GameStartGUI to start the game.
+     * All parameters passed in are initilised in GameStartGUI class.
+     * @param currentBoard Board object
+     * @param counter Counter object
+     * @param dice Dice object
+     * @param muliplayer boolean multiplayer,  if option is selected in StartMenuGUI
+     */
     public Game(Board currentBoard, Counter counter, Dice dice, boolean muliplayer) {
         Game.currentBoard = currentBoard;
         Game.counter = counter;
         this.dice = dice;
         this.multiplayer = muliplayer;
+        // create an Ai object.
         this.ai = new Ai();
     }
 
+    /**
+     * set GUI object, so that the Game class can call updates on the GameGUI.
+     * @param gameGui GameGUI object.
+     */
     public void setGameGUI(GameGUI gameGui) {
         Game.gui = gameGui;
     }
-
-    Scanner scanner = new Scanner(System.in);
-    Random random = new Random();
-    String rollInput = "";  //Placeholder value for gui, this checks if the necessary input was provided
-    String choiceInput = "";
-    
     /**
-         * Overall game loop
-         * Contains: 
-         *      The ability to check whose turn it is (import to see who to apply results to)
-         *      The ability to roll the dice
-         *      The ability to display legal moves
-         *      The ability to move the player to those legal positions if available
-         *      The ability to check the result of a players movement (takedown, score, movement)
-         *      The ability to check if a player has won
-    */
-
+     * returns current game Board.
+     * @return returns Board object, currentBoard.
+     */
     public static Board getCurrentBoard() {return currentBoard;}
-
+    /**
+     * gets the current counter object.
+     * @return Counter object.
+     */
     public static Counter getCounter() {return counter;}
         
     public void start() {
@@ -240,14 +242,6 @@ public class Game {
         int strip = stripPos[0];
         int movePosition = stripPos[1];
         
-        // for each position, we are going to find only the STRIP (0,1,2) and index (0-7) that it ends up in. 
-        // already know which player it is, so we just check for each valid move if:
-        // 1.) if you are in the p1strip / p2string: 
-        //        * take current position of a tile and add roll amount, if this is greater than the length of the first part of the strip
-        //        * otherwise you are just moving on this strip. 
-        // then when it comes to moving the chips, we already know where a particular tile will end up if selected
-        // so all we need to check is if its taking or stacking / ending up on a rosette 
-
         int checkTileAfter;
         if (strip == 1) {
             checkTileAfter = movePosition + roll;
@@ -278,16 +272,6 @@ public class Game {
     // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
     private static boolean isMoveable(String player, int roll, int movePosition, int strip) {
         // validiation of moves happens, here, so the above method can be simplified more easily.
-
-        // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].isRosetta();
-        // Tile tile = currentBoard.getBoardStrip(0,1,2 strip)[position of tile].getChip().getOwnership();
-
-        // find when chip is not movable:
-        // check if chip is moving onto a rosette tile
-        // check the tile its moving to by using: currentBoard, the strip its moving to (p1, p2, middle)
-        // if this rosette tile is unoccupied or has current player chip on it can move here.
-        // otherwise, this is not a valid move.
-        // Check if the tile before has a chip on it
         
         int checkTileAfter;
         if (strip == 1) {
