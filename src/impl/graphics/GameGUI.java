@@ -259,6 +259,7 @@ public class GameGUI extends JFrame {
         for (int i = 0; i < currentMovable.size(); i++) {
             // if current movable is -1. make sure to print token there
             // add token image if you can add a token to the screen
+            System.out.println("updating selectable tiles");
             if (currentMovable.get(i)[1]==-1) {
                 componentsArray[currentMovable.get(i)[0]][4].updateImage(1, player,true);
             }

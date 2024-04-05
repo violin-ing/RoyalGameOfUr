@@ -21,15 +21,15 @@ public class Game {
     public boolean multiplayer = false;
 
     public Game(Board currentBoard, Counter counter, Dice dice, boolean muliplayer) {
-        this.currentBoard = currentBoard;
-        this.counter = counter;
+        Game.currentBoard = currentBoard;
+        Game.counter = counter;
         this.dice = dice;
         this.multiplayer = muliplayer;
         this.ai = new Ai();
     }
 
     public void setGameGUI(GameGUI gameGui) {
-        this.gui = gameGui;
+        Game.gui = gameGui;
     }
 
     Scanner scanner = new Scanner(System.in);
@@ -69,7 +69,7 @@ public class Game {
             System.out.println("PICKING TURN");
             // ai player turn 
             if (!multiplayer && currentPlayer.equals("P2")) {
-                System.out.println("AI/NETWORK PLAYER PICKING MOVE");
+                System.out.println("AI PLAYER PICKING MOVE");
                 rollAmount = dice.roll();
                 gui.editP2Roll(rollAmount);
                 if (rollAmount!=0) {
@@ -148,40 +148,20 @@ public class Game {
         boolean possibleMoves;
         int currentPlayerCounter;
         
-        if (networkPlay) {
-            System.out.println("Moving for network play");
-            if (player.equals("P1")) {
-                currentPlayerCounter = Client.counter.getP1Counter();
-            } else {
-                currentPlayerCounter = Client.counter.getP2Counter();
-            }
+        if (player.equals("P1")) {
+            currentPlayerCounter = counter.getP1Counter();
         } else {
-            if (player.equals("P1")) {
-                currentPlayerCounter = counter.getP1Counter();
-            } else {
-                currentPlayerCounter = counter.getP2Counter();
-            }
+            currentPlayerCounter = counter.getP2Counter();
         }
 
-        if (networkPlay) {
-            List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, Client.currentBoard.identifyPieces(player), currentPlayerCounter);
-            List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
-            if (futurePositions.size()==0) {
-                possibleMoves = false;
-            } else {
-                possibleMoves = true;
-            }
-            Client.gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+        List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
+        List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
+        if (futurePositions.size()==0) {
+            possibleMoves = false;
         } else {
-            List<int[]> currentMovablePositions = getCurrentMovablePositions(player, roll, currentBoard.identifyPieces(player), currentPlayerCounter);
-            List<int[]> futurePositions = getFuturePositions(player, roll, currentMovablePositions);
-            if (futurePositions.size()==0) {
-                possibleMoves = false;
-            } else {
-                possibleMoves = true;
-            }
-            gui.updateSelectableTiles(currentMovablePositions, futurePositions);
+            possibleMoves = true;
         }
+        gui.updateSelectableTiles(currentMovablePositions, futurePositions);
 
         return possibleMoves;
     }
@@ -312,16 +292,6 @@ public class Game {
         }
 
         if (strip != 1 && checkTileAfter == 6) {
-            if (networkPlay) {
-                if (Client.currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
-                    String enemyPlayer = "P2";
-                    if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
-                        return true;
-                    } else if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals(enemyPlayer)) {
-                        return false;
-                    }
-                }
-            } else {
                 if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
                     String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
                     if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
@@ -331,7 +301,6 @@ public class Game {
                     }
                 }
             }
-        }
         return true;
     }
 }
