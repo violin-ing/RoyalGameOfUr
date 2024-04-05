@@ -6,6 +6,8 @@ public class Node {
     private Board board;
     private HashSet<String> moves;
     private int[] pos;
+    private int roll;
+    private Node parent;
     private List<Node> children;
 
     public Node(String type, double score, Board board, HashSet<String> moves, int[] pos) {
@@ -20,6 +22,13 @@ public class Node {
     public Node(String type, double score) {
         this.type = type;
         this.score = score;
+        this.children = new ArrayList<>();
+    }
+
+    public Node(String type, double score, int roll) {
+        this.type = type;
+        this.score = score;
+        this.roll = roll;
         this.children = new ArrayList<>();
     }
 
@@ -41,6 +50,18 @@ public class Node {
 
     public int[] getPos() {
         return this.pos;
+    }
+
+    public int getRoll() {
+        return this.roll;
+    }
+
+    public Node getParent() {
+        return this.parent;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
     }
 
     public List<Node> getChildren() {

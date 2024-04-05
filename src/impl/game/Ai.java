@@ -11,7 +11,7 @@ public class Ai {
     public static String p2 = "P2";
 
     //String[] moves = {"MOVE", "ROSETTE", "ADD CHIP", "STACK", "TAKE CHIP", "WIN", "BLOCK"};
-    static String[] moves = {"MOVE", "TAKE CHIP", "STACK", "ADD CHIP"};
+    //static String[] moves = {"MOVE", "TAKE CHIP", "STACK", "ADD CHIP"};
     static String[] tactics = {"SPEEDY", "HOSTILE", "ATTRITION", "SNEAKY"};
 
     // different game tactics in order of move priority
@@ -39,24 +39,13 @@ public class Ai {
         return this.root;
     }
 
-
-    public Map<String, String> mapScores() {
-        //behaviour = new HashMap<>();
-
-        for (int i = 0; i < tactics.length; i++) {
-            behaviour.put(tactics[i], moves[i]);
-        }
-        System.out.println(behaviour);
-        return behaviour;
-    }
-
     public Board createTempBoard(Board board, String player, int[] currentPos, int[] futurePos) {
         Board tempBoard = board;
 
         int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
         System.out.println(move);
 
-        tempBoard.move(move, player);
+        tempBoard.move(move, player, false);
 
         return tempBoard;
     }
@@ -66,7 +55,7 @@ public class Ai {
         
         Board tempBoard = board;
 
-        return tempBoard.move(move, player);
+        return tempBoard.move(move, player, false);
     }
 
     public Node createTree(int roll) {
@@ -86,7 +75,10 @@ public class Ai {
         for (int i = 0; i < maxFuturePositions.size(); i++) { 
             maxBoards.add(createTempBoard(Game.getCurrentBoard(), p2, maxCurrentMovablePositions.get(i), maxFuturePositions.get(i)));
         }
-        
+
+        if (maxBoards.isEmpty()) {
+            return root;
+        }
 
         Queue<Node> queue = new LinkedList<>();
         queue.add(root); // Add the root node to the queue
@@ -98,51 +90,30 @@ public class Ai {
             for (int i = 0; i < levelSize; i++) {
                 Node currentNode = queue.poll(); // Get the current node from the queue
 
-                if (LEVELS == 3) {
-                    for (int j = 0; j < ROLL_PERCENTAGES.length; j++) {
-    
-                        Node childNode = new Node(currentNode.getNextType(), 0);
-    
-                        currentNode.addChild(childNode); // Add the child node to the current node
-                        queue.add(childNode); // Add the child node to the queue for further processing
-                    }
-                } else if (LEVELS == 4) {
-                    for (int j = 0; j < maxBoards.size(); j++) {
+                switch (LEVELS) {
+                    case 4: // root level --> ai moves
+                        calculateMaxNodes(currentNode, queue, maxBoards, maxCurrentMovablePositions, maxFuturePositions);
+                        break;
 
-                        HashSet<String> movesList = getMoveTypes(maxBoards.get(j), p2, maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
-                        int[] pos = getPos(maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
+                    case 3: // ai moves level --> player rolls 
+                        calculateRollNodes(currentNode, queue);
+                        break;
 
-                        Node childNode = new Node(currentNode.getNextType(), 0, maxBoards.get(j), movesList, pos);
+                    case 2: // player rolls --> player moves
+                        Board parentMaxBoard = currentNode.getParent().getBoard();
 
-                        currentNode.addChild(childNode); // Add the child node to the current node
-                        queue.add(childNode); // Add the child node to the queue for further processing
-    
-                    }
-                } else if (LEVELS == 2) {
-                    int maxBoardsSize = maxBoards.size();
-                    int count = 0;
+                        List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, currentNode.getRoll(), parentMaxBoard.identifyPieces(p1), Game.getCounter().getP1Counter());
+                        List<int[]> minFuturePositions = Game.getFuturePositions(p1, currentNode.getRoll(), minCurrentMovablePositions);
 
-                    while (count < maxBoardsSize) {
-                        for (int playerRoll = 1; playerRoll < 5; playerRoll++) {
-                            List<int[]> minCurrentMovablePositions = Game.getCurrentMovablePositions(p1, playerRoll, maxBoards.get(count).identifyPieces(p1), Game.getCounter().getP1Counter());
-                            List<int[]> minFuturePositions = Game.getFuturePositions(p1, playerRoll, minCurrentMovablePositions);
+                        List<Board> minBoards = new ArrayList<>();
 
-                            for (int j = 0; j < maxBoards.size(); j++) { 
-
-                                Board minBoard = createTempBoard(maxBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
-
-                                HashSet<String> movesList = getMoveTypes(minBoard, p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
-                                int[] pos = getPos(minCurrentMovablePositions.get(j), minFuturePositions.get(j));
-
-                                Node childNode = new Node(currentNode.getNextType(), getScore(movesList), minBoard, movesList, pos);
-
-                                currentNode.addChild(childNode); // Add the child node to the current node
-                                queue.add(childNode); // Add the child node to the queue for further processing
-
-                            }
+                        for (int j = 0; j < minFuturePositions.size(); j++) { 
+                            minBoards.add(createTempBoard(parentMaxBoard, p2, minCurrentMovablePositions.get(j), minFuturePositions.get(j)));
                         }
-                        count++;
-                    }
+
+                        calculateMinNodes(currentNode, queue, minBoards, minCurrentMovablePositions, minFuturePositions);
+                        break;
+
                 }
             }
             
@@ -151,6 +122,51 @@ public class Ai {
 
         return root;
 
+    }
+
+    public void calculateMaxNodes(Node currentNode, Queue<Node> queue, List<Board> maxBoards, List<int[]> maxCurrentMovablePositions, List<int[]> maxFuturePositions) {
+        for (int j = 0; j < maxBoards.size(); j++) {
+
+            HashSet<String> movesList = getMoveTypes(maxBoards.get(j), p2, maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
+            int[] pos = getPos(maxCurrentMovablePositions.get(j), maxFuturePositions.get(j));
+
+            Node childNode = new Node(currentNode.getNextType(), 0, maxBoards.get(j), movesList, pos);
+            childNode.setParent(currentNode);
+
+            currentNode.addChild(childNode); // Add the child node to the current node
+            queue.add(childNode); // Add the child node to the queue for further processing
+
+        }
+    }
+
+    public void calculateMinNodes(Node currentNode, Queue<Node> queue, List<Board> minBoards, List<int[]> minCurrentMovablePositions, List<int[]> minFuturePositions) {
+        for (int j = 0; j < minBoards.size(); j++) { 
+
+            HashSet<String> movesList = getMoveTypes(minBoards.get(j), p1, minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+            int[] pos = getPos(minCurrentMovablePositions.get(j), minFuturePositions.get(j));
+
+            Node childNode = new Node(currentNode.getNextType(), getScore(movesList), minBoards.get(j), movesList, pos);
+            childNode.setParent(currentNode);
+
+            currentNode.addChild(childNode); // Add the child node to the current node
+            queue.add(childNode); // Add the child node to the queue for further processing
+
+        }
+    }
+
+    public void calculateRollNodes(Node currentNode, Queue<Node> queue) {
+        if (currentNode.getMoves().contains("ROSETTE")) {
+            // If "rosette" is present, do not create child nodes
+            return;
+        }
+
+        for (int j = 1; j < ROLL_PERCENTAGES.length; j++) {
+            Node childNode = new Node(currentNode.getNextType(), 0, j);
+            childNode.setParent(currentNode);
+        
+            currentNode.addChild(childNode); // Add the child node to the current node
+            queue.add(childNode); // Add the child node to the queue for further processing
+        }
     }
 
     public int[] getPos(int[] currentPos, int[] futurePos) { 
