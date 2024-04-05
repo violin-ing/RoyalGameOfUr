@@ -1,9 +1,14 @@
 import java.util.Random;
-
+/**
+ * Dice class handles random dice rolls
+ */
 public class Dice {
     private Random random = new Random();
 
-    //Faithful recreation of the dice roll mechanic, rolls 4 dice (with 50/50 odds to land on a point or not, for each point landed on, 1 movement point is added)
+    /**
+     * generates a random number for a roll between 0-4
+     * @return integer number for roll amount (0-4)
+     */
     public int roll() {
         int totalPoints = 0;
         

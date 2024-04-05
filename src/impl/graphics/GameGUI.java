@@ -5,26 +5,32 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 import javax.swing.*;
-
+/**
+ * Represents the graphical user interface for the game.
+ * Extends JFrame to create the game window.
+ */
 public class GameGUI extends JFrame {
     private static final int WINDOWWIDTH = 1200;
     private static final int WINDOWHEIGHT = 1000;
-    private String player;
-    private Dice dice = new Dice();
-    private Game game;
-    private Client client;
-    private JButton rollButtonP1;
-    private JLabel rollAmountP1;
-    private JLabel rollAmountP2;
-    private JButton rollButtonP2;
-    private GraphicsButton[][] buttonArray;
-    private GraphicsTile[][] componentsArray;
-    private JLabel scoreP1;
-    private JLabel scoreP2;
+    private String player; // Current player
+    private Dice dice = new Dice(); // Dice object for rolling
+    private Game game; // Game object
+    private Client client; // Client object for network play
+    private JButton rollButtonP1; // Roll button for player 1
+    private JLabel rollAmountP1; // Roll amount label for player 1
+    private JLabel rollAmountP2; // Roll amount label for player 2
+    private JButton rollButtonP2; // Roll button for player 2
+    private GraphicsButton[][] buttonArray; // Array of graphical buttons representing tiles
+    private GraphicsTile[][] componentsArray; // Array of graphical tiles
+    private JLabel scoreP1; // Score label for player 1
+    private JLabel scoreP2; // Score label for player 2
+    private boolean networkPlay = false; // Flag indicating network play mode
 
-    private boolean networkPlay = false;
-
-    // sets up the game screen on first run.
+    /**
+     * Constructs a GameGUI object for single player mode.
+     * Initializes the game screen and adds required components.
+     * @param game The Game object.
+     */
     public GameGUI(Game game) {
         this.game = game;
         this.setLayout(null);
@@ -35,6 +41,11 @@ public class GameGUI extends JFrame {
         addComponents();
         setVisible(true);
     }
+    /**
+     * Constructs a GameGUI object for network play mode.
+     * Initializes the game screen and adds required components.
+     * @param client The Client object.
+     */
     public GameGUI(Client client) {
         this.networkPlay = true;
         this.client = client;
@@ -47,7 +58,10 @@ public class GameGUI extends JFrame {
         setVisible(true);
     }
 
-    // adds all required components to the screen.
+    /**
+     * Adds all required components to the game screen.
+     * Tiles, buttons, roll buttons, roll amount labels, and score labels are added to the screen.
+     */
     public void addComponents() {
         componentsArray = new GraphicsTile[3][8];
         buttonArray = new GraphicsButton[3][8];
@@ -96,6 +110,11 @@ public class GameGUI extends JFrame {
         this.add(scoreP2);
     }
 
+    /**
+     * Changes the player turn based on the current player.
+     * Enables or disables roll buttons accordingly.
+     * @param player The current player.
+     */
     public void changePlayerTurn(String player) {
         this.player = player;
         if (player.equals("P1")) {
@@ -106,7 +125,11 @@ public class GameGUI extends JFrame {
             rollButtonP2.setEnabled(true);
         }
     }
-
+    /**
+     * Updates the roll amount label for the specified player.
+     * @param player The player ("P1" or "P2").
+     * @param rollAmount The roll amount to be displayed.
+     */
     public void updateRollLabel(String player, int rollAmount) {
         if (player.equals("P1")) {
             rollAmountP1.setText(rollAmount+"");
@@ -115,20 +138,35 @@ public class GameGUI extends JFrame {
         }
     }
 
-    // For singleplayer and multiplayer (network) game modes
+    /**
+     * Disables the roll button for player 2.
+     * Applicable for both singleplayer and multiplayer (network) game modes.
+     */
     public void disableP2() {
         rollButtonP2.setEnabled(false);
     }
 
-    // For singleplayer and multiplayer (network) game modes
+    /**
+     * Enables or disables the roll button for player 1.
+     * Applicable for both singleplayer and multiplayer (network) game modes.
+     * @param switcher Boolean value to set the button enabled or disabled.
+     */
     public void switchP1RollButton(boolean switcher) {
         rollButtonP1.setEnabled(switcher);
     }
 
+    /**
+     * Updates the roll amount label for player 2.
+     * @param roll The roll amount for player 2.
+     */
     public void editP2Roll(int roll) {
         rollAmountP2.setText("" + roll);
     }
-
+    /**
+     * Adds action listener to the roll button.
+     * @param rollbutton The roll button.
+     * @param rollAmountText The roll amount label.
+     */
     public void rollButtonActionListener(JButton rollbutton, JLabel rollAmountText) {
         rollbutton.addActionListener(new ActionListener() {
             @Override
@@ -154,7 +192,11 @@ public class GameGUI extends JFrame {
             }
         });
     }
-
+    /**
+     * Adds mouse listener to the graphic buttons.
+     * Handles chip selection and move actions.
+     * @param button The graphic button.
+     */
     public void addButtonActionListener(GraphicsButton button) {
         button.addMouseListener(new MouseListener() {
             
@@ -201,7 +243,13 @@ public class GameGUI extends JFrame {
             }
         });
     }
-
+    /**
+     * Sets buttons invisible except for the ones related to the current move.
+     * @param moveFromStrip The strip from which the chip is moved.
+     * @param moveFromLocation The location from which the chip is moved.
+     * @param moveToStrip The strip to which the chip is moved.
+     * @param moveToLocation The location to which the chip is moved.
+     */
     public void setButtonsInvisible(int moveFromStrip, int moveFromLocation, int moveToStrip, int moveToLocation) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 8; j++) {
@@ -216,8 +264,9 @@ public class GameGUI extends JFrame {
         }
     }
 
-    // this method is called if a button is already selected and the player selected another chip
-    // this will reset all the selected and selectable properties of the buttons.
+    /**
+     * Resets all selected and selectable properties of the buttons when a button is already selected and the player selects another chip.
+     */
     public void resetChipSelection() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 8; j++) {
@@ -230,7 +279,10 @@ public class GameGUI extends JFrame {
             }
         }
     }
-
+    /**
+     * Sends move information to the game object.
+     * @param button The graphic button representing the move.
+     */
     public void sendMoveInformation(GraphicsButton button) {
         game.move[0] = button.getMoveFromStrip();
         game.move[1] = button.getMoveFromLocation();
@@ -238,7 +290,10 @@ public class GameGUI extends JFrame {
         game.move[3] = button.getMoveLocation();
         game.moveSelected = true;
     }
-
+    /**
+     * Sends move information to the client object for network play.
+     * @param button The graphic button representing the move.
+     */
     public void sendClientMoveInfo(GraphicsButton button) {
         client.info[0] = String.valueOf(button.getMoveFromStrip());
         client.info[1] = String.valueOf(button.getMoveFromLocation());
@@ -246,12 +301,18 @@ public class GameGUI extends JFrame {
         client.info[3] = String.valueOf(button.getMoveLocation());
         Client.moveSelected = true;
     } 
-
+    /**
+     * Closes the frame associated with the game GUI.
+     */
     public void closeFrame() {
         this.setVisible(false);
         this.dispose();
     }
-
+    /**
+     * Updates the selectable tiles on the game board based on the current movable and future movable positions.
+     * @param currentMovable List of current movable positions.
+     * @param futureMovable List of future movable positions.
+     */
     public void updateSelectableTiles(List<int[]> currentMovable, List<int[]> futureMovable) {
         // System.out.println("Number of moves: " + currentMovable.size());
         // System.out.println("Number of future moves: " + futureMovable.size());
@@ -275,7 +336,11 @@ public class GameGUI extends JFrame {
             buttonArray[currentMovePos[0]][currentMovePos[1]].setChipButtonsMoveButton(futureMovePos[0], futureMovePos[1]);
         }
     }
-    // converts position of tile in strips to a position in the graphicbutton array.
+    /**
+     * Converts the position of a tile in strips to a position in the graphic button array.
+     * @param stripPlace The position of the tile in strips.
+     * @return An array containing the position of the tile in the graphic button array.
+     */
     public int[] getButtonArrayPosition(int[] stripPlace) {
         int[] positionInArray = new int[2];
         positionInArray[0] = stripPlace[0];
@@ -296,12 +361,18 @@ public class GameGUI extends JFrame {
         }
         return positionInArray;
     }
-
+    /**
+     * Updates the score display on the game GUI based on the given counter.
+     * @param counter The counter object containing score information.
+     */
     public void updateScore(Counter counter) {
         scoreP1.setText("Score: " + counter.getP1Counter() + "-" + counter.getP1Score());
         scoreP2.setText("Score: " + counter.getP2Counter() + "-" + counter.getP2Score());
     }
-
+    /**
+     * Updates the graphical representation of the game board based on the current board state.
+     * @param currentBoard The current state of the game board.
+     */
     public void updateBoard(Board currentBoard) {
         // this will update the sprites on the board after a move has been made.
         // update side strips:
