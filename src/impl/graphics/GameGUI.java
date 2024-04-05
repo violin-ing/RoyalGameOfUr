@@ -268,7 +268,6 @@ public class GameGUI extends JFrame {
             int[] futureMovePos = getButtonArrayPosition(futureMovable.get(i));
 
             buttonArray[currentMovePos[0]][currentMovePos[1]].setButtonSelectable();
-            System.out.println("Set button selectable");
             // make sure the future position and position of the future path are stored correctly.
             buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveFromLocation(currentMovable.get(i)[0], currentMovable.get(i)[1]);
             buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveToLocation(futureMovable.get(i)[0], futureMovable.get(i)[1]);

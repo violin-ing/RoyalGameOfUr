@@ -48,6 +48,7 @@ public class GraphicsButton extends JButton {
     public boolean checkIsChipSelection() {return chipSelection;}
 
     public void setButtonSelectable() {
+        System.out.println("Set button selectable");
         this.setBorder(BorderFactory.createLineBorder(Color.GREEN,5));
         this.setEnabled(true);
         this.setVisible(true);
