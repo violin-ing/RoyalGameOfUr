@@ -137,6 +137,10 @@ public class Client {
                                                        move[2] = 1;
                                                   }
 
+                                                  if (move[3] >= 6) {
+                                                       move[3] = 6;
+                                                  }
+
                                                   currentBoard.move(move, "P2");
 
                                                   // System.out.println("hello there 1");
@@ -251,15 +255,16 @@ public class Client {
                                                   // 1. Chip's old position (strip + index)
                                                   // 2. Chip's new position (strip + index)
                                                   // 3. Rosetta boolean (of chip's new position)
-                                                  Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
-                                                  if (newTile.isRosetta()) {
-                                                       info[4] = "true";
-                                                       rosetta = true;
-                                                  } else {
-                                                       info[4] = "false";
-                                                       rosetta = false;
+                                                  if (! (newIndex >= 6)) {
+                                                       Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
+                                                       if (newTile.isRosetta()) {
+                                                            info[4] = "true";
+                                                            rosetta = true;
+                                                       } else {
+                                                            info[4] = "false";
+                                                            rosetta = false;
+                                                       }
                                                   }
-                                                  
                                                   for (int i = 0; i < info.length; i++) {
                                                        packetBuilder.append("," + info[i]);
                                                   }
