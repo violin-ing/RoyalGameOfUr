@@ -285,7 +285,7 @@ public class Game {
             }
         }
 
-        if (strip != 1 && checkTileAfter == 6) {
+        if (strip == 1) {
                 if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
                     String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
                     if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {

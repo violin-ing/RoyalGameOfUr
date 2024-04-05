@@ -332,7 +332,7 @@ public class GameGUI extends JFrame {
             }
         }
         //middle string
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             componentsArray[1][i].updateImage(middleStrip[i].getChip().getAmn(), middleStrip[i].getChip().getOwnership(),false);
         }
         // reset the properties of the buttons.

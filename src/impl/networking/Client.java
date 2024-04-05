@@ -471,7 +471,7 @@ public class Client {
               }
           }
   
-          if (strip != 1 && checkTileAfter == 6) {
+          if (strip == 1) {
                   if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
                       String enemyPlayer = "P2";
                       if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {
