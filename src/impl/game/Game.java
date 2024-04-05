@@ -117,7 +117,7 @@ public class Game {
                     // }
                 }
             }
-            currentBoard.move(move, currentPlayer);
+            currentBoard.move(move, currentPlayer, true);
             System.out.println("update the board");
             gui.updateBoard(currentBoard);
             gui.updateScore(counter);
@@ -167,8 +167,6 @@ public class Game {
     }
 
     // this will check if a particular chip on the board is movable.
-    // TODO: make a method which will calculate where this particular piece will be moved (edit the above method).
-
     public static List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {
         List<int[]> currentMovablePositions = new ArrayList<>();
         int[] stringPos = new int[2];
@@ -268,8 +266,6 @@ public class Game {
         // if this rosette tile is unoccupied or has current player chip on it can move here.
         // otherwise, this is not a valid move.
         // Check if the tile before has a chip on it
-
-        //TODO: MAKE THIS A METHOD BELOW 
         
         int checkTileAfter;
         if (strip == 1) {

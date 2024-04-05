@@ -60,7 +60,7 @@ public class Board {
     public Tile[] getBoardStrip(int index) {return this.board[index];}
     public Tile[][] getBoard() {return this.board;}
 
-    public HashSet<String> move(int[] moveChoice, String player) {
+    public HashSet<String> move(int[] moveChoice, String player, boolean changePlayer) {
         Tile movingFromTile;
         Tile movingToTile;
         boolean addedChip  = false;
@@ -95,7 +95,7 @@ public class Board {
             movingToTile.getChip().setOwnership(player);
             moveType.add("ADD CHIP");
 
-            if (movingToTile.isRosetta()) {
+            if (movingToTile.isRosetta() && changePlayer) {
                 // this has the effect of giving the player another turn.
                 counter.getPlayerTurn();
                 moveType.add("ROSETTA");
@@ -123,7 +123,7 @@ public class Board {
                 moveType.add("MOVE");
             }
             // give player another turn if this is a rosetta.
-            if (movingToTile.isRosetta()) {
+            if (movingToTile.isRosetta() && changePlayer) {
                 counter.getPlayerTurn();
                 moveType.add("ROSETTA");
             }

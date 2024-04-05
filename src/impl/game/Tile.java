@@ -17,6 +17,4 @@ public class Tile {
         this.rosetta = true;
     }
     
-
-    // TODO: add a method to check if the tile is a rosetta, and invoke the "getPlayerTurn" method so that it toggles the player turn (which will be toggled again later) to allow for a repeat turn
 }
