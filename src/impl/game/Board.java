@@ -2,20 +2,27 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * Represents the game board of a board game. The board is divided into three strips: one for each player and a middle strip.
+ * Each strip contains a series of tiles, and each tile can hold a chip. The board tracks the positions of all chips and manages
+ * the movement of chips according to the game rules. It supports operations such as moving chips between tiles, adding new chips
+ * to the board, and removing chips as they reach the end of their path.
+ */
 public class Board {
-    private Counter counter;
+    private Counter counter; // The counter object associated with this board.
     
-    private Tile[] p1Strip = new Tile[6];
-    private Tile[] midStrip = new Tile[8];
-    private Tile[] p2Strip = new Tile[6];
+    private Tile[] p1Strip = new Tile[6]; // The strip of tiles for player 1.
+    private Tile[] midStrip = new Tile[8]; // The middle strip of tiles, shared by both players.
+    private Tile[] p2Strip = new Tile[6]; // The strip of tiles for player 2.
     
-    // Create an aray of strips, has three positions, 0 for p1, 1 for mid, 2 for p2]
-    private Tile[][] board;
+    private Tile[][] board; // An array of tile strips, representing the entire board.
 
-    // Constructor for the board, initializes each strip with a tile in each positon (which itself contains a chip)
-    // The chip is initialized with ownership "none" and amount 0, and the position is set to the index of the tile
-    // We then form a board 2D array with the initialised strips
-    
+    /**
+     * Constructs a new Board object with the specified Counter. Initializes the strips with tiles,
+     * setting each tile's chip to have "none" ownership and zero amount initially. Special "rosetta" tiles are also marked.
+     * 
+     * @param counter The Counter object to be used with this board.
+     */
     public Board(Counter counter) {
         this.counter = counter;
         for (int i = 0; i < p1Strip.length; i++) 
@@ -49,15 +56,39 @@ public class Board {
         board = new Tile[][] {p1Strip, midStrip, p2Strip};  //Creates an array of strips, 0 for p1, 1 for mid, 2 for p2
     }
 
+    /**
+     * Constructs a Board object as a deep copy of another Board object.
+     * 
+     * @param board The Board object to copy.
+     */
     public Board(Board board) {
         this.board = board.getBoard();
     }
 
 
-    //Returns a strip of the board specified by the index
+    /**
+     * Returns the specified strip of the board.
+     * 
+     * @param index The index of the strip to return (0 for p1Strip, 1 for midStrip, 2 for p2Strip).
+     * @return The Tile array representing the requested strip of the board.
+     */
     public Tile[] getBoardStrip(int index) {return this.board[index];}
+
+    /**
+     * Returns the 2D array representing the entire board.
+     * 
+     * @return A 2D Tile array representing the board.
+     */
     public Tile[][] getBoard() {return this.board;}
 
+    /**
+     * Moves a chip from one tile to another, based on the provided move choice and the player making the move.
+     * Handles different move types including adding new chips, removing chips (scoring), and moving or stacking chips on tiles.
+     * 
+     * @param moveChoice An array representing the move (from strip, from position, to strip, to position).
+     * @param player The player making the move.
+     * @return A HashSet<String> indicating the types of move made (e.g., "WIN", "STACK", "MOVE").
+     */
     public HashSet<String> move(int[] moveChoice, String player) {
         Tile movingFromTile;
         Tile movingToTile;
@@ -134,6 +165,14 @@ public class Board {
         return moveType;
     }
 
+    /**
+     * Overloaded move method that also considers whether to change the player's turn after the move.
+     * 
+     * @param moveChoice An array representing the move (from strip, from position, to strip, to position).
+     * @param player The player making the move.
+     * @param changePlayer A boolean indicating whether to change the player's turn after the move.
+     * @return A HashSet<String> indicating the types of move made (e.g., "WIN", "STACK", "MOVE").
+     */
     public HashSet<String> move(int[] moveChoice, String player, boolean changePlayer) {
         Tile movingFromTile;
         Tile movingToTile;
@@ -219,6 +258,12 @@ public class Board {
         return moveType;
     }
 
+    /**
+     * Identifies and returns a list of all positions occupied by the specified player's chips.
+     * 
+     * @param player The player whose chips to identify.
+     * @return A list of int arrays, each representing the strip and position of a chip.
+     */
     public List<int[]> identifyPieces(String player) {
         List<int[]> pieces = new ArrayList<>();
 
