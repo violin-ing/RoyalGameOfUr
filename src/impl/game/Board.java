@@ -1,15 +1,9 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 public class Board {
     private Counter counter;
-    
-    private int lengthOfPlayerStrip = 6;
-    private int lengthOfPlayerStripSectionOne = 4;
-    private int lengthOfMidStrip = 8;
     
     private Tile[] p1Strip = new Tile[6];
     private Tile[] midStrip = new Tile[8];

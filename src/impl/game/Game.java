@@ -144,6 +144,18 @@ public class Game {
                     break;
                 }
             }
+
+            List<int[]> pieces = currentBoard.identifyPieces("P1");
+            System.out.println("pieces p1");
+            for (int[] pos : pieces) {
+                System.out.println(Arrays.toString(pos));
+            }
+
+            List<int[]> pieces2 = currentBoard.identifyPieces("P2");
+            System.out.println("pieces p2");
+            for (int[] pos : pieces2) {
+                System.out.println(Arrays.toString(pos));
+            }
         }
     }
     
