@@ -106,10 +106,10 @@ public class Client {
                                              System.out.println("from opponent: " + opponentPkt);
                                              String[] infoPkt = opponentPkt.split(",");
                                              if (infoPkt.length == 2) {
-                                                  System.out.println("\ninfo length = 2");
+                                                  System.out.println("info length = 2");
                                                   myTurn = true;
                                              } else if (infoPkt.length == 6) {
-                                                  System.out.println("\ninfo length = 6");
+                                                  System.out.println("info length = 6");
                                                   String rosetta = infoPkt[5];
 
                                                   if ("true".equals(rosetta)) {
@@ -117,6 +117,8 @@ public class Client {
                                                   } else {
                                                        myTurn = true;
                                                   }
+
+                                                  Thread.sleep(500);
 
                                                   // Stream packet array into a usable int[] array
                                                   String[] moveStr = {infoPkt[1], infoPkt[2], infoPkt[3], infoPkt[4]};
@@ -127,15 +129,19 @@ public class Client {
 
                                                   if (moveStr[0].equals("0")) {
                                                        move[0] = 2;
-                                                  } else {
+                                                  } else if (moveStr[0].equals("1")) {
                                                        move[0] = 1;
                                                   }
                                                   
                                                   if (moveStr[2].equals("0")) {
                                                        move[2] = 2;
-                                                  } else {
-                                                       move[0] = 1;
+                                                  } else if (moveStr[2].equals("1")) {
+                                                       move[2] = 1;
                                                   }
+
+                                                  if (move[3] >= 6 && (move[2] == 0 || move[2] == 2)){
+                                                       myTurn = true;
+                                                  } 
 
                                                   currentBoard.move(move, "P2");
 
@@ -179,7 +185,7 @@ public class Client {
                                         myTurn = false;
           
                                         boolean rosetta = false;
-                                        do {
+                                        // do {
                                              StringBuffer packetBuilder = new StringBuffer();
           
                                              while (!rollPressed) {
@@ -251,15 +257,19 @@ public class Client {
                                                   // 1. Chip's old position (strip + index)
                                                   // 2. Chip's new position (strip + index)
                                                   // 3. Rosetta boolean (of chip's new position)
-                                                  Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
-                                                  if (newTile.isRosetta()) {
-                                                       info[4] = "true";
-                                                       rosetta = true;
-                                                  } else {
-                                                       info[4] = "false";
-                                                       rosetta = false;
+                                                  System.out.println("New Strip: " + newStrip);
+                                                  System.out.println("New Index: " + newIndex);
+
+                                                  if (! (newIndex >= 6 && newStrip != 1)) {
+                                                       Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
+                                                       if (newTile.isRosetta()) {
+                                                            info[4] = "true";
+                                                            rosetta = true;
+                                                       } else {
+                                                            info[4] = "false";
+                                                            rosetta = false;
+                                                       }
                                                   }
-                                                  
                                                   for (int i = 0; i < info.length; i++) {
                                                        packetBuilder.append("," + info[i]);
                                                   }
@@ -278,11 +288,12 @@ public class Client {
 
                                              if (rosetta) {
                                                   myTurn = true;
-                                                  rosetta = true;
+                                                  rosetta = false;
                                                   rollPressed = false;
+                                                  moveSelected = false;
                                                   continue;
                                              }
-                                        } while (rosetta);
+                                        // } while (rosetta);
           
                                         SwingUtilities.invokeLater(new Runnable() {
                                              public void run() {
@@ -318,131 +329,6 @@ public class Client {
                     }
 
                     serverListener.start();
-
-                    // Main thread deals with sending messages to server
-                    // while (true) {
-                    //      if (myTurn) {
-                    //           gui.changePlayerTurn("P1");
-                              
-                    //           rollPressed = false;
-                    //           moveSelected = false;
-                    //           myTurn = false;
-
-                    //           boolean rosetta = false;
-                    //           do {
-                    //                StringBuffer packetBuilder = new StringBuffer();
-
-                    //                while (!rollPressed) {
-                    //                     try {
-                    //                          wait();
-                    //                     } catch (Exception e) {
-                    //                          // IGNORE
-                    //                     }  
-                    //                }
-                    //                rollPressed = false;
-     
-                    //                System.out.println("TEST: Testing rolling functionality");
-                    //                int diceNum = rollAmount;
-                    //                System.out.println(rollAmount);
-     
-                    //                String diceRoll = Integer.toString(diceNum);
-                    //                packetBuilder.append(diceRoll);
-
-                    //                // System.out.println("diceNum String = " + diceRoll);
-
-                    //                if (diceNum == 0) {
-                    //                     out.println("0,nil");
-                    //                     System.out.println("sent nil packet");
-                    //                     myTurn = false;
-                    //                     rosetta = false;
-                    //                     continue;
-                    //                } else {
-                    //                     // System.out.println("diceNum = " + diceRoll);
-                    //                     if (!availableMoves("P1", diceNum)) {
-                    //                          System.out.println("no moves avail");
-                    //                          packetBuilder.append(",nil");
-                    //                          out.println(packetBuilder.toString());
-                    //                          System.out.println("sent nil packet");
-                    //                          rosetta = false;
-                    //                          myTurn = false;
-                    //                          continue;
-                    //                     }
-                    //                     // System.out.println("WAITING FOR MOVE");
-                    //                     while (!moveSelected) {
-                    //                          try {
-                    //                               wait();
-                    //                          } catch (Exception e) {
-                    //                               // IGNORE
-                    //                          }  
-                    //                     }
-                    //                     moveSelected = false;
-
-                    //                     int[] move = Arrays.stream(info)
-                    //                          .limit(4)
-                    //                          .mapToInt(Integer::parseInt)
-                    //                          .toArray();
-
-                    //                     currentBoard.move(move, "P1");
-                    //                     System.out.println("update the board");
-
-                    //                     SwingUtilities.invokeLater(new Runnable() {
-                    //                          public void run() {
-                    //                               gui.updateBoard(currentBoard);
-                    //                               gui.updateScore(counter);
-                    //                          }
-                    //                      });
-
-                    //                     int newStrip = move[2];
-                    //                     int newIndex = move[3];
-
-                    //                     // INFORMATION TO SEND:
-                    //                     // 1. Chip's old position (strip + index)
-                    //                     // 2. Chip's new position (strip + index)
-                    //                     // 3. Rosetta boolean (of chip's new position)
-                    //                     Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
-                    //                     if (newTile.isRosetta()) {
-                    //                          info[4] = "true";
-                    //                          rosetta = true;
-                    //                     } else {
-                    //                          info[4] = "false";
-                    //                          rosetta = false;
-                    //                     }
-                                        
-                    //                     for (int i = 0; i < info.length; i++) {
-                    //                          packetBuilder.append("," + info[i]);
-                    //                     }
-                    //                     out.println(packetBuilder.toString());
-                    //                     System.out.println("sent move packet");
-                    //                     System.out.println(packetBuilder.toString());
-                    //                     // packetBuilder = {
-                    //                     //      diceRoll, 
-                    //                     //      oldStrip, 
-                    //                     //      oldIndex, 
-                    //                     //      newStrip, 
-                    //                     //      newIndex, 
-                    //                     //      "true"/"false"
-                    //                     // }
-                    //                }
-                    //           } while (rosetta);
-
-                    //           SwingUtilities.invokeLater(new Runnable() {
-                    //                public void run() {
-                    //                     gui.changePlayerTurn("P2");
-                    //                     gui.disableP2();
-                    //                }
-                    //            });
-                              
-                    //           if (counter.getP1Score() >= 7) {
-                    //                SwingUtilities.invokeLater(() -> {
-                    //                     gui.closeFrame();
-                    //                });
-                    //                ClientWinGUI.display("You have won the game!");
-                    //                serverListener.interrupt();
-                    //                heartbeatSender.interrupt();
-                    //                return;
-                    //           }
-                    //      }
-                    // }
 
                     while (true) {
                          try {
@@ -548,9 +434,6 @@ public class Client {
                       checkTileAfter = (checkTileAfter - 4); // Position on new strip
                       strip = ("P1".equals(player)) ? 0 : 2;
               }
-              if (checkTileAfter > 5) {
-                  checkTileAfter = 6;
-              }
           } else {
               checkTileAfter = movePosition + roll;
               if (movePosition>=4) {
@@ -588,7 +471,7 @@ public class Client {
               }
           }
   
-          if (strip != 1 && checkTileAfter == 6) {
+          if (strip == 1) {
                   if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
                       String enemyPlayer = "P2";
                       if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {

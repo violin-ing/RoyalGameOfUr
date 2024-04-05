@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 public class Ai {
     private Node root;
     public static double[] ROLL_PERCENTAGES = {0.0625, 0.25, 0.375, 0.25, 0.0625};
-    public static int LEVELS = 4;
+   //public static int LEVELS = 4;
 
     public static String p1 = "P1";
     public static String p2 = "P2";
@@ -63,23 +63,26 @@ public class Ai {
 
     public HashSet<String> getMoveTypes(Board board, String player, int[] currentPos, int[] futurePos) {
         int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
+        
+        Board tempBoard = board;
 
-        return board.move(move, player);
+        return tempBoard.move(move, player);
     }
 
-    public void createTree(int roll) {
-        root = new Node("max", 0);
+    public Node createTree(int roll) {
+        System.out.println("create tree");
+        Node root = new Node("max", 0);
+
+        int LEVELS = 4;
 
         List<Board> maxBoards = new ArrayList<>();
-        List<Board> minBoards = new ArrayList<>();
-        List<Integer> branches = new ArrayList<>();
-        List<Integer> scores = new ArrayList<>();
     
         List<int[]> maxCurrentMovablePositions = Game.getCurrentMovablePositions(p2, roll, Game.getCurrentBoard().identifyPieces(p2), Game.getCounter().getP2Counter());
-
+        System.out.println("current" + maxCurrentMovablePositions.size());
         List<int[]> maxFuturePositions = Game.getFuturePositions(p2, roll, maxCurrentMovablePositions);
+        System.out.println("future" + maxFuturePositions.size());
 
-            // calculates all possible boards after ai makes a move
+        // calculates all possible boards after ai makes a move
         for (int i = 0; i < maxFuturePositions.size(); i++) { 
             maxBoards.add(createTempBoard(Game.getCurrentBoard(), p2, maxCurrentMovablePositions.get(i), maxFuturePositions.get(i)));
         }
@@ -146,6 +149,8 @@ public class Ai {
             LEVELS--; // Decrement the number of levels
         }
 
+        return root;
+
     }
 
     public int[] getPos(int[] currentPos, int[] futurePos) { 
@@ -176,7 +181,7 @@ public class Ai {
             System.out.print("\t");
         }
 
-        System.out.println(node.getType() + ": " + node.getScore() + ": " + node.getMoves());
+        System.out.println(node.getType() + ": " + node.getScore() + ": " + node.getMoves() + ": " + Arrays.toString(node.getPos()));
         for (Node child : node.getChildren()) {
             printTree(child, level + 1);
         }
@@ -221,32 +226,31 @@ public class Ai {
 
     public Node filterChildren(double expectimax) {
         List<Node> children = this.root.getChildren();
-
+    
         List<Node> filteredChildren = children.stream()
-        .filter(child -> child.getScore() == expectimax)
-        .toList(); // Collect the filtered objects into a new ArrayList
-
-        for (Node c : filteredChildren) { //
-            System.out.println(c.getScore());
-        }
-
+                .filter(child -> child.getScore() == expectimax)
+                .toList();
+    
+        /* 
         List<Node> tempFilteredChildren = new ArrayList<>(filteredChildren);
-
-        for (String m : moves) {
-            for (Node child : tempFilteredChildren) {
-                if (child.getMoves().contains(m)) {
-                    System.out.println(m);
-                    System.out.println(child.getMoves().contains(m));
-                    filteredChildren = filteredChildren.stream()
-                            .filter(c -> c.getMoves().contains(m))
-                            .toList();
-                    break; // Break the inner loop after finding the first matching move
+    
+        while (tempFilteredChildren.size() > 1) {
+            for (String m : moves) {
+                filteredChildren = tempFilteredChildren.stream()
+                        .filter(child -> child.getMoves().contains(m))
+                        .toList();
+    
+                if (!filteredChildren.isEmpty()) {
+                    // Update tempFilteredChildren for the next iteration
+                    tempFilteredChildren = new ArrayList<>(filteredChildren);
+                    break; // Break the loop after finding the first matching move
                 }
             }
-        }
+        } */
     
-        return filteredChildren.size() > 0 ? filteredChildren.get(0) : null; // Return the first child, or null if none found
-        
+        return filteredChildren.size() > 0 ? filteredChildren.get(0) : null;
+    }
+    
             
 
         /* 
@@ -283,7 +287,6 @@ public class Ai {
                     // TAKE CHIP --> closest
             } */
         
-    }
 
     public void speedy(List<Node> filteredChildren) {
         

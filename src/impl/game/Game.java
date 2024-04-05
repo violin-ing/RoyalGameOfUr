@@ -73,10 +73,12 @@ public class Game {
                 rollAmount = dice.roll();
                 gui.editP2Roll(rollAmount);
                 if (rollAmount!=0) {
-                    ai.createTree(rollAmount);
+                    Node root = ai.createTree(rollAmount);
+                    ai.setRoot(root);
+                    
                     double expectimax = ai.expectiminimax(ai.getRoot(), "max");
-                    ai.printTree(ai.getRoot(), 1);
                     ai.getRoot().setScore(expectimax);
+                    ai.printTree(ai.getRoot(), 1);
                     Node bestChild = ai.filterChildren(expectimax);
                     move = bestChild.getPos();
                     System.out.println(Arrays.toString(move));
@@ -228,9 +230,6 @@ public class Game {
                     checkTileAfter = (checkTileAfter - 4); // Position on new strip
                     strip = ("P1".equals(player)) ? 0 : 2;
             }
-            if (checkTileAfter > 5) {
-                checkTileAfter = 6;
-            }
         } else {
             checkTileAfter = movePosition + roll;
             if (movePosition>=4) {
@@ -282,7 +281,7 @@ public class Game {
             }
         }
 
-        if (strip != 1 && checkTileAfter == 6) {
+        if (strip == 1) {
                 if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
                     String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
                     if (currentBoard.getBoardStrip(strip)[checkTileAfter].getChip().getOwnership().equals("none")) {

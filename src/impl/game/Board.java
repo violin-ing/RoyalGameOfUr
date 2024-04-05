@@ -67,7 +67,7 @@ public class Board {
         boolean removedChip = false;
         HashSet<String> moveType = new HashSet<>();
         
-        // if statment sets up tile we are moving from and to.
+        // if statment sets up tile we are moving fro m and to.
         // this will also check if we are adding a chip to the board / or removing one (scoring).
         if (moveChoice[1]==-1) {
             movingFromTile = null;
