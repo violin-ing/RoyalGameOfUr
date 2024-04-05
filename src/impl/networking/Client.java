@@ -153,7 +153,7 @@ public class Client {
                                                        myTurn = true;
                                                   } 
 
-                                                  currentBoard.move(move, "P2");
+                                                  currentBoard.move(move, "P2",true);
 
                                                   gui.updateBoard(currentBoard);
                                                   gui.updateScore(counter);

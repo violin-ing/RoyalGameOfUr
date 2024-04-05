@@ -3,7 +3,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
-// TODO: make interface for frame
 // render this on a new thread 
 public class GameStartGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
