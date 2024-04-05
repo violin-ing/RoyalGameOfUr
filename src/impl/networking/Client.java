@@ -197,11 +197,9 @@ public class Client {
                                              }  
                                         }
                                         rollPressed = false;
-          
-                                        System.out.println("TEST: Testing rolling functionality");
+                                        
                                         int diceNum = rollAmount;
-                                        System.out.println(rollAmount);
-          
+                        
                                         String diceRoll = Integer.toString(diceNum);
                                         packetBuilder.append(diceRoll);
      
