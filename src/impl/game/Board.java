@@ -103,90 +103,6 @@ public class Board implements Cloneable {
      * @param player The player making the move.
      * @return A HashSet<String> indicating the types of move made (e.g., "WIN", "STACK", "MOVE").
      */
-    public HashSet<String> move(int[] moveChoice, String player) {
-        Tile movingFromTile;
-        Tile movingToTile;
-        boolean addedChip  = false;
-        boolean removedChip = false;
-        HashSet<String> moveType = new HashSet<>();
-        
-        // if statment sets up tile we are moving fro m and to.
-        // this will also check if we are adding a chip to the board / or removing one (scoring).
-        if (moveChoice[1]==-1) {
-            movingFromTile = null;
-            movingToTile = board[moveChoice[2]][moveChoice[3]];
-            addedChip = true;
-        } else if((moveChoice[2]==0  || moveChoice[2]==2) && moveChoice[3]==6) {
-            movingToTile = null;
-            movingFromTile = board[moveChoice[0]][moveChoice[1]];
-            removedChip = true;
-        } else {
-            movingFromTile = board[moveChoice[0]][moveChoice[1]];
-            movingToTile = board[moveChoice[2]][moveChoice[3]];
-        }
-
-        if (removedChip) {
-            // clear from tile
-            // add tile amount to score
-            counter.increasePlayerScore(player, movingFromTile.getChip().getAmn());
-            moveType.add("WIN");
-            // CLEAR TILE AFTER
-        } else if(addedChip){
-            // increase value of tile we are moving to, and check if we are on a rosetta tile
-            // if we are on a rosetta give player another turn
-            movingToTile.getChip().increaseAmn(1);
-            movingToTile.getChip().setOwnership(player);
-            moveType.add("ADD CHIP");
-
-            if (movingToTile.isRosetta()) {
-                // this has the effect of giving the player another turn.
-                counter.getPlayerTurn();
-                moveType.add("ROSETTA");
-            }
-            // decrement the counter value for player
-            counter.reduceCounter(player);
-        } else {
-            // if chip is our own;
-            // increase stack amount
-            // check if this is a rosetta tile
-            // MOVING TO OWN TILE
-            if (movingToTile.getChip().getOwnership().equals(player)) {
-                movingToTile.getChip().increaseAmn(movingFromTile.getChip().getStackAmount());
-                moveType.add("STACK");
-            } else {
-                // MOVING TO ENEMY TILE
-                String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
-                if (movingToTile.getChip().getOwnership().equals(enemyPlayer)) {
-                    counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
-                    moveType.add("TAKE CHIP");
-                }
-                // IF MOVING TO EMPTY TILE WE DO THIS ASWELL
-                movingToTile.getChip().setOwnership(player);
-                movingToTile.getChip().setAmn(movingFromTile.getChip().getAmn());
-                moveType.add("MOVE");
-            }
-            // give player another turn if this is a rosetta.
-            if (movingToTile.isRosetta()) {
-                counter.getPlayerTurn();
-                moveType.add("ROSETTA");
-            }
-        }
-        if (!addedChip) {
-            // clear the previous tile.
-            movingFromTile.getChip().setOwnership("none");
-            movingFromTile.getChip().setAmn(0);
-        }
-        return moveType;
-    }
-
-    /**
-     * Overloaded move method that also considers whether to change the player's turn after the move.
-     * 
-     * @param moveChoice An array representing the move (from strip, from position, to strip, to position).
-     * @param player The player making the move.
-     * @param changePlayer A boolean indicating whether to change the player's turn after the move.
-     * @return A HashSet<String> indicating the types of move made (e.g., "WIN", "STACK", "MOVE").
-     */
     public HashSet<String> move(int[] moveChoice, String player, boolean changePlayer) {
         Tile movingFromTile;
         Tile movingToTile;
@@ -224,7 +140,7 @@ public class Board implements Cloneable {
             movingToTile.getChip().setOwnership(player);
             moveType.add("ADD CHIP");
 
-            if (movingToTile.isRosetta() && changePlayer) {
+            if (movingToTile.isRosetta()) {
                 // this has the effect of giving the player another turn.
                 if (changePlayer) {
                     counter.getPlayerTurn();
@@ -248,7 +164,7 @@ public class Board implements Cloneable {
                 String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
                 if (movingToTile.getChip().getOwnership().equals(enemyPlayer)) {
                     if (changePlayer) {
-                        counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());
+                        counter.increaseCounter(enemyPlayer, movingToTile.getChip().getStackAmount());  
                     }
                     moveType.add("TAKE CHIP");
                 }
@@ -258,8 +174,10 @@ public class Board implements Cloneable {
                 moveType.add("MOVE");
             }
             // give player another turn if this is a rosetta.
-            if (movingToTile.isRosetta() && changePlayer) {
-                counter.getPlayerTurn();
+            if (movingToTile.isRosetta()) {
+                if (changePlayer) {
+                    counter.getPlayerTurn();
+                }
                 moveType.add("ROSETTA");
             }
         }
@@ -268,7 +186,6 @@ public class Board implements Cloneable {
             movingFromTile.getChip().setOwnership("none");
             movingFromTile.getChip().setAmn(0);
         }
-
         return moveType;
     }
 
