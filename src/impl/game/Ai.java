@@ -53,14 +53,17 @@ public class Ai {
     public HashSet<String> getMoveTypes(Board board, String player, int[] currentPos, int[] futurePos) {
         int[] move = IntStream.concat(Arrays.stream(currentPos), Arrays.stream(futurePos)).toArray();
         
+
         Board tempBoard = new Board(board);
 
-
         System.out.println("board");
-        System.out.println(board);
-        System.out.println(tempBoard);
+
+        System.out.println(board.getBoard());
+        System.out.println(tempBoard.getBoard());
 
         return tempBoard.move(move, player, false);
+
+
     }
 
     public Node createTree(int roll) {
