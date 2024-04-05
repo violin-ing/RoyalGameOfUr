@@ -254,12 +254,12 @@ public class GameGUI extends JFrame {
     }
 
     public void updateSelectableTiles(List<int[]> currentMovable, List<int[]> futureMovable) {
-        System.out.println("Number of moves: " + currentMovable.size());
-        System.out.println("Number of future moves: " + futureMovable.size());
+        // System.out.println("Number of moves: " + currentMovable.size());
+        // System.out.println("Number of future moves: " + futureMovable.size());
         for (int i = 0; i < currentMovable.size(); i++) {
             // if current movable is -1. make sure to print token there
             // add token image if you can add a token to the screen
-            System.out.println("updating selectable tiles");
+            // System.out.println("updating selectable tiles");
             if (currentMovable.get(i)[1]==-1) {
                 componentsArray[currentMovable.get(i)[0]][4].updateImage(1, player,true);
             }
@@ -268,7 +268,8 @@ public class GameGUI extends JFrame {
             int[] futureMovePos = getButtonArrayPosition(futureMovable.get(i));
 
             buttonArray[currentMovePos[0]][currentMovePos[1]].setButtonSelectable();
-            System.out.println("Set button selectable");
+            // System.out.println("At position: " + currentMovePos[0] + " " + currentMovePos[1]);
+            // System.out.println("From move position in original grid: " + currentMovable.get(i)[0] + " " + currentMovable.get(i)[1]);
             // make sure the future position and position of the future path are stored correctly.
             buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveFromLocation(currentMovable.get(i)[0], currentMovable.get(i)[1]);
             buttonArray[currentMovePos[0]][currentMovePos[1]].setMoveToLocation(futureMovable.get(i)[0], futureMovable.get(i)[1]);

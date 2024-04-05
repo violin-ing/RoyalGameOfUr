@@ -174,29 +174,24 @@ public class Game {
     public static List<int[]> getCurrentMovablePositions(String player, int roll, List<int[]> currentPositions, int tileCounter) {
         List<int[]> currentMovablePositions = new ArrayList<>();
         int[] stringPos = new int[2];
-
         for (int[] stripAndPos : currentPositions) {
-            System.out.println("1 chip");
             if (isMoveable(player, roll, stripAndPos[1], stripAndPos[0])) {
-                System.out.println("1 move");
                 currentMovablePositions.add(stripAndPos);
             }
         }
         // this will add a possible move for a player to move a token onto the board.
         if (player.equals("P1")) {
-            System.out.println("1 chip");
             if (tileCounter != 0) {
-                System.out.println("1 move");
                 stringPos[0] = 0;
                 stringPos[1] = -1;
+                System.out.println(stringPos[0] + " " + stringPos[1]);
                 currentMovablePositions.add(stringPos);
             }
         } else {
-            System.out.println("1 chip");
             if (tileCounter !=0 ) {
-                System.out.println("1 move");
                 stringPos[0] = 2;
                 stringPos[1] = -1;
+                System.out.println(stringPos[0] + " " + stringPos[1]);
                 currentMovablePositions.add(stringPos);
             }
         }

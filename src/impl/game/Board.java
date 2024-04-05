@@ -67,7 +67,7 @@ public class Board {
         boolean removedChip = false;
         HashSet<String> moveType = new HashSet<>();
         
-        // if statment sets up tile we are moving from and to.
+        // if statment sets up tile we are moving fro m and to.
         // this will also check if we are adding a chip to the board / or removing one (scoring).
         if (moveChoice[1]==-1) {
             movingFromTile = null;
@@ -139,13 +139,14 @@ public class Board {
 
     public List<int[]> identifyPieces(String player) {
         List<int[]> pieces = new ArrayList<>();
-        int[] stripPos = new int[2];
 
         for (int i = 0; i < 3; i++) {
             for (Tile tile : this.board[i]) {
                 if (tile.getChip().getOwnership().equals(player)) {
+                    int[] stripPos = new int[2];
                     stripPos[0] = i;
                     stripPos[1] = tile.getPos();
+                    System.out.println(stripPos[0] + " " + stripPos[1]);
                     pieces.add(stripPos);
                 }    
             }
