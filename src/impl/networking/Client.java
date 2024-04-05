@@ -143,7 +143,7 @@ public class Client {
                                                        myTurn = true;
                                                   } 
 
-                                                  currentBoard.move(move, "P2");
+                                                  currentBoard.move(move, "P2",true);
 
                                                   // System.out.println("hello there 1");
 
@@ -240,7 +240,7 @@ public class Client {
                                                        .mapToInt(Integer::parseInt)
                                                        .toArray();
           
-                                                  currentBoard.move(move, "P1");
+                                                  currentBoard.move(move, "P1",true);
                                                   System.out.println("update the board");
           
                                                   SwingUtilities.invokeLater(new Runnable() {
