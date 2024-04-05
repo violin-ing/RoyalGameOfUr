@@ -104,14 +104,13 @@ public class Client {
                                         String opponentPkt = in.readLine();
                                         if (opponentPkt != null) {
                                              System.out.println("from opponent: " + opponentPkt);
-                                             String[] info = opponentPkt.split(",");
-                                             for (String x : info) System.out.print("info array: " + x + " ");
-                                             if (info.length == 2) {
+                                             String[] infoPkt = opponentPkt.split(",");
+                                             if (infoPkt.length == 2) {
                                                   System.out.println("\ninfo length = 2");
                                                   myTurn = true;
-                                             } else if (info.length == 6) {
+                                             } else if (infoPkt.length == 6) {
                                                   System.out.println("\ninfo length = 6");
-                                                  String rosetta = info[5];
+                                                  String rosetta = infoPkt[5];
 
                                                   if ("true".equals(rosetta)) {
                                                        myTurn = false;
@@ -120,7 +119,7 @@ public class Client {
                                                   }
 
                                                   // Stream packet array into a usable int[] array
-                                                  String[] moveStr = {info[1], info[2], info[3], info[4]};
+                                                  String[] moveStr = {infoPkt[1], infoPkt[2], infoPkt[3], infoPkt[4]};
                                                   int[] move = new int[4];
 
                                                   move[1] = Integer.parseInt(moveStr[1]);
@@ -172,7 +171,136 @@ public class Client {
                                         e.printStackTrace();
                                    }
                               } else {
-                                   continue;
+                                   if (myTurn) {
+                                        gui.changePlayerTurn("P1");
+                                        
+                                        rollPressed = false;
+                                        moveSelected = false;
+                                        myTurn = false;
+          
+                                        boolean rosetta = false;
+                                        do {
+                                             StringBuffer packetBuilder = new StringBuffer();
+          
+                                             while (!rollPressed) {
+                                                  try {
+                                                       wait();
+                                                  } catch (Exception e) {
+                                                       // IGNORE
+                                                  }  
+                                             }
+                                             rollPressed = false;
+               
+                                             System.out.println("TEST: Testing rolling functionality");
+                                             int diceNum = rollAmount;
+                                             System.out.println(rollAmount);
+               
+                                             String diceRoll = Integer.toString(diceNum);
+                                             packetBuilder.append(diceRoll);
+          
+                                             // System.out.println("diceNum String = " + diceRoll);
+          
+                                             if (diceNum == 0) {
+                                                  out.println("0,nil");
+                                                  System.out.println("sent nil packet");
+                                                  myTurn = false;
+                                                  rosetta = false;
+                                                  rollPressed = false;
+                                                  continue;
+                                             } else {
+                                                  // System.out.println("diceNum = " + diceRoll);
+                                                  if (!availableMoves("P1", diceNum)) {
+                                                       System.out.println("no moves avail");
+                                                       packetBuilder.append(",nil");
+                                                       out.println(packetBuilder.toString());
+                                                       System.out.println("sent nil packet");
+                                                       rosetta = false;
+                                                       myTurn = false;
+                                                       rollPressed = false;
+                                                       continue;
+                                                  }
+                                                  // System.out.println("WAITING FOR MOVE");
+                                                  while (!moveSelected) {
+                                                       try {
+                                                            wait();
+                                                       } catch (Exception e) {
+                                                            // IGNORE
+                                                       }  
+                                                  }
+                                                  moveSelected = false;
+          
+                                                  int[] move = Arrays.stream(info)
+                                                       .limit(4)
+                                                       .mapToInt(Integer::parseInt)
+                                                       .toArray();
+          
+                                                  currentBoard.move(move, "P1");
+                                                  System.out.println("update the board");
+          
+                                                  SwingUtilities.invokeLater(new Runnable() {
+                                                       public void run() {
+                                                            gui.updateBoard(currentBoard);
+                                                            gui.updateScore(counter);
+                                                       }
+                                                   });
+          
+                                                  int newStrip = move[2];
+                                                  int newIndex = move[3];
+          
+                                                  // INFORMATION TO SEND:
+                                                  // 1. Chip's old position (strip + index)
+                                                  // 2. Chip's new position (strip + index)
+                                                  // 3. Rosetta boolean (of chip's new position)
+                                                  Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
+                                                  if (newTile.isRosetta()) {
+                                                       info[4] = "true";
+                                                       rosetta = true;
+                                                  } else {
+                                                       info[4] = "false";
+                                                       rosetta = false;
+                                                  }
+                                                  
+                                                  for (int i = 0; i < info.length; i++) {
+                                                       packetBuilder.append("," + info[i]);
+                                                  }
+                                                  out.println(packetBuilder.toString());
+                                                  System.out.println("sent move packet");
+                                                  System.out.println(packetBuilder.toString());
+                                                  // packetBuilder = {
+                                                  //      diceRoll, 
+                                                  //      oldStrip, 
+                                                  //      oldIndex, 
+                                                  //      newStrip, 
+                                                  //      newIndex, 
+                                                  //      "true"/"false"
+                                                  // }
+                                             }
+
+                                             if (rosetta) {
+                                                  myTurn = true;
+                                                  rosetta = true;
+                                                  rollPressed = false;
+                                                  continue;
+                                             }
+                                        } while (rosetta);
+          
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                             public void run() {
+                                                  gui.changePlayerTurn("P2");
+                                                  gui.disableP2();
+                                             }
+                                         });
+                                        
+                                        if (counter.getP1Score() >= 7) {
+                                             SwingUtilities.invokeLater(() -> {
+                                                  gui.closeFrame();
+                                             });
+                                             ClientWinGUI.display("You have won the game!");
+                                             // serverListener.interrupt();
+                                             heartbeatSender.interrupt();
+                                             return;
+                                        }
+                                   }
                               }
                          }
                     });
@@ -192,128 +320,136 @@ public class Client {
                     serverListener.start();
 
                     // Main thread deals with sending messages to server
-                    while (true) {
-                         if (myTurn) {
-                              gui.changePlayerTurn("P1");
+                    // while (true) {
+                    //      if (myTurn) {
+                    //           gui.changePlayerTurn("P1");
                               
-                              rollPressed = false;
-                              moveSelected = false;
-                              myTurn = false;
+                    //           rollPressed = false;
+                    //           moveSelected = false;
+                    //           myTurn = false;
 
-                              boolean rosetta = false;
-                              do {
-                                   StringBuffer packetBuilder = new StringBuffer();
+                    //           boolean rosetta = false;
+                    //           do {
+                    //                StringBuffer packetBuilder = new StringBuffer();
 
-                                   while (!rollPressed) {
-                                        try {
-                                             wait();
-                                        } catch (Exception e) {
-                                             // IGNORE
-                                        }  
-                                   }
-                                   rollPressed = false;
+                    //                while (!rollPressed) {
+                    //                     try {
+                    //                          wait();
+                    //                     } catch (Exception e) {
+                    //                          // IGNORE
+                    //                     }  
+                    //                }
+                    //                rollPressed = false;
      
-                                   System.out.println("TEST: Testing rolling functionality");
-                                   int diceNum = rollAmount;
-                                   System.out.println(rollAmount);
+                    //                System.out.println("TEST: Testing rolling functionality");
+                    //                int diceNum = rollAmount;
+                    //                System.out.println(rollAmount);
      
-                                   String diceRoll = Integer.toString(diceNum);
-                                   packetBuilder.append(diceRoll);
+                    //                String diceRoll = Integer.toString(diceNum);
+                    //                packetBuilder.append(diceRoll);
 
-                                   // System.out.println("diceNum String = " + diceRoll);
+                    //                // System.out.println("diceNum String = " + diceRoll);
 
-                                   if (diceNum == 0) {
-                                        out.println("0,nil");
-                                        System.out.println("sent nil packet");
-                                        myTurn = false;
-                                        rosetta = false;
-                                        continue;
-                                   } else {
-                                        // System.out.println("diceNum = " + diceRoll);
-                                        if (!availableMoves("P1", diceNum)) {
-                                             System.out.println("no moves avail");
-                                             packetBuilder.append(",nil");
-                                             out.println(packetBuilder.toString());
-                                             System.out.println("sent nil packet");
-                                             rosetta = false;
-                                             myTurn = false;
-                                             continue;
-                                        }
-                                        // System.out.println("WAITING FOR MOVE");
-                                        while (!moveSelected) {
-                                             try {
-                                                  wait();
-                                             } catch (Exception e) {
-                                                  // IGNORE
-                                             }  
-                                        }
-                                        moveSelected = false;
+                    //                if (diceNum == 0) {
+                    //                     out.println("0,nil");
+                    //                     System.out.println("sent nil packet");
+                    //                     myTurn = false;
+                    //                     rosetta = false;
+                    //                     continue;
+                    //                } else {
+                    //                     // System.out.println("diceNum = " + diceRoll);
+                    //                     if (!availableMoves("P1", diceNum)) {
+                    //                          System.out.println("no moves avail");
+                    //                          packetBuilder.append(",nil");
+                    //                          out.println(packetBuilder.toString());
+                    //                          System.out.println("sent nil packet");
+                    //                          rosetta = false;
+                    //                          myTurn = false;
+                    //                          continue;
+                    //                     }
+                    //                     // System.out.println("WAITING FOR MOVE");
+                    //                     while (!moveSelected) {
+                    //                          try {
+                    //                               wait();
+                    //                          } catch (Exception e) {
+                    //                               // IGNORE
+                    //                          }  
+                    //                     }
+                    //                     moveSelected = false;
 
-                                        int[] move = Arrays.stream(info)
-                                             .limit(4)
-                                             .mapToInt(Integer::parseInt)
-                                             .toArray();
+                    //                     int[] move = Arrays.stream(info)
+                    //                          .limit(4)
+                    //                          .mapToInt(Integer::parseInt)
+                    //                          .toArray();
 
-                                        currentBoard.move(move, "P1");
-                                        System.out.println("update the board");
+                    //                     currentBoard.move(move, "P1");
+                    //                     System.out.println("update the board");
 
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                             public void run() {
-                                                  gui.updateBoard(currentBoard);
-                                                  gui.updateScore(counter);
-                                             }
-                                         });
+                    //                     SwingUtilities.invokeLater(new Runnable() {
+                    //                          public void run() {
+                    //                               gui.updateBoard(currentBoard);
+                    //                               gui.updateScore(counter);
+                    //                          }
+                    //                      });
 
-                                        int newStrip = move[2];
-                                        int newIndex = move[3];
+                    //                     int newStrip = move[2];
+                    //                     int newIndex = move[3];
 
-                                        // INFORMATION TO SEND:
-                                        // 1. Chip's old position (strip + index)
-                                        // 2. Chip's new position (strip + index)
-                                        // 3. Rosetta boolean (of chip's new position)
-                                        Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
-                                        if (newTile.isRosetta()) {
-                                             info[4] = "true";
-                                             rosetta = true;
-                                        } else {
-                                             info[4] = "false";
-                                             rosetta = false;
-                                        }
+                    //                     // INFORMATION TO SEND:
+                    //                     // 1. Chip's old position (strip + index)
+                    //                     // 2. Chip's new position (strip + index)
+                    //                     // 3. Rosetta boolean (of chip's new position)
+                    //                     Tile newTile = currentBoard.getBoardStrip(newStrip)[newIndex];
+                    //                     if (newTile.isRosetta()) {
+                    //                          info[4] = "true";
+                    //                          rosetta = true;
+                    //                     } else {
+                    //                          info[4] = "false";
+                    //                          rosetta = false;
+                    //                     }
                                         
-                                        for (int i = 0; i < info.length; i++) {
-                                             packetBuilder.append("," + info[i]);
-                                        }
-                                        out.println(packetBuilder.toString());
-                                        System.out.println("sent move packet");
-                                        System.out.println(packetBuilder.toString());
-                                        // packetBuilder = {
-                                        //      diceRoll, 
-                                        //      oldStrip, 
-                                        //      oldIndex, 
-                                        //      newStrip, 
-                                        //      newIndex, 
-                                        //      "true"/"false"
-                                        // }
-                                   }
-                              } while (rosetta);
+                    //                     for (int i = 0; i < info.length; i++) {
+                    //                          packetBuilder.append("," + info[i]);
+                    //                     }
+                    //                     out.println(packetBuilder.toString());
+                    //                     System.out.println("sent move packet");
+                    //                     System.out.println(packetBuilder.toString());
+                    //                     // packetBuilder = {
+                    //                     //      diceRoll, 
+                    //                     //      oldStrip, 
+                    //                     //      oldIndex, 
+                    //                     //      newStrip, 
+                    //                     //      newIndex, 
+                    //                     //      "true"/"false"
+                    //                     // }
+                    //                }
+                    //           } while (rosetta);
 
-                              SwingUtilities.invokeLater(new Runnable() {
-                                   public void run() {
-                                        gui.changePlayerTurn("P2");
-                                        gui.disableP2();
-                                   }
-                               });
+                    //           SwingUtilities.invokeLater(new Runnable() {
+                    //                public void run() {
+                    //                     gui.changePlayerTurn("P2");
+                    //                     gui.disableP2();
+                    //                }
+                    //            });
                               
-                              if (counter.getP1Score() >= 7) {
-                                   SwingUtilities.invokeLater(() -> {
-                                        gui.closeFrame();
-                                   });
-                                   ClientWinGUI.display("You have won the game!");
-                                   serverListener.interrupt();
-                                   heartbeatSender.interrupt();
-                                   return;
-                              }
-                         }
+                    //           if (counter.getP1Score() >= 7) {
+                    //                SwingUtilities.invokeLater(() -> {
+                    //                     gui.closeFrame();
+                    //                });
+                    //                ClientWinGUI.display("You have won the game!");
+                    //                serverListener.interrupt();
+                    //                heartbeatSender.interrupt();
+                    //                return;
+                    //           }
+                    //      }
+                    // }
+
+                    while (true) {
+                         try {
+                              wait();
+                         } catch (Exception e) {
+                              // IGNORE
+                         }  
                     }
                } catch (Exception e) {
                     e.printStackTrace();
