@@ -73,10 +73,12 @@ public class Game {
                 rollAmount = dice.roll();
                 gui.editP2Roll(rollAmount);
                 if (rollAmount!=0) {
-                    ai.createTree(rollAmount);
+                    Node root = ai.createTree(rollAmount);
+                    ai.setRoot(root);
+                    
                     double expectimax = ai.expectiminimax(ai.getRoot(), "max");
-                    ai.printTree(ai.getRoot(), 1);
                     ai.getRoot().setScore(expectimax);
+                    ai.printTree(ai.getRoot(), 1);
                     Node bestChild = ai.filterChildren(expectimax);
                     move = bestChild.getPos();
                     System.out.println(Arrays.toString(move));
