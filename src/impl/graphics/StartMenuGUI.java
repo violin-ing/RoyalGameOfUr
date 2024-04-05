@@ -3,14 +3,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
-// render this on a new thread 
+
+/**
+ * StartMenuGUI start menu to select player options (multiplayer, local multiplayer, or singleplayer)
+ */
 public class StartMenuGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
     private static final int WINDOWHEIGHT = 800;
-    public static void main(String[] args) {
-        new StartMenuGUI();
-    }
-
+    /**
+     * StartMenuGUI consturctor, intilises display options.
+     */
     public StartMenuGUI() {
         addComponents();
         this.setLayout(null);
@@ -20,7 +22,11 @@ public class StartMenuGUI extends JFrame {
         this.setTitle("Royal Game of Ur");
         setVisible(true);
     }
-
+    /**
+     * closes the frame, and starts a GameStartGUI window.
+     * @param muliplayer takes in boolean multiplayer if it was selected
+     * @param network takes in boolean network if selected.
+     */
     public void initialiseGameStart(boolean muliplayer, boolean network) {
         closeFrame();
         System.out.println(muliplayer + " SELECTED");
@@ -31,7 +37,9 @@ public class StartMenuGUI extends JFrame {
         });
         // pass some params somewhere if muliplayers (would also change UI)
     }
-
+    /**
+     * adds all swing components to the screen, this includes the Singleplayer, Multiplayer options.
+     */
     public void addComponents() {
         JButton startSingleButton = new JButton("Singleplayer");
         JButton startMultiButton = new JButton("Multiplayer (Local)");
@@ -46,7 +54,12 @@ public class StartMenuGUI extends JFrame {
         this.add(startMultiButton);
         this.add(startNetwkButton);
     }
-
+    /**
+     * adds actionlisteners to buttons to start game and change multiplayer and network options.
+     * @param button
+     * @param muliplayer
+     * @param network
+     */
     public void addStartButtonAction(JButton button,boolean muliplayer, boolean network) {
         button.addActionListener(new ActionListener(){
             @Override
@@ -55,7 +68,9 @@ public class StartMenuGUI extends JFrame {
             }
         });
     }
-
+    /**
+     * closes the frame once option has been selected.
+     */
     public void closeFrame() {
         this.setVisible(false);
         this.dispose();

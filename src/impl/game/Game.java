@@ -83,7 +83,6 @@ public class Game {
                     Board saveBoard = new Board(currentBoard);
                     Node root = ai.createTree(rollAmount);
                     ai.setRoot(root);
-                    
                     double expectimax = ai.expectiminimax(ai.getRoot(), "max");
                     ai.getRoot().setScore(expectimax);
                     ai.printTree(ai.getRoot(), 1);

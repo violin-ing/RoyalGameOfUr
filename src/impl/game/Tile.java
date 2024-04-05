@@ -49,5 +49,4 @@ public class Tile {
     public void setRosetta() {
         this.rosetta = true;
     }
-    
 }

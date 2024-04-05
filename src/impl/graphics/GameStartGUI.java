@@ -3,28 +3,41 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
-// render this on a new thread 
+
+/**
+ * Represents the graphical user interface for starting the game.
+ * Extends JFrame to create the game start window.
+ */
 public class GameStartGUI extends JFrame {
     private static final int WINDOWWIDTH = 500;
     private static final int WINDOWHEIGHT = 500;
-    private boolean muliplayer, network;
-    private static Counter counter = new Counter();
-    private static Board currentBoard = new Board(counter);
-    private static Dice dice = new Dice();
-    public static GameGUI gameGUI;
+    private boolean multiplayer; // Flag indicating if multiplayer mode is selected
+    private boolean network; // Flag indicating if network mode is selected
+    private static Counter counter = new Counter(); // Counter object for game state
+    private static Board currentBoard = new Board(counter); // Board object for the current game board
+    private static Dice dice = new Dice(); // Dice object for dice rolling
+    public static GameGUI gameGUI; // GameGUI object for game interface
 
-    public GameStartGUI(boolean muliplayer, boolean network) {
-        this.muliplayer = muliplayer;
+    /**
+     * Constructs a GameStartGUI object with specified multiplayer and network mode settings.
+     * @param multiplayer Indicates if multiplayer mode is selected.
+     * @param network Indicates if network mode is selected.
+     */
+    public GameStartGUI(boolean multiplayer, boolean network) {
+        this.multiplayer = multiplayer;
         this.network = network;
         addComponents();
         this.setLayout(null);
-        this.setSize(new Dimension(WINDOWWIDTH,WINDOWHEIGHT));
+        this.setSize(new Dimension(WINDOWWIDTH, WINDOWHEIGHT));
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Royal Game of Ur");
         setVisible(true);
     }
 
+    /**
+     * Starts the game based on the selected mode.
+     */
     public void startGame() {
         if (network) {
             Counter counter = new Counter();
@@ -41,7 +54,7 @@ public class GameStartGUI extends JFrame {
             counter = new Counter();
             currentBoard = new Board(counter);
             dice = new Dice();
-            Game game = new Game(currentBoard, counter, dice, muliplayer);
+            Game game = new Game(currentBoard, counter, dice, multiplayer);
             GameGUI gui = new GameGUI(game);
             game.setGameGUI(gui);
             Thread gamThread = new Thread(() -> {
@@ -51,18 +64,21 @@ public class GameStartGUI extends JFrame {
         }
     }
 
+    /**
+     * Adds components to the game start window.
+     */
     public void addComponents() {
         JButton startButton = new JButton("Start Game");
         JLabel option = new JLabel();
-        if (muliplayer) {
+        if (multiplayer) {
             option.setText("Multiplayer (Local) Selected");
         } else if (network) {
             option.setText("Multiplayer (Network) Selected");
         } else {
-            option.setText("Singleplayer Selected");;
+            option.setText("Singleplayer Selected");
         }
-        option.setBounds((WINDOWWIDTH/2)-100, WINDOWHEIGHT/2-100, 200, 100);
-        startButton.setBounds((WINDOWWIDTH/2)-100,WINDOWHEIGHT/2,200,100);
+        option.setBounds((WINDOWWIDTH / 2) - 100, WINDOWHEIGHT / 2 - 100, 200, 100);
+        startButton.setBounds((WINDOWWIDTH / 2) - 100, WINDOWHEIGHT / 2, 200, 100);
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -72,7 +88,7 @@ public class GameStartGUI extends JFrame {
                         startGame();
                         return null;
                     }
-        
+
                     @Override
                     protected void done() {
                         // Close the start frame after the background task completes
@@ -85,6 +101,9 @@ public class GameStartGUI extends JFrame {
         this.add(option);
     }
 
+    /**
+     * Closes the game start window.
+     */
     public void closeFrame() {
         this.setVisible(false);
         this.dispose();
