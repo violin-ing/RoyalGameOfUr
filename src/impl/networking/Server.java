@@ -4,10 +4,11 @@ import java.io.PrintWriter;
 import java.net.*;
 
 /**
- * The {@code Server} class represents a server for a multiplayer game.
- * It listens for connections from players, pairs them up, and starts their game sessions.
- * This server broadcasts its IP address and waits for players to connect on a specified port.
- * Once two players have connected, it matches them together and initiates a game session.
+ * Represents a server in a multiplayer game environment. This server is responsible for
+ * broadcasting its IP address to potential clients and handling incoming player connections.
+ * It pairs connected players into game sessions and manages the initiation of these game sessions.
+ * The server listens on a specified port for player connections and continues to accept and pair
+ * players as they connect.
  */
 public class Server {
      public static final int DEFAULT_PORT = 6969; // Default port number for server
@@ -15,20 +16,22 @@ public class Server {
      private ServerSocket serverSocket;
 
      /**
-      * Constructs a new {@code Server} that listens for player connections on the given port.
-      * Upon instantiation, it starts broadcasting the server's IP address and listens for player connections.
-      * When two players connect, it pairs them and starts a new game session.
-      * 
-      * @param port The port number on which the server will listen for connections.
-      */
+     * Constructs a new Server instance that listens for incoming player connections on the specified port.
+     * Upon instantiation, this server starts a separate thread to broadcast its IP address to potential clients.
+     * It then continuously listens for player connections, pairs connected players, and initiates their game sessions.
+     * 
+     * @param port The port number on which the server will listen for incoming connections.
+     */
      public Server(int port) {
           try {
-               // Start broadcasting server IP address
+               // Start a thread to broadcast the server's IP address
                System.out.println("Server: Broadcasting IP address...");
                new Thread(new BroadcastServer()).start();
 
+                // Initialize the server socket to listen for connections
                serverSocket = new ServerSocket(port);
 
+               // Continuously listen for player connections and pair them into game sessions
                while (true) {
                     System.out.println("Server: Listening for player connections...");
                     Socket player1 = serverSocket.accept();
@@ -47,6 +50,7 @@ public class Server {
 
                               Thread.sleep(1000); // Ensure that clients receive the matchfound message
 
+                              // Initialize and start the game session for the paired players
                               GameSession gameSession = new GameSession(player1, player2);
                               gameSession.connectionInit();
 
@@ -63,11 +67,11 @@ public class Server {
      }
 
      /**
-      * The entry point of the server application.
-      * It creates an instance of {@code Server} using the {@code DEFAULT_PORT}.
-      * 
-      * @param args Command line arguments (not used).
-      */
+     * The main method and the entry point of the server application.
+     * It creates a server instance that listens for player connections on the {@code DEFAULT_PORT}.
+     * 
+     * @param args Command line arguments (not used).
+     */
      public static void main(String[] args) {
           new Server(DEFAULT_PORT);
      }
