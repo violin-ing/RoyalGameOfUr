@@ -254,7 +254,7 @@ public class Game {
      * @param stripPos int[] of length 2, the strip of the chip to be moved, and the position in strip it ends up.
      * @param player String player, current player.
      * @param roll int, the amount rolled by the player.
-     * @return returns an int[]
+     * @return returns an int[] with the strip position and position in the strip the chip ends up.
      */
     public static int[] newPosition(int[] stripPos, String player, int roll) {
         int[] newPos = new int[2];
@@ -288,10 +288,16 @@ public class Game {
         return newPos;
     }
 
-    // will return -1 if this chip cannot be moved, otherwise will return the postion and strip it will be moved to.
+    /**
+     * checks if a particular chip can be moved for a player.
+     * @param player String player, current player.
+     * @param roll int, roll amount by player.
+     * @param movePosition int, the position the chip is moving from
+     * @param strip int, strip position the chip is moving from
+     * @return returns a boolean, true if a particular chip can be moved, and false if no.
+     */
     private static boolean isMoveable(String player, int roll, int movePosition, int strip) {
         // validiation of moves happens, here, so the above method can be simplified more easily.
-        
         int checkTileAfter;
         if (strip == 1) {
             checkTileAfter = movePosition + roll;
@@ -306,7 +312,6 @@ public class Game {
                     strip=1;
             }
         }
-
         if (strip == 1) {
                 if (currentBoard.getBoardStrip(strip)[checkTileAfter].isRosetta()) {
                     String enemyPlayer = "P1".equals(player) ? "P2" : "P1";
