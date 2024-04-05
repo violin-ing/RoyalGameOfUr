@@ -59,8 +59,8 @@ public class Chip {
     public String getOwnership() {return ownership;}
 
     /**
-     * 
-     * @return
+     * getAmn: getter for the amount of chips stacked.
+     * @return returns the amount of stacked chips
      */
     public int getAmn() {return amount;}
 }

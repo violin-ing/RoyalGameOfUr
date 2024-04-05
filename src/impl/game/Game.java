@@ -1,5 +1,7 @@
 import java.util.*;
 
+import javax.swing.border.Border;
+
 // General notes:
 // anywhere with a "system.out.println" message should be replaced with a call to the GUI to display the message, use general intuition to determine 
 
@@ -59,7 +61,7 @@ public class Game {
         if (!multiplayer) {
             gui.disableP2();
         }
-
+        
         while (true) {
             rollPressed = false;
             moveSelected = false;         
@@ -73,6 +75,7 @@ public class Game {
                 rollAmount = dice.roll();
                 gui.editP2Roll(rollAmount);
                 if (rollAmount!=0) {
+                    Board saveBoard = new Board(currentBoard);
                     Node root = ai.createTree(rollAmount);
                     ai.setRoot(root);
                     
@@ -82,6 +85,8 @@ public class Game {
                     Node bestChild = ai.filterChildren(expectimax);
                     move = bestChild.getPos();
                     System.out.println(Arrays.toString(move));
+                    currentBoard = new Board(saveBoard);
+                    // currentBoard = saveBoard;
                 }
             } else {
                 // players turn

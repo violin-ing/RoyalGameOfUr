@@ -237,7 +237,7 @@ public class Client {
                                                   .mapToInt(Integer::parseInt)
                                                   .toArray();
      
-                                             currentBoard.move(move, "P1");
+                                             currentBoard.move(move, "P1",true);
                                              System.out.println("update the board");
      
                                              SwingUtilities.invokeLater(new Runnable() {
