@@ -63,8 +63,13 @@ public class Board implements Cloneable {
      * 
      * @param board The Board object to copy.
      */
+    /* 
     public Board(Board board) {
         this.board = (Tile[][])board.getBoard().clone();
+    } */
+
+    public Board(Board board) {
+        this.board = board.getBoard();
     }
 
     @Override
