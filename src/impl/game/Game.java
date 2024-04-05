@@ -230,9 +230,6 @@ public class Game {
                     checkTileAfter = (checkTileAfter - 4); // Position on new strip
                     strip = ("P1".equals(player)) ? 0 : 2;
             }
-            if (checkTileAfter > 5) {
-                checkTileAfter = 6;
-            }
         } else {
             checkTileAfter = movePosition + roll;
             if (movePosition>=4) {
