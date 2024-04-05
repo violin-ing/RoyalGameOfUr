@@ -4,9 +4,9 @@ import javax.swing.JLabel;
 public class EndGameGUI extends JFrame{
 
     private String winningPlayer;
-    private final static int WINDOWHEIGHT = 450;
-    private final static int WINDOWWIDTH = 100;
-    
+    private final static int WINDOWHEIGHT = 100;
+    private final static int WINDOWWIDTH = 450;
+
     public EndGameGUI(String winningPlayer) {
         setTitle("Game Over");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
